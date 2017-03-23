@@ -1,4 +1,4 @@
-# S$\in$T
+# set
 
 <p align="center"><img src ="img/set-icon.png" style="width:500px"/></p>
 
