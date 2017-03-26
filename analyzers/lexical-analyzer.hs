@@ -19,7 +19,7 @@ difference (head:tail) = split (onSublist "!=") head ++ difference tail
 --
 belongs:: [String] -> [String]
 belongs [] = []
-belongs (head:tail) = split (onSublist ":e") head ++ belongs tail
+belongs (head:tail) = split (onSublist ":in") head ++ belongs tail
 
 --
 biggerThan:: [String] -> [String]
