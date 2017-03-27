@@ -1,23 +1,23 @@
- Lexical Analyzer
+-- Lexical Analyzer
 -- Version: 25/03/2017
 -- Author : Breno Viana
 module LexicalAnalyzer (analyzer) where
 
--- Imports https://hackage.haskell.org/package/split-0.2.3.1/docs/Data-List-Split.html
+-- Imports
 import Data.List
 import Data.List.Split
 
 
 
---block:: [String] -> [String]
---block [] = []
---block (head:tail) = split (dropInnerBlanks $ oneOf "{}();,") head ++ block tail
+block:: [String] -> [String]
+block [] = []
+block (head:tail) = split (dropInnerBlanks $ oneOf "{}();,") head ++ block tail
 
---blank:: [String] -> [String]
---blank [] = []
---blank (head:tail) = if head == " "
---        then blank tail
---        else head : blank tail
+blank:: [String] -> [String]
+blank [] = []
+blank (head:tail) = if head == " "
+        then blank tail
+        else head : blank tail
 
 --
 belongs:: String -> [String]
