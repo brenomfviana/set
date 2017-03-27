@@ -21,11 +21,15 @@ tokens :-
   real                                 { \s -> Type s}
   universal                            { \s -> Type s}
   text                                 { \s -> Type s}
-  :=                                   { \s -> Assign}
   if                                   { \s -> If}
-  >=                                   { \s -> Greater}
-  =                                    { \s -> Equality}
-  $digit+                              { \s -> Int (read s) }
+  func                                 { \s -> Function }
+  while                                { \s -> While }
+  :=                                   { \s -> Assign }
+  \in                                  { \s -> Belongs }
+  >=                                   { \s -> GreaterOrEqual }
+  >                                    { \s -> Greater }
+  =                                    { \s -> Equality }
+  $digit+                              { \s -> Int (read s) } -- Int or Natural?
   $alpha [$alpha $digit \_ \']*        { \s -> Id s }
   \" $alpha [$alpha $digit ! \_ \']* \"  { \s -> String s}
 
@@ -40,11 +44,15 @@ data Token =
   End     |
   Colon   |
   SemiColon |
-  Assign    | 
+  Assign    |
+  Function |
+  While |
   If  |
   Then |
   Write |
+  Belongs |
   Greater |
+  GreaterOrEqual |
   Type String |
   Id String |
   Int Int |

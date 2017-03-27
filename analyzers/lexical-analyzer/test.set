@@ -1,0 +1,7 @@
+program main
+A : set natural;
+x : natural;
+begin
+   x := 1;
+   if x :in A then write "ok!"
+end
