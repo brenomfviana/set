@@ -1,11 +1,23 @@
--- Lexical Analyzer
+ Lexical Analyzer
 -- Version: 25/03/2017
 -- Author : Breno Viana
 module LexicalAnalyzer (analyzer) where
 
--- Imports
+-- Imports https://hackage.haskell.org/package/split-0.2.3.1/docs/Data-List-Split.html
 import Data.List
 import Data.List.Split
+
+
+
+--block:: [String] -> [String]
+--block [] = []
+--block (head:tail) = split (dropInnerBlanks $ oneOf "{}();,") head ++ block tail
+
+--blank:: [String] -> [String]
+--blank [] = []
+--blank (head:tail) = if head == " "
+--        then blank tail
+--        else head : blank tail
 
 --
 belongs:: String -> [String]
@@ -40,4 +52,4 @@ equality (head:tail) =
 ---- Output: List with all lexemes of the program
 analyzer:: [String] -> [String]
 analyzer [] = []
-analyzer (head:tail) = equality(lessThan(biggerThan(difference(belongs(head))))) ++ analyzer(tail)
+analyzer (head:tail) = blank(block(equality(lessThan(biggerThan(difference(belongs(head))))))) ++ analyzer(tail)
