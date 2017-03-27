@@ -8,18 +8,13 @@ import Data.List
 import Data.List.Split
 
 --
-equality:: String -> [String]
-equality str = split (onSublist "=") str
+belongs:: String -> [String]
+belongs str = split (onSublist ":in") str
 
 --
 difference:: [String] -> [String]
 difference [] = []
 difference (head:tail) = split (onSublist "!=") head ++ difference tail
-
---
-belongs:: [String] -> [String]
-belongs [] = []
-belongs (head:tail) = split (onSublist ":in") head ++ belongs tail
 
 --
 biggerThan:: [String] -> [String]
@@ -31,10 +26,18 @@ lessThan:: [String] -> [String]
 lessThan [] = []
 lessThan (head:tail) = split (onSublist ">=") head ++ lessThan tail
 
+--
+equality:: [String] -> [String]
+equality [] = []
+equality (head:tail) =
+    if head /= "!=" && head /= "<=" && head /= ">="
+        then split (onSublist "=") head ++ equality tail
+        else head : equality tail
+
 
 -- Analyzes the code
 ---- Input : List with the words
 ---- Output: List with all lexemes of the program
 analyzer:: [String] -> [String]
 analyzer [] = []
-analyzer (head:tail) = lessThan(biggerThan(belongs(difference(equality(head))))) ++ analyzer(tail)
+analyzer (head:tail) = equality(lessThan(biggerThan(difference(belongs(head))))) ++ analyzer(tail)
