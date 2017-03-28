@@ -1,7 +1,16 @@
 program main
-A : set natural;
-x : natural;
-begin
-   x := 1;
-   if x :in A then write "ok!"
+A : natural;
+x : int;
+y : float;
+z : string;
+
+x := 1;
+y := 1.5;
+z := "Oi";
+
+if x \in A
+	print "Ok!";
+endif else
+	print "Not_ok!";
+endelse
 end

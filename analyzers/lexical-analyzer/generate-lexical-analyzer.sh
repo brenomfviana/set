@@ -7,4 +7,4 @@ echo "Compiling..."
 ghc lexical-analyzer.hs
 
 echo "Tokenizing program..."
-lexical-analyzer < $1
+./lexical-analyzer < $1
