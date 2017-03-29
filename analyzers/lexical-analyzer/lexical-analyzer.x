@@ -12,6 +12,7 @@ tokens :-
 
   $white+                              ;
   "--".*                               ;
+  \" [^\" \\]* \"                      { \s -> String s }
   program                              { \s -> Program }
   :                                    { \s -> Colon }
   ";"                                  { \s -> SemiColon }
@@ -58,14 +59,10 @@ tokens :-
   !                                    { \s -> Denial }
   =                                    { \s -> Equality }
   print                                { \s -> Print }
-  $digit+                                   { \s -> Int } -- Int or Natural?
-  $digit+.$digit+                           { \s -> Float } -- Float or Real?
-  $alpha [$alpha $digit \_ \']*             { \s -> Id s }
-  $alphaB [$alphaB $digit \_ \']*           { \s -> Set_Id s }
-  \" $alpha [$alpha $digit ! \_ \']* \"     { \s -> String s}
-  \" $alphaB [$alphaB $digit ! \_ \']* \"   { \s -> String s}
-  \" $alpha [$alphaB $digit ! \_ \']* \"    { \s -> String s}
-  \" $alphaB [$alpha $digit ! \_ \']* \"    { \s -> String s}
+  $digit+                              { \s -> Int (read s) } -- Int or Natural?
+  $digit+.$digit+                      { \s -> Float (read s) } -- Float or Real?
+  $alpha [$alpha $digit \_ \']*        { \s -> Id s }
+  $alphaB [$alphaB $digit \_ \']*      { \s -> Set_Id s }
 
 {
 -- Each action has type :: String -> Token
@@ -100,8 +97,8 @@ data Token =
   Type String       |
   Set_Id String     |
   Id String         |
-  Int               |
-  Float             |
+  Int Int           |
+  Float Float       |
   Empty_Set         |
   Intersection      |
   Union             |

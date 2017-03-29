@@ -11,6 +11,6 @@ z := "Oi";
 if x \in A
 	print "Ok!";
 endif else
-	print "Not_ok!";
+	print "Not * ok!";
 endelse
 end
