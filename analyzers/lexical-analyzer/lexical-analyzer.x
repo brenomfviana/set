@@ -5,8 +5,7 @@ module Main (main) where
 %wrapper "basic"
 
 $digit = 0-9      -- digits
-$alpha = [a-z]   -- alphabetic characters
-$alphaB = [A-Z]   -- big alphabetic characters
+$alpha = [a-zA-Z]   -- alphabetic characters
 
 tokens :-
 
@@ -26,6 +25,8 @@ tokens :-
   int                                  { \s -> Type s }
   float                                { \s -> Type s }
   string                               { \s -> Type s }
+  "set["                               { \s -> Set_of }
+  "]"                                  { \s -> End_Set_of }
   if                                   { \s -> If }
   endif                                { \s -> End_If }
   else                                 { \s -> Else }
@@ -62,7 +63,6 @@ tokens :-
   $digit+                              { \s -> Int (read s) } -- Int or Natural?
   $digit+.$digit+                      { \s -> Float (read s) } -- Float or Real?
   $alpha [$alpha $digit \_ \']*        { \s -> Id s }
-  $alphaB [$alphaB $digit \_ \']*      { \s -> Set_Id s }
 
 {
 -- Each action has type :: String -> Token
@@ -83,6 +83,8 @@ data Token =
   Equivalence       |
   Subset            |
   Complement        |
+  Set_of            |
+  End_Set_of        |
   If                |
   End_If            |
   Else              |
@@ -95,7 +97,6 @@ data Token =
   Denial            |
   Equality          |
   Type String       |
-  Set_Id String     |
   Id String         |
   Int Int           |
   Float Float       |
