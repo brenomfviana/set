@@ -1,16 +1,22 @@
 import Data.List
 
-type Number = Integer
-type Literal = [Char]
+type Name = [Char]
 
-data Type = Int | String | Bool | Float | Char deriving (Show)
-data Value = Number | Literal deriving (Show)
-type Name = Literal
+type Address = Int
+
+data Value = Int (Int) 
+            | String ([Char]) 
+            | Boolean (Bool) 
+            | Double (Double) 
+            | Float (Float) 
+            | Pointer (Address) deriving (Show)
+
+type Escope = [Char]
 
 
-type Symbol = (Name, Type, Number, String)
+type Symbol = (Name, Value, Escope)
 type SymbolTable = [Symbol]
 
 
-addSymbol :: (Name, Type, Number, String) -> [Symbol] -> [(Name, Type, Number, String)]
-addSymbol (a, b, c, d) symbols = symbols ++ [(a, b, c, d)]
+addSymbol :: Symbol -> SymbolTable -> SymbolTable
+addSymbol (a, b, c) symbols = symbols ++ [(a, b, c)]
