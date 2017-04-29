@@ -37,6 +37,7 @@ tokens :-
   while                                { \s -> While }
   endwhile                             { \s -> End_While }
   end                                  { \s -> End }
+  typedef                              { \s -> Typedef }
   :=                                   { \s -> Assign }
   "\in"                                { \s -> Belongs }
   "\cap"                               { \s -> Intersection }
@@ -90,6 +91,7 @@ data Token =
   Else              |
   Else_If           |
   End_Els           |
+  Typedef           |
   Greater           |
   GreaterOrEqual    |
   Smaller           |
