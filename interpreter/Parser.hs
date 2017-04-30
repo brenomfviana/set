@@ -6,11 +6,9 @@ module Parser where
 
 -- Imports
 import Data.List
-
+import Text.Parsec
 
 
 -- Parser
 parser :: [String] -> [String]
--- parser =
---    do
 -- Check program, declaration of variables,

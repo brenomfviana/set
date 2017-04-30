@@ -25,13 +25,17 @@ type Symbol = (Name, Value, Escope)
 -- Symbol table
 type SymbolTable = [Symbol]
 
+
 -- Add a symbol to symbol table
 addSymbol :: Symbol -> SymbolTable -> SymbolTable
 addSymbol (a, b, c) symbols = symbols ++ [(a, b, c)]
 
+
 -- Find symbol
 findSymbol :: SymbolTable -> Name -> Escope -> Symbol
-findSymbol [] _ _ = ("Not Found", "NF", "NULL") -- Error variable not found
+-- Error variable not found
+findSymbol [] _ _ = ("Not Found", "NF", "NULL")
+-- Searching variable
 findSymbol (head:tail) name escope = let (n, _, e) = head in
                                         if (name == n && escope == e) then head
                                         else findSymbol tail name escope
