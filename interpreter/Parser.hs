@@ -1,4 +1,4 @@
--- Syntax Analyzer
+-- Parser (Syntax Analyzer)
 -- Version: 30/04/2017
 -- Author : Breno Viana
 
