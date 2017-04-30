@@ -1,0 +1,16 @@
+program samplei
+    natural x = 2;
+    natural y = 3;
+    real z = 5.0;
+    if (y > x) then
+        x += y;
+    endif
+    if (y > x) then
+        x++;
+    endif
+    else
+        y += x*2;
+    endelse
+    print(x);
+    print(y);
+end
