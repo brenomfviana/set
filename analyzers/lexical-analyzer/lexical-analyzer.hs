@@ -1,6 +1,10 @@
+-- Syntax Analyzer
+-- Version: 28/04/2017
+-- Author : Raul Silva
+
 {-# OPTIONS_GHC -fno-warn-unused-binds -fno-warn-missing-signatures #-}
 {-# LANGUAGE CPP #-}
-{-# LINE 1 "lexical-analyzer.x" #-}
+{-# LINE 2 "lexical-analyzer.x" #-}
 
 module Main (main) where
 
@@ -230,7 +234,7 @@ alex_deflt :: Array Int Int
 alex_deflt = listArray (0,185) [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,28,28,-1,30,30,36,36,39,39,40,40,42,42,42,50,50,50,53,53,-1,-1,-1,-1,-1,-1,-1,-1,50,55,55,55,-1,55,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,42,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
 
 alex_accept = listArray (0::Int,185) [AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccSkip,AlexAccSkip,AlexAcc (alex_action_2),AlexAcc (alex_action_3),AlexAcc (alex_action_4),AlexAcc (alex_action_5),AlexAcc (alex_action_6),AlexAcc (alex_action_7),AlexAcc (alex_action_8),AlexAcc (alex_action_9),AlexAcc (alex_action_10),AlexAcc (alex_action_11),AlexAcc (alex_action_12),AlexAcc (alex_action_13),AlexAcc (alex_action_14),AlexAcc (alex_action_15),AlexAcc (alex_action_16),AlexAcc (alex_action_17),AlexAcc (alex_action_18),AlexAcc (alex_action_19),AlexAcc (alex_action_20),AlexAcc (alex_action_21),AlexAcc (alex_action_22),AlexAcc (alex_action_23),AlexAcc (alex_action_24),AlexAcc (alex_action_25),AlexAcc (alex_action_26),AlexAcc (alex_action_27),AlexAcc (alex_action_28),AlexAcc (alex_action_29),AlexAcc (alex_action_30),AlexAcc (alex_action_31),AlexAcc (alex_action_32),AlexAcc (alex_action_33),AlexAcc (alex_action_34),AlexAcc (alex_action_35),AlexAcc (alex_action_36),AlexAcc (alex_action_37),AlexAcc (alex_action_38),AlexAcc (alex_action_39),AlexAcc (alex_action_40),AlexAcc (alex_action_41),AlexAcc (alex_action_42),AlexAcc (alex_action_43),AlexAcc (alex_action_44),AlexAcc (alex_action_45),AlexAcc (alex_action_46),AlexAcc (alex_action_47),AlexAcc (alex_action_48),AlexAcc (alex_action_49),AlexAcc (alex_action_50),AlexAcc (alex_action_51),AlexAcc (alex_action_52),AlexAcc (alex_action_53),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54),AlexAcc (alex_action_54)]
-{-# LINE 68 "lexical-analyzer.x" #-}
+{-# LINE 69 "lexical-analyzer.x" #-}
 
 -- Each action has type :: String -> Token
 
@@ -287,59 +291,59 @@ main = do
   s <- getContents
   print (alexScanTokens s)
 
-alex_action_2 =  \s -> String s 
-alex_action_3 =  \s -> Program 
-alex_action_4 =  \s -> Colon 
-alex_action_5 =  \s -> SemiColon 
-alex_action_6 =  \s -> Comma 
-alex_action_7 =  \s -> Type s 
-alex_action_8 =  \s -> Type s 
-alex_action_9 =  \s -> Type s 
-alex_action_10 =  \s -> Type s 
-alex_action_11 =  \s -> Type s 
-alex_action_12 =  \s -> Type s 
-alex_action_13 =  \s -> Type s 
-alex_action_14 =  \s -> Type s 
-alex_action_15 =  \s -> Type s 
-alex_action_16 =  \s -> Set_of 
-alex_action_17 =  \s -> End_Set_of 
-alex_action_18 =  \s -> If 
-alex_action_19 =  \s -> End_If 
-alex_action_20 =  \s -> Else 
-alex_action_21 =  \s -> Else_If 
-alex_action_22 =  \s -> End_Els 
-alex_action_23 =  \s -> Function 
+alex_action_2 =  \s -> String s
+alex_action_3 =  \s -> Program
+alex_action_4 =  \s -> Colon
+alex_action_5 =  \s -> SemiColon
+alex_action_6 =  \s -> Comma
+alex_action_7 =  \s -> Type s
+alex_action_8 =  \s -> Type s
+alex_action_9 =  \s -> Type s
+alex_action_10 =  \s -> Type s
+alex_action_11 =  \s -> Type s
+alex_action_12 =  \s -> Type s
+alex_action_13 =  \s -> Type s
+alex_action_14 =  \s -> Type s
+alex_action_15 =  \s -> Type s
+alex_action_16 =  \s -> Set_of
+alex_action_17 =  \s -> End_Set_of
+alex_action_18 =  \s -> If
+alex_action_19 =  \s -> End_If
+alex_action_20 =  \s -> Else
+alex_action_21 =  \s -> Else_If
+alex_action_22 =  \s -> End_Els
+alex_action_23 =  \s -> Function
 alex_action_24 =  \s -> End_Function
-alex_action_25 =  \s -> While 
-alex_action_26 =  \s -> End_While 
-alex_action_27 =  \s -> End 
-alex_action_28 =  \s -> Typedef 
-alex_action_29 =  \s -> Assign 
-alex_action_30 =  \s -> Belongs 
-alex_action_31 =  \s -> Intersection 
-alex_action_32 =  \s -> Union 
-alex_action_33 =  \s -> Equivalence 
-alex_action_34 =  \s -> Subset 
-alex_action_35 =  \s -> Complement 
-alex_action_36 =  \s -> Empty_Set 
-alex_action_37 =  \s -> Open_Bracket 
-alex_action_38 =  \s -> Close_Bracket 
-alex_action_39 =  \s -> Open_Parentheses 
-alex_action_40 =  \s -> Close_Parentheses 
-alex_action_41 =  \s -> Multiplication 
-alex_action_42 =  \s -> Division 
-alex_action_43 =  \s -> Addition 
-alex_action_44 =  \s -> Subtraction 
-alex_action_45 =  \s -> GreaterOrEqual 
-alex_action_46 =  \s -> SmallerOrEqual 
-alex_action_47 =  \s -> Greater 
-alex_action_48 =  \s -> Smaller 
-alex_action_49 =  \s -> Denial 
-alex_action_50 =  \s -> Equality 
-alex_action_51 =  \s -> Print 
-alex_action_52 =  \s -> Int (read s) 
-alex_action_53 =  \s -> Float (read s) 
-alex_action_54 =  \s -> Id s 
+alex_action_25 =  \s -> While
+alex_action_26 =  \s -> End_While
+alex_action_27 =  \s -> End
+alex_action_28 =  \s -> Typedef
+alex_action_29 =  \s -> Assign
+alex_action_30 =  \s -> Belongs
+alex_action_31 =  \s -> Intersection
+alex_action_32 =  \s -> Union
+alex_action_33 =  \s -> Equivalence
+alex_action_34 =  \s -> Subset
+alex_action_35 =  \s -> Complement
+alex_action_36 =  \s -> Empty_Set
+alex_action_37 =  \s -> Open_Bracket
+alex_action_38 =  \s -> Close_Bracket
+alex_action_39 =  \s -> Open_Parentheses
+alex_action_40 =  \s -> Close_Parentheses
+alex_action_41 =  \s -> Multiplication
+alex_action_42 =  \s -> Division
+alex_action_43 =  \s -> Addition
+alex_action_44 =  \s -> Subtraction
+alex_action_45 =  \s -> GreaterOrEqual
+alex_action_46 =  \s -> SmallerOrEqual
+alex_action_47 =  \s -> Greater
+alex_action_48 =  \s -> Smaller
+alex_action_49 =  \s -> Denial
+alex_action_50 =  \s -> Equality
+alex_action_51 =  \s -> Print
+alex_action_52 =  \s -> Int (read s)
+alex_action_53 =  \s -> Float (read s)
+alex_action_54 =  \s -> Id s
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 {-# LINE 1 "<built-in>" #-}
@@ -453,7 +457,7 @@ alexScanUser user input (sc)
   = case alex_scan_tkn user input (0) input sc AlexNone of
         (AlexNone, input') ->
                 case alexGetByte input of
-                        Nothing -> 
+                        Nothing ->
 
 
 
@@ -482,13 +486,13 @@ alexScanUser user input (sc)
 
 alex_scan_tkn user orig_input len input s last_acc =
   input `seq` -- strict in the input
-  let 
+  let
         new_acc = (check_accs (alex_accept `quickIndex` (s)))
   in
   new_acc `seq`
   case alexGetByte input of
      Nothing -> (new_acc, input)
-     Just (c, new_input) -> 
+     Just (c, new_input) ->
 
 
 
@@ -497,7 +501,7 @@ alex_scan_tkn user orig_input len input s last_acc =
                 base   = alexIndexInt32OffAddr alex_base s
                 offset = (base + ord_c)
                 check  = alexIndexInt16OffAddr alex_check offset
-                
+
                 new_s = if (offset >= (0)) && (check == ord_c)
                           then alexIndexInt16OffAddr alex_table offset
                           else alexIndexInt16OffAddr alex_deflt s
@@ -553,16 +557,16 @@ type AlexAccPred user = user -> AlexInput -> Int -> AlexInput -> Bool
 alexAndPred p1 p2 user in1 len in2
   = p1 user in1 len in2 && p2 user in1 len in2
 
---alexPrevCharIsPred :: Char -> AlexAccPred _ 
+--alexPrevCharIsPred :: Char -> AlexAccPred _
 alexPrevCharIs c _ input _ _ = c == alexInputPrevChar input
 
 alexPrevCharMatches f _ input _ _ = f (alexInputPrevChar input)
 
---alexPrevCharIsOneOfPred :: Array Char Bool -> AlexAccPred _ 
+--alexPrevCharIsOneOfPred :: Array Char Bool -> AlexAccPred _
 alexPrevCharIsOneOf arr _ input _ _ = arr ! alexInputPrevChar input
 
 --alexRightContext :: Int -> AlexAccPred _
-alexRightContext (sc) user _ _ input = 
+alexRightContext (sc) user _ _ input =
      case alex_scan_tkn user input (0) input sc AlexNone of
           (AlexNone, _) -> False
           _ -> True
