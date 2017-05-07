@@ -42,7 +42,6 @@ tokens :-
   "\in"                                { \s -> Belongs }
   "\cap"                               { \s -> Intersection }
   "\cup"                               { \s -> Union }
-  "\equiv"                             { \s -> Equivalence }
   "\subset"                            { \s -> Subset }
   "\stcomp"                            { \s -> Complement }
   "\emptyset"                          { \s -> Empty_Set }
@@ -81,7 +80,6 @@ data Token =
   While             |
   End_While         |
   Belongs           |
-  Equivalence       |
   Subset            |
   Complement        |
   Set_of            |
