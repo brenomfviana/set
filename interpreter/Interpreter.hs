@@ -1,6 +1,7 @@
 -- Interpreter
--- Version: 30/04/2017
+-- Version: 09/05/2017
 -- Author : Breno Viana
+module Interpreter where
 
 -- Imports
 import System.Environment
@@ -14,11 +15,11 @@ import LexicalAnalyzer
 main :: IO
 main = do
     -- Get arguments
-    args <- getArgs
-    -- Interprets each file
-    set args
+    filesPath <- listOfStringsToFilePath getArgs
+    -- Interprets the file
+    set filesPath
 
--- Interpret each file
+-- Interpret the file
 set :: [FilePath] -> (Bool, [String])
 set [] = (False, [])
 set (head:tail) =
@@ -37,3 +38,8 @@ set (head:tail) =
 interpret :: String -> (Bool, [String])
 interpret [] = (False, [])
 interpret code = analyzer(code)
+
+-- Convert
+listOfStringsToFilePath :: [String] -> [FilePath]
+listOfStringsToFilePath [] = []
+listOfStringsToFilePath (head:tail) = decodeString head : listOfStringsToFilePath tail
