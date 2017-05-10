@@ -19,6 +19,7 @@ main = do
     -- Interprets the file
     set filesPath
 
+
 -- Interpret the file
 set :: [FilePath] -> (Bool, [String])
 set [] = (False, [])
@@ -34,10 +35,12 @@ set (head:tail) =
         -- Error message
         else putStrLn "ERROR: File does not exist."
 
+
 -- Interprets the code
 interpret :: String -> (Bool, [String])
 interpret [] = (False, [])
 interpret code = analyzer(code)
+
 
 -- Convert
 listOfStringsToFilePath :: [String] -> [FilePath]
