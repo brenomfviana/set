@@ -1,6 +1,6 @@
 # set
 
-<p align="center"><img src ="img/set-icon.png" style="width:500px"/></p>
+<p align="center"><img src ="img/set-icon-i.png" style="width:500px"/></p>
 
 ## Description
 
