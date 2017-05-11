@@ -74,7 +74,7 @@ updatePositon position _ []        = position
 
 
 -- -----------------------------------------------------------------------------
--- Parser to Tokens
+-- Parser to nonterminals
 -- -----------------------------------------------------------------------------
 
 program :: ParsecT [Token] [(Token,Token)] IO ([Token])
@@ -123,7 +123,7 @@ remaining_stmts = (do a <- semiColonToken
 
 
 -- -----------------------------------------------------------------------------
--- Functions to Symbol Table
+-- Functions of the Symbol Table
 -- -----------------------------------------------------------------------------
 
 get_default_value :: Token -> Token
