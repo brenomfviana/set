@@ -1,5 +1,5 @@
 -- Interpreter
--- Version: 09/05/2017
+-- Version: 10/05/2017
 -- Author : Breno Viana
 module Interpreter where
 
@@ -8,41 +8,36 @@ import System.Environment
 import System.IO
 import System.IO.Error
 import System.Directory
+import System.FilePath.Posix
 import Data.List
-import LexicalAnalyzer
+import Lexer
 
--- Main
-main :: IO
-main = do
-    -- Get arguments
-    filesPath <- listOfStringsToFilePath getArgs
-    -- Interprets the file
-    set filesPath
+-- Print messages
+checkNumberOfArguments :: [String] -> String
+-- Error message
+checkNumberOfArguments [] = fail "ERROR: No argument. Enter the file to be compiled."
+checkNumberOfArguments (head:tail) =
+    if null tail
+    -- Success message
+    then "Just one argument. OK."
+    -- Warning message
+    else "WARNING: Too many arguments. Only the first argument will be used."
 
+-- Get first argument
+getFirstArgument :: [String] -> String
+getFirstArgument (head:tail) = head
 
 -- Interpret the file
-set :: [FilePath] -> (Bool, [String])
-set [] = (False, [])
-set (head:tail) =
-    -- Check if there is file
-    if doesFileExist head
-        -- Check file extension
-        then if takeExtension head == ".set"
-                -- Interprets the file
-                then interpret readFile head
-                -- Error message
-                else putStrLn "ERROR: The file can't be interpreted."
-        -- Error message
-        else putStrLn "ERROR: File does not exist."
+set :: String -> Bool
+set code =
+    --
+    putStrLn(getTokens code)
+    return True
 
-
--- Interprets the code
-interpret :: String -> (Bool, [String])
-interpret [] = (False, [])
-interpret code = analyzer(code)
-
-
--- Convert
-listOfStringsToFilePath :: [String] -> [FilePath]
-listOfStringsToFilePath [] = []
-listOfStringsToFilePath (head:tail) = decodeString head : listOfStringsToFilePath tail
+-- Main
+main = do
+    args <- getArgs
+    putStrLn(checkNumberOfArguments args)
+    firstArgument <- getFirstArgument args
+    content <- readFile firstArgument
+    putStrLn firstArgument
