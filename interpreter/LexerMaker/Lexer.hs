@@ -2,10 +2,7 @@
 {-# LANGUAGE CPP #-}
 {-# LINE 1 "Lexer.x" #-}
 
-module Lexer where
-
-import System.IO
-import System.IO.Unsafe
+module Main (main) where
 
 #if __GLASGOW_HASKELL__ >= 603
 #include "ghcconfig.h"
@@ -132,7 +129,25 @@ type Byte = Word8
 -- -----------------------------------------------------------------------------
 -- The input type
 
-{-# LINE 76 "templates/wrappers.hs" #-}
+
+type AlexInput = (AlexPosn,     -- current position,
+                  Char,         -- previous char
+                  [Byte],       -- pending bytes on current char
+                  String)       -- current input string
+
+ignorePendingBytes :: AlexInput -> AlexInput
+ignorePendingBytes (p,c,ps,s) = (p,c,[],s)
+
+alexInputPrevChar :: AlexInput -> Char
+alexInputPrevChar (p,c,bs,s) = c
+
+alexGetByte :: AlexInput -> Maybe (Byte,AlexInput)
+alexGetByte (p,c,(b:bs),s) = Just (b,(p,c,bs,s))
+alexGetByte (p,c,[],[]) = Nothing
+alexGetByte (p,_,[],(c:s))  = let p' = alexMove p c 
+                                  (b:bs) = utf8Encode c
+                              in p' `seq`  Just (b, (p', c, bs, s))
+
 
 {-# LINE 98 "templates/wrappers.hs" #-}
 
@@ -150,7 +165,18 @@ type Byte = Word8
 -- `move_pos' calculates the new position after traversing a given character,
 -- assuming the usual eight character tab stops.
 
-{-# LINE 157 "templates/wrappers.hs" #-}
+
+data AlexPosn = AlexPn !Int !Int !Int
+        deriving (Eq,Show)
+
+alexStartPos :: AlexPosn
+alexStartPos = AlexPn 0 1 1
+
+alexMove :: AlexPosn -> Char -> AlexPosn
+alexMove (AlexPn a l c) '\t' = AlexPn (a+1)  l     (((c+alex_tab_size-1) `div` alex_tab_size)*alex_tab_size+1)
+alexMove (AlexPn a l c) '\n' = AlexPn (a+1) (l+1)   1
+alexMove (AlexPn a l c) _    = AlexPn (a+1)  l     (c+1)
+
 
 -- -----------------------------------------------------------------------------
 -- Default monad
@@ -167,28 +193,7 @@ type Byte = Word8
 -- -----------------------------------------------------------------------------
 -- Basic wrapper
 
-
-type AlexInput = (Char,[Byte],String)
-
-alexInputPrevChar :: AlexInput -> Char
-alexInputPrevChar (c,_,_) = c
-
--- alexScanTokens :: String -> [token]
-alexScanTokens str = go ('\n',[],str)
-  where go inp@(_,_bs,s) =
-          case alexScan inp 0 of
-                AlexEOF -> []
-                AlexError _ -> error "lexical error"
-                AlexSkip  inp' len     -> go inp'
-                AlexToken inp' len act -> act (take len s) : go inp'
-
-alexGetByte :: AlexInput -> Maybe (Byte,AlexInput)
-alexGetByte (c,(b:bs),s) = Just (b,(c,bs,s))
-alexGetByte (c,[],[])    = Nothing
-alexGetByte (_,[],(c:s)) = case utf8Encode c of
-                             (b:bs) -> Just (b, (c, bs, s))
-                             [] -> Nothing
-
+{-# LINE 398 "templates/wrappers.hs" #-}
 
 
 -- -----------------------------------------------------------------------------
@@ -204,7 +209,16 @@ alexGetByte (_,[],(c:s)) = case utf8Encode c of
 
 -- Adds text positions to the basic model.
 
-{-# LINE 451 "templates/wrappers.hs" #-}
+
+--alexScanTokens :: String -> [token]
+alexScanTokens str = go (alexStartPos,'\n',[],str)
+  where go inp@(pos,_,_,str) =
+          case alexScan inp 0 of
+                AlexEOF -> []
+                AlexError ((AlexPn _ line column),_,_,_) -> error $ "lexical error at line " ++ (show line) ++ ", column " ++ (show column)
+                AlexSkip  inp' len     -> go inp'
+                AlexToken inp' len act -> act pos (take len str) : go inp'
+
 
 
 -- -----------------------------------------------------------------------------
@@ -233,10 +247,12 @@ alex_deflt :: Array Int Int
 alex_deflt = listArray (0,181) [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,26,26,-1,28,28,34,34,37,37,38,38,40,40,40,47,47,47,50,50,-1,-1,-1,-1,-1,-1,-1,47,52,52,52,-1,52,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,40,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1]
 
 alex_accept = listArray (0::Int,181) [AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccNone,AlexAccSkip,AlexAccSkip,AlexAcc (alex_action_2),AlexAcc (alex_action_3),AlexAcc (alex_action_4),AlexAcc (alex_action_5),AlexAcc (alex_action_6),AlexAcc (alex_action_7),AlexAcc (alex_action_8),AlexAcc (alex_action_9),AlexAcc (alex_action_10),AlexAcc (alex_action_11),AlexAcc (alex_action_12),AlexAcc (alex_action_13),AlexAcc (alex_action_14),AlexAcc (alex_action_15),AlexAcc (alex_action_16),AlexAcc (alex_action_17),AlexAcc (alex_action_18),AlexAcc (alex_action_19),AlexAcc (alex_action_20),AlexAcc (alex_action_21),AlexAcc (alex_action_22),AlexAcc (alex_action_23),AlexAcc (alex_action_24),AlexAcc (alex_action_25),AlexAcc (alex_action_26),AlexAcc (alex_action_27),AlexAcc (alex_action_28),AlexAcc (alex_action_29),AlexAcc (alex_action_30),AlexAcc (alex_action_31),AlexAcc (alex_action_32),AlexAcc (alex_action_33),AlexAcc (alex_action_34),AlexAcc (alex_action_35),AlexAcc (alex_action_36),AlexAcc (alex_action_37),AlexAcc (alex_action_38),AlexAcc (alex_action_39),AlexAcc (alex_action_40),AlexAcc (alex_action_41),AlexAcc (alex_action_42),AlexAcc (alex_action_43),AlexAcc (alex_action_44),AlexAcc (alex_action_45),AlexAcc (alex_action_46),AlexAcc (alex_action_47),AlexAcc (alex_action_48),AlexAcc (alex_action_49),AlexAcc (alex_action_50),AlexAcc (alex_action_51),AlexAcc (alex_action_52),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53),AlexAcc (alex_action_53)]
-{-# LINE 70 "Lexer.x" #-}
+{-# LINE 67 "Lexer.x" #-}
+
+-- Token Position
+data L a = L{ getPos :: AlexPosn, unPos :: a } deriving (Eq,Show)
 
 -- Each action has type :: String -> Token
-
 -- The token type:
 data Token =
   Program           |
@@ -285,64 +301,67 @@ data Token =
   String String
   deriving (Eq,Show)
 
-getTokens fn = unsafePerformIO (getTokensAux fn)
+-- getTokens fn = unsafePerformIO (getTokensAux fn)
 
-getTokensAux fn = do {fh <- openFile fn ReadMode;
-                    s <- hGetContents fh;
-                    return (alexScanTokens s)}
+-- getTokensAux fn = do {fh <- openFile fn ReadMode;
+--                    s <- hGetContents fh;
+--                    return (alexScanTokens s)}
+main = do
+    s <- getContents
+    print (alexScanTokens s)
 
-alex_action_2 =  \s -> String s 
-alex_action_3 =  \s -> Program 
-alex_action_4 =  \s -> Colon 
-alex_action_5 =  \s -> SemiColon 
-alex_action_6 =  \s -> Comma 
-alex_action_7 =  \s -> Type s 
-alex_action_8 =  \s -> Type s 
-alex_action_9 =  \s -> Type s 
-alex_action_10 =  \s -> Type s 
-alex_action_11 =  \s -> Type s 
-alex_action_12 =  \s -> Type s 
-alex_action_13 =  \s -> Type s 
-alex_action_14 =  \s -> Type s 
-alex_action_15 =  \s -> Type s 
-alex_action_16 =  \s -> Set_of 
-alex_action_17 =  \s -> End_Set_of 
-alex_action_18 =  \s -> If 
-alex_action_19 =  \s -> End_If 
-alex_action_20 =  \s -> Else 
-alex_action_21 =  \s -> Else_If 
-alex_action_22 =  \s -> End_Els 
-alex_action_23 =  \s -> Function 
-alex_action_24 =  \s -> End_Function
-alex_action_25 =  \s -> While 
-alex_action_26 =  \s -> End_While 
-alex_action_27 =  \s -> End 
-alex_action_28 =  \s -> Typedef 
-alex_action_29 =  \s -> Assign 
-alex_action_30 =  \s -> Belongs 
-alex_action_31 =  \s -> Intersection 
-alex_action_32 =  \s -> Union 
-alex_action_33 =  \s -> Subset 
-alex_action_34 =  \s -> Complement 
-alex_action_35 =  \s -> Empty_Set 
-alex_action_36 =  \s -> Open_Bracket 
-alex_action_37 =  \s -> Close_Bracket 
-alex_action_38 =  \s -> Open_Parentheses 
-alex_action_39 =  \s -> Close_Parentheses 
-alex_action_40 =  \s -> Multiplication 
-alex_action_41 =  \s -> Division 
-alex_action_42 =  \s -> Addition 
-alex_action_43 =  \s -> Subtraction 
-alex_action_44 =  \s -> GreaterOrEqual 
-alex_action_45 =  \s -> SmallerOrEqual 
-alex_action_46 =  \s -> Greater 
-alex_action_47 =  \s -> Smaller 
-alex_action_48 =  \s -> Denial 
-alex_action_49 =  \s -> Equality 
-alex_action_50 =  \s -> Print 
-alex_action_51 =  \s -> Int (read s) 
-alex_action_52 =  \s -> Float (read s) 
-alex_action_53 =  \s -> Id s 
+alex_action_2 =  \pos s -> L { getPos = pos, unPos = String s }
+alex_action_3 =  \pos s -> L { getPos = pos, unPos = Program }
+alex_action_4 =  \pos s -> L { getPos = pos, unPos = Colon }
+alex_action_5 =  \pos s -> L { getPos = pos, unPos = SemiColon }
+alex_action_6 =  \pos s -> L { getPos = pos, unPos = Comma }
+alex_action_7 =  \pos s -> L { getPos = pos, unPos = Type s }
+alex_action_8 =  \pos s -> L { getPos = pos, unPos = Type s }
+alex_action_9 =  \pos s -> L { getPos = pos, unPos = Type s }
+alex_action_10 =  \pos s -> L { getPos = pos, unPos = Type s }
+alex_action_11 =  \pos s -> L { getPos = pos, unPos = Type s }
+alex_action_12 =  \pos s -> L { getPos = pos, unPos = Type s }
+alex_action_13 =  \pos s -> L { getPos = pos, unPos = Type s }
+alex_action_14 =  \pos s -> L { getPos = pos, unPos = Type s }
+alex_action_15 =  \pos s -> L { getPos = pos, unPos = Type s }
+alex_action_16 =  \pos s -> L { getPos = pos, unPos = Set_of }
+alex_action_17 =  \pos s -> L { getPos = pos, unPos = End_Set_of }
+alex_action_18 =  \pos s -> L { getPos = pos, unPos = If }
+alex_action_19 =  \pos s -> L { getPos = pos, unPos = End_If }
+alex_action_20 =  \pos s -> L { getPos = pos, unPos = Else }
+alex_action_21 =  \pos s -> L { getPos = pos, unPos = Else_If }
+alex_action_22 =  \pos s -> L { getPos = pos, unPos = End_Els }
+alex_action_23 =  \pos s -> L { getPos = pos, unPos = Function }
+alex_action_24 =  \pos s -> L { getPos = pos, unPos = End_Function}
+alex_action_25 =  \pos s -> L { getPos = pos, unPos = While }
+alex_action_26 =  \pos s -> L { getPos = pos, unPos = End_While }
+alex_action_27 =  \pos s -> L { getPos = pos, unPos = End }
+alex_action_28 =  \pos s -> L { getPos = pos, unPos = Typedef }
+alex_action_29 =  \pos s -> L { getPos = pos, unPos = Assign }
+alex_action_30 =  \pos s -> L { getPos = pos, unPos = Belongs }
+alex_action_31 =  \pos s -> L { getPos = pos, unPos = Intersection }
+alex_action_32 =  \pos s -> L { getPos = pos, unPos = Union }
+alex_action_33 =  \pos s -> L { getPos = pos, unPos = Subset }
+alex_action_34 =  \pos s -> L { getPos = pos, unPos = Complement }
+alex_action_35 =  \pos s -> L { getPos = pos, unPos = Empty_Set }
+alex_action_36 =  \pos s -> L { getPos = pos, unPos = Open_Bracket }
+alex_action_37 =  \pos s -> L { getPos = pos, unPos = Close_Bracket }
+alex_action_38 =  \pos s -> L { getPos = pos, unPos = Open_Parentheses }
+alex_action_39 =  \pos s -> L { getPos = pos, unPos = Close_Parentheses }
+alex_action_40 =  \pos s -> L { getPos = pos, unPos = Multiplication }
+alex_action_41 =  \pos s -> L { getPos = pos, unPos = Division }
+alex_action_42 =  \pos s -> L { getPos = pos, unPos = Addition }
+alex_action_43 =  \pos s -> L { getPos = pos, unPos = Subtraction }
+alex_action_44 =  \pos s -> L { getPos = pos, unPos = GreaterOrEqual }
+alex_action_45 =  \pos s -> L { getPos = pos, unPos = SmallerOrEqual }
+alex_action_46 =  \pos s -> L { getPos = pos, unPos = Greater }
+alex_action_47 =  \pos s -> L { getPos = pos, unPos = Smaller }
+alex_action_48 =  \pos s -> L { getPos = pos, unPos = Denial }
+alex_action_49 =  \pos s -> L { getPos = pos, unPos = Equality }
+alex_action_50 =  \pos s -> L { getPos = pos, unPos = Print }
+alex_action_51 =  \pos s -> L { getPos = pos, unPos = Int (read s) }
+alex_action_52 =  \pos s -> L { getPos = pos, unPos = Float (read s) }
+alex_action_53 =  \pos s -> L { getPos = pos, unPos = Id s }
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 {-# LINE 1 "<built-in>" #-}

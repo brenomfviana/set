@@ -5,71 +5,73 @@ import System.IO
 import System.IO.Unsafe
 }
 
-%wrapper "basic"
+%wrapper "posn"
 
-$digit = 0-9      -- digits
+$digit = 0-9        -- digits
 $alpha = [a-zA-Z]   -- alphabetic characters
 
 tokens :-
 
   $white+                              ;
   "--".*                               ;
-  \" [^\" \\]* \"                      { \s -> String s }
-  program                              { \s -> Program }
-  :                                    { \s -> Colon }
-  ";"                                  { \s -> SemiColon }
-  ","                                  { \s -> Comma }
-  natural                              { \s -> Type s }
-  integer                              { \s -> Type s }
-  rational                             { \s -> Type s }
-  real                                 { \s -> Type s }
-  universal                            { \s -> Type s }
-  text                                 { \s -> Type s }
-  int                                  { \s -> Type s }
-  float                                { \s -> Type s }
-  string                               { \s -> Type s }
-  "set["                               { \s -> Set_of }
-  "]"                                  { \s -> End_Set_of }
-  if                                   { \s -> If }
-  endif                                { \s -> End_If }
-  else                                 { \s -> Else }
-  elseif                               { \s -> Else_If }
-  endelse                              { \s -> End_Els }
-  func                                 { \s -> Function }
-  endfunc                              { \s -> End_Function}
-  while                                { \s -> While }
-  endwhile                             { \s -> End_While }
-  end                                  { \s -> End }
-  typedef                              { \s -> Typedef }
-  :=                                   { \s -> Assign }
-  "\in"                                { \s -> Belongs }
-  "\cap"                               { \s -> Intersection }
-  "\cup"                               { \s -> Union }
-  "\subset"                            { \s -> Subset }
-  "\stcomp"                            { \s -> Complement }
-  "\emptyset"                          { \s -> Empty_Set }
-  "{"                                  { \s -> Open_Bracket }
-  "}"                                  { \s -> Close_Bracket }
-  "("                                  { \s -> Open_Parentheses }
-  ")"                                  { \s -> Close_Parentheses }
-  "*"                                  { \s -> Multiplication }
-  "/"                                  { \s -> Division }
-  "+"                                  { \s -> Addition }
-  "-"                                  { \s -> Subtraction }
-  >=                                   { \s -> GreaterOrEqual }
-  "<="                                 { \s -> SmallerOrEqual }
-  >                                    { \s -> Greater }
-  "<"                                  { \s -> Smaller }
-  !                                    { \s -> Denial }
-  =                                    { \s -> Equality }
-  print                                { \s -> Print }
-  $digit+                              { \s -> Int (read s) } -- Int or Natural?
-  $digit+.$digit+                      { \s -> Float (read s) } -- Float or Real?
-  $alpha [$alpha $digit \_ \']*        { \s -> Id s }
+  \" [^\" \\]* \"                      { \pos s -> L { getPos = pos, unPos = String s }}
+  program                              { \pos s -> L { getPos = pos, unPos = Program }}
+  :                                    { \pos s -> L { getPos = pos, unPos = Colon }}
+  ";"                                  { \pos s -> L { getPos = pos, unPos = SemiColon }}
+  ","                                  { \pos s -> L { getPos = pos, unPos = Comma }}
+  natural                              { \pos s -> L { getPos = pos, unPos = Type s }}
+  integer                              { \pos s -> L { getPos = pos, unPos = Type s }}
+  rational                             { \pos s -> L { getPos = pos, unPos = Type s }}
+  real                                 { \pos s -> L { getPos = pos, unPos = Type s }}
+  universal                            { \pos s -> L { getPos = pos, unPos = Type s }}
+  text                                 { \pos s -> L { getPos = pos, unPos = Type s }}
+  int                                  { \pos s -> L { getPos = pos, unPos = Type s }}
+  float                                { \pos s -> L { getPos = pos, unPos = Type s }}
+  string                               { \pos s -> L { getPos = pos, unPos = Type s }}
+  "set["                               { \pos s -> L { getPos = pos, unPos = Set_of }}
+  "]"                                  { \pos s -> L { getPos = pos, unPos = End_Set_of }}
+  if                                   { \pos s -> L { getPos = pos, unPos = If }}
+  endif                                { \pos s -> L { getPos = pos, unPos = End_If }}
+  else                                 { \pos s -> L { getPos = pos, unPos = Else }}
+  elseif                               { \pos s -> L { getPos = pos, unPos = Else_If }}
+  endelse                              { \pos s -> L { getPos = pos, unPos = End_Els }}
+  func                                 { \pos s -> L { getPos = pos, unPos = Function }}
+  endfunc                              { \pos s -> L { getPos = pos, unPos = End_Function}}
+  while                                { \pos s -> L { getPos = pos, unPos = While }}
+  endwhile                             { \pos s -> L { getPos = pos, unPos = End_While }}
+  end                                  { \pos s -> L { getPos = pos, unPos = End }}
+  typedef                              { \pos s -> L { getPos = pos, unPos = Typedef }}
+  :=                                   { \pos s -> L { getPos = pos, unPos = Assign }}
+  "\in"                                { \pos s -> L { getPos = pos, unPos = Belongs }}
+  "\cap"                               { \pos s -> L { getPos = pos, unPos = Intersection }}
+  "\cup"                               { \pos s -> L { getPos = pos, unPos = Union }}
+  "\subset"                            { \pos s -> L { getPos = pos, unPos = Subset }}
+  "\stcomp"                            { \pos s -> L { getPos = pos, unPos = Complement }}
+  "\emptyset"                          { \pos s -> L { getPos = pos, unPos = Empty_Set }}
+  "{"                                  { \pos s -> L { getPos = pos, unPos = Open_Bracket }}
+  "}"                                  { \pos s -> L { getPos = pos, unPos = Close_Bracket }}
+  "("                                  { \pos s -> L { getPos = pos, unPos = Open_Parentheses }}
+  ")"                                  { \pos s -> L { getPos = pos, unPos = Close_Parentheses }}
+  "*"                                  { \pos s -> L { getPos = pos, unPos = Multiplication }}
+  "/"                                  { \pos s -> L { getPos = pos, unPos = Division }}
+  "+"                                  { \pos s -> L { getPos = pos, unPos = Addition }}
+  "-"                                  { \pos s -> L { getPos = pos, unPos = Subtraction }}
+  >=                                   { \pos s -> L { getPos = pos, unPos = GreaterOrEqual }}
+  "<="                                 { \pos s -> L { getPos = pos, unPos = SmallerOrEqual }}
+  >                                    { \pos s -> L { getPos = pos, unPos = Greater }}
+  "<"                                  { \pos s -> L { getPos = pos, unPos = Smaller }}
+  !                                    { \pos s -> L { getPos = pos, unPos = Denial }}
+  =                                    { \pos s -> L { getPos = pos, unPos = Equality }}
+  print                                { \pos s -> L { getPos = pos, unPos = Print }}
+  $digit+                              { \pos s -> L { getPos = pos, unPos = Int (read s) }}
+  $digit+.$digit+                      { \pos s -> L { getPos = pos, unPos = Float (read s) }}
+  $alpha [$alpha $digit \_ \']*        { \pos s -> L { getPos = pos, unPos = Id s }}
 
 {
--- Each action has type :: String -> Token
+-- Token Position
+data L a = L { getPos :: AlexPosn, unPos :: a } deriving (Eq,Show)
 
+-- Each action has type :: String -> Token
 -- The token type:
 data Token =
   Program           |
@@ -121,6 +123,5 @@ data Token =
 getTokens fn = unsafePerformIO (getTokensAux fn)
 
 getTokensAux fn = do {fh <- openFile fn ReadMode;
-                    s <- hGetContents fh;
-                    return (alexScanTokens s)}
-}
+                   s <- hGetContents fh;
+                   return (alexScanTokens s)}
