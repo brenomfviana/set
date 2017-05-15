@@ -3,5 +3,5 @@
 echo "Converting to Haskell code..."
 alex Lexer.x
 
-echo "Compiling..."
-ghc Lexer.hs
+# echo "Compiling..."
+# ghc Lexer.hs
