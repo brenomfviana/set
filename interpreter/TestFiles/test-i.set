@@ -1,16 +1,6 @@
 program main
-	natural : A;
-	int : x;
-	float : y;
-	string : z;
-
+	Int : x;
+	Float : y;
 	x := 1;
-	y := 1.5;
-	z := "Oi";
-
-	if x \in A
-		print "Ok!";
-	endif else
-		print "Not * ok!";
-	endelse
-end
+	y := 0.5;
+end main
