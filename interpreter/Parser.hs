@@ -15,56 +15,51 @@ import Lexer
 -- Parser to Tokens
 -- -----------------------------------------------------------------------------
 
--- Describe function
+-- Program Token
 programToken = tokenPrim show updatePositon getToken where
     getToken Program = Just Program
     getToken _       = Nothing
 
--- Describe function
-idToken = tokenPrim show updatePositon getToken where
-    getToken (Id x) = Just (Id x)
-    getToken _      = Nothing
-
--- Describe function
-varToken = tokenPrim show updatePositon getToken where
-    getToken Var = Just Var
-    getToken _   = Nothing
-
--- Describe function
-beginToken = tokenPrim show updatePositon getToken where
-    getToken Begin = Just Begin
-    getToken _     = Nothing
-
--- Describe function
+-- End Token
 endToken = tokenPrim show updatePositon getToken where
     getToken End = Just End
     getToken _   = Nothing
 
-semiColonToken :: ParsecT [Token] st IO (Token)
--- Describe function
-semiColonToken = tokenPrim show updatePositon getToken where
-    getToken SemiColon = Just SemiColon
-    getToken _         = Nothing
+-- ID Token
+idToken = tokenPrim show updatePositon getToken where
+    getToken (Id x) = Just (Id x)
+    getToken _      = Nothing
 
--- Describe function
+-- Colon Token
 colonToken = tokenPrim show updatePositon getToken where
     getToken Colon = Just Colon
     getToken _     = Nothing
 
--- Describe function
+-- Semicolon Token
+semiColonToken :: ParsecT [Token] st IO (Token)
+semiColonToken = tokenPrim show updatePositon getToken where
+    getToken SemiColon = Just SemiColon
+    getToken _         = Nothing
+
+-- Assign Token
 assignToken = tokenPrim show updatePositon getToken where
     getToken Assign = Just Assign
     getToken _      = Nothing
 
--- Describe function
+-- Type Token
+typeToken = tokenPrim show updatePositon getToken where
+    getToken (Type x) = Just (Type x)
+    getToken _        = Nothing
+
+-- Int Token
 intToken = tokenPrim show updatePositon getToken where
     getToken (Int x) = Just (Int x)
     getToken _       = Nothing
 
--- Describe function
-typeToken = tokenPrim show updatePositon getToken where
-    getToken (Type x) = Just (Type x)
-    getToken _        = Nothing
+-- Float Token
+-- floatToken = tokenPrim show updatePositon getToken where
+--     getToken (Float x) = Just (Float x)
+--     getToken _         = Nothing
 
 --
 updatePositon :: SourcePos -> Token -> [Token] -> SourcePos
@@ -77,48 +72,47 @@ updatePositon position _ []        = position
 -- Parser to nonterminals
 -- -----------------------------------------------------------------------------
 
-program :: ParsecT [Token] [(Token,Token)] IO ([Token])
+program :: ParsecT [Token] [(Token, Token)] IO ([Token])
 program = do
     a <- programToken
     b <- idToken
-    c <- varToken
     d <- varDecl
-    e <- beginToken
     f <- stmts
     g <- endToken
     eof
-    return (a:b:[c] ++ d++ [e] ++ f ++ [g])
+    return (a:[b] ++ d ++ f ++ [g])
 
-varDecl :: ParsecT [Token] [(Token,Token)] IO([Token])
+varDecl :: ParsecT [Token] [(Token, Token)] IO([Token])
 varDecl = do
-    a <- idToken
+    a <- typeToken
     b <- colonToken
-    c <- typeToken
-    updateState(symtable_insert (a, get_default_value c))
+    c <- idToken
+    d <- semiColonToken
+    updateState(symtableInsert (c, getDefaultValue a))
     s <- getState
     liftIO (print s)
     return (a:b:[c])
 
-stmts :: ParsecT [Token] [(Token,Token)] IO([Token])
+stmts :: ParsecT [Token] [(Token, Token)] IO([Token])
 stmts = do
     first <- assign
     next <- remaining_stmts
     return (first ++ next)
 
-assign :: ParsecT [Token] [(Token,Token)] IO([Token])
+assign :: ParsecT [Token] [(Token, Token)] IO([Token])
 assign = do
     a <- idToken
     b <- assignToken
     c <- intToken
-    updateState(symtable_update (a, c))
+    updateState(symtableUpdate (a, c))
     s <- getState
     liftIO (print s)
     return (a:b:[c])
 
-remaining_stmts :: ParsecT [Token] [(Token,Token)] IO([Token])
+remaining_stmts :: ParsecT [Token] [(Token, Token)] IO([Token])
 remaining_stmts = (do a <- semiColonToken
-    b <- assign
-    return (a:b)) <|> (return [])
+                      b <- assign
+                      return (a:b)) <|> (return [])
 
 
 
@@ -126,24 +120,31 @@ remaining_stmts = (do a <- semiColonToken
 -- Functions of the Symbol Table
 -- -----------------------------------------------------------------------------
 
-get_default_value :: Token -> Token
-get_default_value (Type "int") = Int 0
+getDefaultValue :: Token -> Token
+-- getDefaultValue (Type "Nat") = Nat 0
+getDefaultValue (Type "Int") = Int 0
+getDefaultValue (Type "Float") = Float 0.0
+-- getDefaultValue (Type "Univ") = Univ "\empty"
+-- getDefaultValue (Type "Text") = Text "\eof"
+-- getDefaultValue (Type "Bool") = Bool false
+-- getDefaultValue (Type "Pointer") = Pointer 0.0
+-- getDefaultValue (Type "Set[" <type> "]") = "Set[" <type> "]" "\empty"
 
-symtable_insert :: (Token,Token) -> [(Token,Token)] -> [(Token,Token)]
-symtable_insert symbol []  = [symbol]
-symtable_insert symbol symtable = symtable ++ [symbol]
+symtableInsert :: (Token,Token) -> [(Token, Token)] -> [(Token, Token)]
+symtableInsert symbol []  = [symbol]
+symtableInsert symbol symtable = symtable ++ [symbol]
 
-symtable_update :: (Token,Token) -> [(Token,Token)] -> [(Token,Token)]
-symtable_update _ [] = fail "Variable not found!"
-symtable_update (id1, v1) ((id2, v2):t) =
+symtableUpdate :: (Token,Token) -> [(Token, Token)] -> [(Token, Token)]
+symtableUpdate _ [] = fail "Variable not found!"
+symtableUpdate (id1, v1) ((id2, v2):t) =
     if id1 == id2 then (id1, v1) : t
-    else (id2, v2) : symtable_update (id1, v1) t
+    else (id2, v2) : symtableUpdate (id1, v1) t
 
-symtable_remove :: (Token,Token) -> [(Token,Token)] -> [(Token,Token)]
-symtable_remove _ [] = fail "Variable not found!"
-symtable_remove (id1, v1) ((id2, v2):t) =
+symtableRemove :: (Token,Token) -> [(Token, Token)] -> [(Token, Token)]
+symtableRemove _ [] = fail "Variable not found!"
+symtableRemove (id1, v1) ((id2, v2):t) =
     if id1 == id2 then t
-    else (id2, v2) : symtable_remove (id1, v1) t
+    else (id2, v2) : symtableRemove (id1, v1) t
 
 
 
@@ -157,7 +158,7 @@ parser tokens = runParserT program [] "Error message" tokens
 
 -- Main
 main :: IO ()
-main = case unsafePerformIO (parser (getTokens "LexerMaker/test.set")) of
+main = case unsafePerformIO (parser (getTokens "TestFiles/test-i.set")) of
     { Left err -> print err;
       Right ans -> print ans
     }
