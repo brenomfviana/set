@@ -57,9 +57,14 @@ intToken = tokenPrim show updatePositon getToken where
     getToken _       = Nothing
 
 -- Float Token
--- floatToken = tokenPrim show updatePositon getToken where
---     getToken (Float x) = Just (Float x)
---     getToken _         = Nothing
+floatToken = tokenPrim show updatePositon getToken where
+    getToken (Float x) = Just (Float x)
+    getToken _         = Nothing
+
+-- Text Token
+textToken = tokenPrim show updatePositon getToken where
+    getToken (Text x) = Just (Text x)
+    getToken _        = Nothing
 
 --
 updatePositon :: SourcePos -> Token -> [Token] -> SourcePos
@@ -76,11 +81,18 @@ program :: ParsecT [Token] [(Token, Token)] IO ([Token])
 program = do
     a <- programToken
     b <- idToken
-    d <- varDecl
-    f <- stmts
-    g <- endToken
+    c <- varDecls
+    d <- stmts
+    e <- endToken
+    f <- idToken
     eof
-    return (a:[b] ++ d ++ f ++ [g])
+    return (a:[b] ++ c ++ d ++ e:[f])
+
+varDecls :: ParsecT [Token] [(Token, Token)] IO([Token])
+varDecls = do
+    first <- varDecl
+    next <- remaining_varDecls
+    return (first ++ next)
 
 varDecl :: ParsecT [Token] [(Token, Token)] IO([Token])
 varDecl = do
@@ -92,6 +104,10 @@ varDecl = do
     s <- getState
     liftIO (print s)
     return (a:b:[c])
+    
+remaining_varDecls :: ParsecT [Token] [(Token, Token)] IO([Token])
+remaining_varDecls = (do a <- varDecl
+                         return (a)) <|> (return [])
 
 stmts :: ParsecT [Token] [(Token, Token)] IO([Token])
 stmts = do
@@ -103,16 +119,16 @@ assign :: ParsecT [Token] [(Token, Token)] IO([Token])
 assign = do
     a <- idToken
     b <- assignToken
-    c <- intToken
+    c <- intToken <|> floatToken <|> textToken
+    d <- semiColonToken
     updateState(symtableUpdate (a, c))
     s <- getState
     liftIO (print s)
     return (a:b:[c])
 
 remaining_stmts :: ParsecT [Token] [(Token, Token)] IO([Token])
-remaining_stmts = (do a <- semiColonToken
-                      b <- assign
-                      return (a:b)) <|> (return [])
+remaining_stmts = (do a <- assign
+                      return (a)) <|> (return [])
 
 
 
@@ -124,8 +140,8 @@ getDefaultValue :: Token -> Token
 -- getDefaultValue (Type "Nat") = Nat 0
 getDefaultValue (Type "Int") = Int 0
 getDefaultValue (Type "Float") = Float 0.0
+getDefaultValue (Type "Text") = Text ""
 -- getDefaultValue (Type "Univ") = Univ "\empty"
--- getDefaultValue (Type "Text") = Text "\eof"
 -- getDefaultValue (Type "Bool") = Bool false
 -- getDefaultValue (Type "Pointer") = Pointer 0.0
 -- getDefaultValue (Type "Set[" <type> "]") = "Set[" <type> "]" "\empty"

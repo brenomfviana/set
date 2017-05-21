@@ -22,7 +22,7 @@ tokens :-
   ","                                  { \s -> Comma }
   Nat                                  { \s -> Type s }
   Int                                  { \s -> Type s }
-  Float                                 { \s -> Type s }
+  Float                                { \s -> Type s }
   Bool                                 { \s -> Type s }
   Univ                                 { \s -> Type s }
   Text                                 { \s -> Type s }
@@ -87,7 +87,7 @@ data Token =
   Float Float         |
 --  Bool Bool         |
 --  Univ Univ         |
---  Text Text         |
+  Text String       |
 --  Pointer Pointer   |
   Set_of            |
   End_Set_of        |
@@ -124,7 +124,7 @@ data Token =
   Denial            |
   Equality          |
   Print             |
-  Input              |
+  Input             |
   Exit              |
   Break             |
   Continue          |

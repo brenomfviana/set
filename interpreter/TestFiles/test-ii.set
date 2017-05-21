@@ -8,9 +8,9 @@ program main
 	y := 1.5;
 	z := "Oi";
 
-	if x \in A
+	if (x \in A)
 		print "Ok!";
-	endif else
+	else
 		print "Not * ok!";
-	endelse
+	endif
 end main

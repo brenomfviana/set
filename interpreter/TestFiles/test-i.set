@@ -1,6 +1,9 @@
 program main
 	Int : x;
 	Float : y;
+	--Text : z;
+	
 	x := 1;
 	y := 0.5;
+	--z := "Ohayo";
 end main
