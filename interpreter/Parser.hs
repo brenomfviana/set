@@ -17,66 +17,66 @@ import Lexer
 
 -- Program Token
 programToken = tokenPrim show updatePositon getToken where
-    getToken Program = Just Program
+    getToken (Program pos) = Just (Program pos)
     getToken _       = Nothing
 
 -- End Token
 endToken = tokenPrim show updatePositon getToken where
-    getToken End = Just End
+    getToken (End pos) = Just (End pos)
     getToken _   = Nothing
 
 -- ID Token
 idToken = tokenPrim show updatePositon getToken where
-    getToken (Id x) = Just (Id x)
+    getToken (Id x pos) = Just (Id x pos)
     getToken _      = Nothing
 
 -- Colon Token
 colonToken = tokenPrim show updatePositon getToken where
-    getToken Colon = Just Colon
+    getToken (Colon pos) = Just (Colon pos)
     getToken _     = Nothing
 
 -- Semicolon Token
 semiColonToken :: ParsecT [Token] st IO (Token)
 semiColonToken = tokenPrim show updatePositon getToken where
-    getToken SemiColon = Just SemiColon
+    getToken (SemiColon pos) = Just (SemiColon pos)
     getToken _         = Nothing
 
 -- Assign Token
 assignToken = tokenPrim show updatePositon getToken where
-    getToken Assign = Just Assign
+    getToken (Assign pos) = Just (Assign pos)
     getToken _      = Nothing
 
 -- Type Token
 typeToken = tokenPrim show updatePositon getToken where
-    getToken (Type x) = Just (Type x)
+    getToken (Type x pos) = Just (Type x pos)
     getToken _        = Nothing
 
 -- Nat Token
 natToken = tokenPrim show updatePositon getToken where
-    getToken (Nat x) = Just (Nat x)
+    getToken (Nat x pos) = Just (Nat x pos)
     getToken _       = Nothing
 
 -- Int Token
 intToken = tokenPrim show updatePositon getToken where
-    getToken (Int x) = Just (Int x)
+    getToken (Int x pos) = Just (Int x pos)
     getToken _       = Nothing
 
 -- Real Token
 realToken = tokenPrim show updatePositon getToken where
-    getToken (Real x) = Just (Real x)
+    getToken (Real x pos) = Just (Real x pos)
     getToken _         = Nothing
 
 -- Bool Token
 boolToken = tokenPrim show updatePositon getToken where
-    getToken (Bool x) = Just (Bool x)
+    getToken (Bool x pos) = Just (Bool x pos)
     getToken _         = Nothing
 
 -- Text Token
 textToken = tokenPrim show updatePositon getToken where
-    getToken (Text x) = Just (Text x)
+    getToken (Text x pos) = Just (Text x pos)
     getToken _        = Nothing
 
---
+-- Update position
 updatePositon :: SourcePos -> Token -> [Token] -> SourcePos
 updatePositon position _ (token:_) = position -- necessita melhoria
 updatePositon position _ []        = position
@@ -114,7 +114,7 @@ varDecl = do
     s <- getState
     liftIO (print s)
     return (a:b:[c])
-    
+
 remaining_varDecls :: ParsecT [Token] [(Token, Token)] IO([Token])
 remaining_varDecls = (do a <- varDecls
                          return (a)) <|> (return [])
@@ -148,12 +148,12 @@ remaining_stmts = (do a <- stmts
 -- -----------------------------------------------------------------------------
 
 getDefaultValue :: Token -> Token
-getDefaultValue (Type "Nat") = Nat 0
-getDefaultValue (Type "Int") = Int 0
-getDefaultValue (Type "Real") = Real 0.0
-getDefaultValue (Type "Text") = Text ""
+getDefaultValue (Type "Nat" pos) = Nat 0 pos
+getDefaultValue (Type "Int" pos) = Int 0 pos
+getDefaultValue (Type "Real" pos) = Real 0.0 pos
+getDefaultValue (Type "Text" pos) = Text "" pos
 -- getDefaultValue (Type "Univ") = Univ "\empty"
-getDefaultValue (Type "Bool") = Bool False
+getDefaultValue (Type "Bool" pos) = Bool False pos
 -- getDefaultValue (Type "Pointer") = Pointer 0.0
 -- getDefaultValue (Type "Set[" <type> "]") = "Set[" <type> "]" "\empty"
 
