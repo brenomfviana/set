@@ -14,7 +14,6 @@ tokens :-
 
   $white+                              ;
   "--".*                               ;
-  \" [^\" \\]* \"                      { \s -> String s }
   program                              { \s -> Program }
   end                                  { \s -> End }
   :                                    { \s -> Colon }
@@ -22,7 +21,7 @@ tokens :-
   ","                                  { \s -> Comma }
   Nat                                  { \s -> Type s }
   Int                                  { \s -> Type s }
-  Float                                { \s -> Type s }
+  Real                                 { \s -> Type s }
   Bool                                 { \s -> Type s }
   Univ                                 { \s -> Type s }
   Text                                 { \s -> Type s }
@@ -49,7 +48,7 @@ tokens :-
   "\emptyset"                          { \s -> Empty_Set }
   "{"                                  { \s -> Open_Bracket }
   "}"                                  { \s -> Close_Bracket }
-  "("                                  { \s -> Open_Parentheses }
+  "("                                  { \s -> Open_Parentheses  }
   ")"                                  { \s -> Close_Parentheses }
   "+"                                  { \s -> Addition }
   "-"                                  { \s -> Subtraction }
@@ -66,8 +65,10 @@ tokens :-
   exit                                 { \s -> Exit }
   break                                { \s -> Break }
   continue                             { \s -> Continue }
-  $digit+                              { \s -> Int (read s) }
-  $digit+.$digit+                      { \s -> Float (read s) }
+  $digit+                              { \s -> Nat (read s) }
+  [\-]?$digit+                         { \s -> Int (read s) }
+  [\-]?$digit+.$digit+                 { \s -> Real (read s) }
+  \" [^\" \\]* \"                      { \s -> Text s }
   $alpha [$alpha $digit \_ \']*        { \s -> Id s }
 
 {
@@ -82,9 +83,9 @@ data Token =
   Comma             |
   Id String         |
   Type String       |
---  Nat Nat           |
+  Nat Int           |
   Int Int           |
-  Float Float         |
+  Real Float        |
 --  Bool Bool         |
 --  Univ Univ         |
   Text String       |

@@ -1,9 +1,11 @@
 program main
+	Nat : n;
 	Int : x;
-	Float : y;
-	--Text : z;
+	Real : y;
+	Text : z;
 	
-	x := 1;
-	y := 0.5;
-	--z := "Ohayo";
+	n := 1;
+	x := -1;
+	y := -0.5;
+	z := "Ohayo";
 end main

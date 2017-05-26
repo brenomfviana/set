@@ -3,5 +3,5 @@
 echo "Converting to Haskell code..."
 alex Lexer.x
 
-# echo "Compiling..."
-# ghc Lexer.hs
+echo "Moving..."
+mv "Lexer.hs" "/home/ubuntu/workspace/interpreter/Lexer.hs"

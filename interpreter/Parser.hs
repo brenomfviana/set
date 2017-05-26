@@ -51,14 +51,19 @@ typeToken = tokenPrim show updatePositon getToken where
     getToken (Type x) = Just (Type x)
     getToken _        = Nothing
 
+-- Nat Token
+natToken = tokenPrim show updatePositon getToken where
+    getToken (Nat x) = Just (Nat x)
+    getToken _       = Nothing
+
 -- Int Token
 intToken = tokenPrim show updatePositon getToken where
     getToken (Int x) = Just (Int x)
     getToken _       = Nothing
 
--- Float Token
-floatToken = tokenPrim show updatePositon getToken where
-    getToken (Float x) = Just (Float x)
+-- Real Token
+realToken = tokenPrim show updatePositon getToken where
+    getToken (Real x) = Just (Real x)
     getToken _         = Nothing
 
 -- Text Token
@@ -91,7 +96,7 @@ program = do
 varDecls :: ParsecT [Token] [(Token, Token)] IO([Token])
 varDecls = do
     first <- varDecl
-    next <- remaining_varDecls
+    next  <- remaining_varDecls
     return (first ++ next)
 
 varDecl :: ParsecT [Token] [(Token, Token)] IO([Token])
@@ -106,20 +111,21 @@ varDecl = do
     return (a:b:[c])
     
 remaining_varDecls :: ParsecT [Token] [(Token, Token)] IO([Token])
-remaining_varDecls = (do a <- varDecl
+remaining_varDecls = (do a <- varDecls
                          return (a)) <|> (return [])
 
+-- Tratar outros stmts
 stmts :: ParsecT [Token] [(Token, Token)] IO([Token])
 stmts = do
     first <- assign
-    next <- remaining_stmts
+    next  <- remaining_stmts
     return (first ++ next)
 
 assign :: ParsecT [Token] [(Token, Token)] IO([Token])
 assign = do
     a <- idToken
     b <- assignToken
-    c <- intToken <|> floatToken <|> textToken
+    c <- natToken <|> (intToken <|> (realToken <|> textToken))
     d <- semiColonToken
     updateState(symtableUpdate (a, c))
     s <- getState
@@ -127,7 +133,7 @@ assign = do
     return (a:b:[c])
 
 remaining_stmts :: ParsecT [Token] [(Token, Token)] IO([Token])
-remaining_stmts = (do a <- assign
+remaining_stmts = (do a <- stmts
                       return (a)) <|> (return [])
 
 
@@ -137,9 +143,9 @@ remaining_stmts = (do a <- assign
 -- -----------------------------------------------------------------------------
 
 getDefaultValue :: Token -> Token
--- getDefaultValue (Type "Nat") = Nat 0
+getDefaultValue (Type "Nat") = Nat 0
 getDefaultValue (Type "Int") = Int 0
-getDefaultValue (Type "Float") = Float 0.0
+getDefaultValue (Type "Real") = Real 0.0
 getDefaultValue (Type "Text") = Text ""
 -- getDefaultValue (Type "Univ") = Univ "\empty"
 -- getDefaultValue (Type "Bool") = Bool false
