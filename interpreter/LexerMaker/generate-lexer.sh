@@ -4,4 +4,7 @@ echo "Converting to Haskell code..."
 alex Lexer.x
 
 echo "Moving..."
-mv "Lexer.hs" "/home/ubuntu/workspace/interpreter/Lexer.hs"
+# Get dir name
+DIRNAME=$(dirname "$(realpath 0)")
+N=""
+mv "Lexer.hs" "${DIRNAME/LexerMaker/$N}Lexer.hs"
