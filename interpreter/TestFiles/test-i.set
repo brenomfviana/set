@@ -3,6 +3,8 @@ program main
 	Int : x;
 	Real : y;
 	Text : z;
+	Bool : b;
+	-- Pointer : p;
 	
 	n := 1;
 	x := -1;

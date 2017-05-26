@@ -10,6 +10,8 @@ import System.IO.Unsafe
 $digit = 0-9        -- digits
 $alpha = [a-zA-Z]   -- alphabetic characters
 
+@boolean = (true) | (false)
+
 tokens :-
 
   $white+                              ;
@@ -68,7 +70,10 @@ tokens :-
   $digit+                              { \s -> Nat (read s) }
   [\-]?$digit+                         { \s -> Int (read s) }
   [\-]?$digit+.$digit+                 { \s -> Real (read s) }
+  @boolean                             { \s -> Bool (read s) }
+  -- [\-]?$digit+.$digit+                 { \s -> Univ (read s) }
   \" [^\" \\]* \"                      { \s -> Text s }
+  -- [\-]?$digit+.$digit+                 { \s -> Pointer (read s) }
   $alpha [$alpha $digit \_ \']*        { \s -> Id s }
 
 {
@@ -86,7 +91,7 @@ data Token =
   Nat Int           |
   Int Int           |
   Real Float        |
---  Bool Bool         |
+  Bool Bool         |
 --  Univ Univ         |
   Text String       |
 --  Pointer Pointer   |

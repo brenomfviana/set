@@ -66,6 +66,11 @@ realToken = tokenPrim show updatePositon getToken where
     getToken (Real x) = Just (Real x)
     getToken _         = Nothing
 
+-- Bool Token
+boolToken = tokenPrim show updatePositon getToken where
+    getToken (Bool x) = Just (Bool x)
+    getToken _         = Nothing
+
 -- Text Token
 textToken = tokenPrim show updatePositon getToken where
     getToken (Text x) = Just (Text x)
@@ -125,7 +130,7 @@ assign :: ParsecT [Token] [(Token, Token)] IO([Token])
 assign = do
     a <- idToken
     b <- assignToken
-    c <- natToken <|> (intToken <|> (realToken <|> textToken))
+    c <- natToken <|> intToken <|> realToken <|> boolToken <|> textToken
     d <- semiColonToken
     updateState(symtableUpdate (a, c))
     s <- getState
@@ -148,7 +153,7 @@ getDefaultValue (Type "Int") = Int 0
 getDefaultValue (Type "Real") = Real 0.0
 getDefaultValue (Type "Text") = Text ""
 -- getDefaultValue (Type "Univ") = Univ "\empty"
--- getDefaultValue (Type "Bool") = Bool false
+getDefaultValue (Type "Bool") = Bool False
 -- getDefaultValue (Type "Pointer") = Pointer 0.0
 -- getDefaultValue (Type "Set[" <type> "]") = "Set[" <type> "]" "\empty"
 
