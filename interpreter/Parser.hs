@@ -1,6 +1,5 @@
 -- Parser (Syntax Analyzer)
--- Version: 10/05/2017
--- Author : Breno Viana
+-- Version: 01/06/2017
 -- module Parser where
 module Main (main) where
 

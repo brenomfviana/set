@@ -1,6 +1,5 @@
 -- Symbol Table
 -- Version: 10/05/2017
--- Author : Felipe Barbalho
 module SymbolTable where
 
 -- Import
