@@ -21,7 +21,7 @@ $alpha = [a-zA-Z]   -- alphabetic characters
 tokens :-
 
   $white+                              ;
-  "#".*                                ;
+  "#".*                                ; -- Comment
   program                              { \p s -> Program (getLC p) }
   end                                  { \p s -> End (getLC p) }
   :                                    { \p s -> Colon (getLC p) }
@@ -37,9 +37,9 @@ tokens :-
   "set["                               { \p s -> Set_of (getLC p) }
   "]"                                  { \p s -> End_Set_of (getLC p) }
   if                                   { \p s -> If (getLC p) }
-  endif                                { \p s -> End_If (getLC p) }
   else                                 { \p s -> Else (getLC p) }
   elseif                               { \p s -> Else_If (getLC p) }
+  endif                                { \p s -> End_If (getLC p) }
   func                                 { \p s -> Function (getLC p) }
   endfunc                              { \p s -> End_Function(getLC p) }
   proc                                 { \p s -> Proc (getLC p) }
@@ -47,17 +47,22 @@ tokens :-
   while                                { \p s -> While (getLC p) }
   endwhile                             { \p s -> End_While (getLC p) }
   typedef                              { \p s -> Typedef (getLC p) }
+  print                                { \p s -> Print (getLC p) }
+  input                                { \p s -> Input (getLC p) }
+  exit                                 { \p s -> Exit (getLC p) }
+  break                                { \p s -> Break (getLC p) }
+  continue                             { \p s -> Continue (getLC p) }
+  @natural                             { \p s -> Nat (read s) (getLC p) }
+  @integer                             { \p s -> Int (read s) (getLC p) }
+  @real                                { \p s -> Real (read s) (getLC p) }
+  @boolean                             { \p s -> Bool (read s) (getLC p) }
+  -- @univ                                { \p s -> Univ (read s) (getLC p) }
+  @string                              { \p s -> Text s (getLC p) }
+  -- @pointer                             { \p s -> Pointer (read s) (getLC p) }
+  $alpha [$alpha $digit \_ \']*        { \p s -> Id s (getLC p) }
+  true                                 { \p s -> Bool True (getLC p) }
+  false                                { \p s -> Bool False (getLC p) }
   :=                                   { \p s -> Assign (getLC p) }
-  "\in"                                { \p s -> Belongs (getLC p) }
-  "\cap"                               { \p s -> Intersection (getLC p) }
-  "\cup"                               { \p s -> Union (getLC p) }
-  "\subset"                            { \p s -> Subset (getLC p) }
-  "\stcomp"                            { \p s -> Complement (getLC p) }
-  "\emptyset"                          { \p s -> Empty_Set (getLC p) }
-  "{"                                  { \p s -> Open_Bracket (getLC p) }
-  "}"                                  { \p s -> Close_Bracket (getLC p) }
-  "("                                  { \p s -> Open_Parentheses  (getLC p) }
-  ")"                                  { \p s -> Close_Parentheses (getLC p) }
   "+"                                  { \p s -> Addition (getLC p) }
   "-"                                  { \p s -> Subtraction (getLC p) }
   "*"                                  { \p s -> Multiplication (getLC p) }
@@ -68,20 +73,16 @@ tokens :-
   "<="                                 { \p s -> SmallerOrEqual (getLC p) }
   !                                    { \p s -> Denial (getLC p) }
   =                                    { \p s -> Equality (getLC p) }
-  print                                { \p s -> Print (getLC p) }
-  input                                { \p s -> Input (getLC p) }
-  exit                                 { \p s -> Exit (getLC p) }
-  break                                { \p s -> Break (getLC p) }
-  continue                             { \p s -> Continue (getLC p) }
-  @natural                             { \p s -> Nat (read s) (getLC p) }
-  @integer                             { \p s -> Int (read s) (getLC p) }
-  @real                                { \p s -> Real (read s) (getLC p) }
-  @boolean                             { \p s -> Bool (read s) (getLC p) }
-  -- @univ                                { \p s -> Univ s (getLC p) }
-  @string                              { \p s -> Text s (getLC p) }
-  -- @pointer                             { \p s -> Pointer (read s) (getLC p) }
-  $alpha [$alpha $digit \_ \']*        { \p s -> Id s (getLC p) }
-
+  "\in"                                { \p s -> Belongs (getLC p) }
+  "\cap"                               { \p s -> Intersection (getLC p) }
+  "\cup"                               { \p s -> Union (getLC p) }
+  "\subset"                            { \p s -> Subset (getLC p) }
+  "\stcomp"                            { \p s -> Complement (getLC p) }
+  "\emptyset"                          { \p s -> Empty_Set (getLC p) }
+  "{"                                  { \p s -> Open_Bracket (getLC p) }
+  "}"                                  { \p s -> Close_Bracket (getLC p) }
+  "("                                  { \p s -> Open_Parentheses (getLC p) }
+  ")"                                  { \p s -> Close_Parentheses (getLC p) }
 {
 
 -- Token Position
@@ -107,9 +108,9 @@ data Token =
   Set_of (Int, Int)            |
   End_Set_of (Int, Int)        |
   If (Int, Int)                |
-  End_If (Int, Int)            |
   Else (Int, Int)              |
   Else_If (Int, Int)           |
+  End_If (Int, Int)            |
   Function (Int, Int)          |
   End_Function (Int, Int)      |
   Proc (Int, Int)              |
@@ -117,17 +118,12 @@ data Token =
   While (Int, Int)             |
   End_While (Int, Int)         |
   Typedef (Int, Int)           |
+  Print (Int, Int)             |
+  Input (Int, Int)             |
+  Exit (Int, Int)              |
+  Break (Int, Int)             |
+  Continue (Int, Int)          |
   Assign (Int, Int)            |
-  Belongs (Int, Int)           |
-  Intersection (Int, Int)      |
-  Union (Int, Int)             |
-  Subset (Int, Int)            |
-  Complement (Int, Int)        |
-  Empty_Set (Int, Int)         |
-  Open_Bracket (Int, Int)      |
-  Close_Bracket (Int, Int)     |
-  Open_Parentheses (Int, Int)  |
-  Close_Parentheses (Int, Int) |
   Addition (Int, Int)          |
   Subtraction (Int, Int)       |
   Multiplication (Int, Int)    |
@@ -138,11 +134,16 @@ data Token =
   SmallerOrEqual (Int, Int)    |
   Denial (Int, Int)            |
   Equality (Int, Int)          |
-  Print (Int, Int)             |
-  Input (Int, Int)             |
-  Exit (Int, Int)              |
-  Break (Int, Int)             |
-  Continue (Int, Int)          |
+  Belongs (Int, Int)           |
+  Intersection (Int, Int)      |
+  Union (Int, Int)             |
+  Subset (Int, Int)            |
+  Complement (Int, Int)        |
+  Empty_Set (Int, Int)         |
+  Open_Bracket (Int, Int)      |
+  Close_Bracket (Int, Int)     |
+  Open_Parentheses (Int, Int)  |
+  Close_Parentheses (Int, Int) |
   String String (Int, Int)
   deriving (Eq,Show)
 
