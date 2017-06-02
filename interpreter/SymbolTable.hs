@@ -1,50 +1,25 @@
 -- Symbol Table
--- Version: 10/05/2017
+-- Version: 01/06/2017
 module SymbolTable where
 
--- Import
-import Data.List
-import Data.Tuple
+-- Imports
 import Lexer
 
--- Scope of the variable
-type Escope = [Char]
--- Symbol
-type Symbol = (Token, Token, Escope)
--- Symbol table
-type SymbolTable = [Symbol]
+-- Insert a Token in symbol table
+symtableInsert :: (Token, Token) -> [(Token, Token)] -> [(Token, Token)]
+symtableInsert symbol [] = [symbol]
+symtableInsert symbol symtable = symtable ++ [symbol]
 
--- Add a symbol to symbol table
-addSymbol :: Symbol -> SymbolTable -> SymbolTable
-addSymbol (a, b, c) symbols = symbols ++ [(a, b, c)]
+-- Updates a Token in symbol table
+symtableUpdate :: (Token, Token) -> [(Token, Token)] -> [(Token, Token)]
+symtableUpdate _ [] = fail "Variable not found!"
+symtableUpdate (Id id1 p1, v1) ((Id id2 p2, v2):t) =
+                               if id1 == id2 then (Id id1 p2, v1) : t
+                               else (Id id2 p2, v2) : symtableUpdate (Id id1 p1, v1) t
 
--- Remove a symbol to symbol table
-removeSymbol :: SymbolTable -> Token -> Escope -> SymbolTable
--- Error symbol not found
-removeSymbol [] _ _ = []
--- Search and remove symbol
-removeSymbol (head:tail) name escope = let (n, _, e) = head in
-                                        if (name == n && escope == e) then removeSymbol tail
-                                        else head : findSymbol tail name escope
-
--- Update a symbol to symbol table
-updateSymbol :: SymbolTable -> Token -> Escope -> Token -> SymbolTable
--- Error symbol not found
-updateSymbol [] _ _ _ = []
--- Search and update symbol
-updateSymbol (head:tail) name escope value = let (n, _, e) = head in
-                                        if (name == n && escope == e) then setValue head value : tail
-                                        else head : findSymbol tail name escope
-
--- Set value
-setValue :: Symbol -> Value -> Symbol
-setValue (n, v, e) value = (n, value, e)
-
--- Find symbol
-findSymbol :: SymbolTable -> Token -> Escope -> Symbol
--- Error symbol not found
-findSymbol [] _ _ = ("Not Found", "NF", "NULL")
--- Search symbol
-findSymbol (head:tail) name escope = let (n, _, e) = head in
-                                        if (name == n && escope == e) then head
-                                        else head : findSymbol tail name escope
+-- Remove a Token of symbol table
+symtableRemove :: (Token, Token) -> [(Token, Token)] -> [(Token, Token)]
+symtableRemove _ [] = fail "Variable not found!"
+symtableRemove (id1, v1) ((id2, v2):t) =
+    if id1 == id2 then t
+    else (id2, v2) : symtableRemove (id1, v1) t

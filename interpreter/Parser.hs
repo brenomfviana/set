@@ -6,9 +6,9 @@ module Main (main) where
 -- Imports
 import Control.Monad.IO.Class
 import System.IO.Unsafe
-import Data.List
 import Text.Parsec
 import Lexer
+import SymbolTable
 
 -- -----------------------------------------------------------------------------
 -- Parser to Tokens
@@ -70,10 +70,20 @@ boolToken = tokenPrim show updatePositon getToken where
     getToken (Bool x pos) = Just (Bool x pos)
     getToken _         = Nothing
 
+-- Univ Token
+-- univToken = tokenPrim show updatePositon getToken where
+--     getToken (Univ x pos) = Just (Univ x pos)
+--     getToken _        = Nothing
+
 -- Text Token
 textToken = tokenPrim show updatePositon getToken where
     getToken (Text x pos) = Just (Text x pos)
     getToken _        = Nothing
+
+-- Addition Token
+additionToken = tokenPrim show updatePositon getToken where
+  getToken (Addition p) = Just (Addition p)
+  getToken _       = Nothing
 
 -- Update position
 updatePositon :: SourcePos -> Token -> [Token] -> SourcePos
@@ -81,11 +91,11 @@ updatePositon position _ (token:_) = position -- necessita melhoria
 updatePositon position _ []        = position
 
 
-
 -- -----------------------------------------------------------------------------
 -- Parser to nonterminals
 -- -----------------------------------------------------------------------------
 
+--
 program :: ParsecT [Token] [(Token, Token)] IO ([Token])
 program = do
     a <- programToken
@@ -97,80 +107,122 @@ program = do
     eof
     return (a:[b] ++ c ++ d ++ e:[f])
 
+--
 varDecls :: ParsecT [Token] [(Token, Token)] IO([Token])
 varDecls = do
     first <- varDecl
-    next  <- remaining_varDecls
+    next  <- remainingVarDecls
     return (first ++ next)
 
+--
 varDecl :: ParsecT [Token] [(Token, Token)] IO([Token])
 varDecl = do
     a <- typeToken
     b <- colonToken
     c <- idToken
     d <- semiColonToken
-    updateState(symtableInsert (c, getDefaultValue a))
+    updateState(symtableInsert(c, getDefaultValue(a)))
     s <- getState
     liftIO (print s)
     return (a:b:[c])
 
-remaining_varDecls :: ParsecT [Token] [(Token, Token)] IO([Token])
-remaining_varDecls = (do a <- varDecls
-                         return (a)) <|> (return [])
+--
+remainingVarDecls :: ParsecT [Token] [(Token, Token)] IO([Token])
+remainingVarDecls = (do a <- varDecls
+                        return (a)) <|> (return [])
 
--- Tratar outros stmts
+--
 stmts :: ParsecT [Token] [(Token, Token)] IO([Token])
 stmts = do
     first <- assign
-    next  <- remaining_stmts
+    next  <- remainingStmts
     return (first ++ next)
 
+--
 assign :: ParsecT [Token] [(Token, Token)] IO([Token])
 assign = do
     a <- idToken
     b <- assignToken
-    c <- natToken <|> intToken <|> realToken <|> boolToken <|> textToken
+    c <- expression
     d <- semiColonToken
-    updateState(symtableUpdate (a, c))
     s <- getState
-    liftIO (print s)
-    return (a:b:[c])
-
-remaining_stmts :: ParsecT [Token] [(Token, Token)] IO([Token])
-remaining_stmts = (do a <- stmts
-                      return (a)) <|> (return [])
+    --
+    if (not (compatible (getType a s) c)) then fail "Type mismatch"
+    else
+      do
+        updateState(symtableUpdate(a, c))
+        s <- getState
+        liftIO (print s)
+        return (a:b:[c])
 
 
 
 -- -----------------------------------------------------------------------------
--- Functions of the Symbol Table
+-- Type checking
 -- -----------------------------------------------------------------------------
 
+-- Get default value of different types
 getDefaultValue :: Token -> Token
 getDefaultValue (Type "Nat" pos) = Nat 0 pos
 getDefaultValue (Type "Int" pos) = Int 0 pos
 getDefaultValue (Type "Real" pos) = Real 0.0 pos
-getDefaultValue (Type "Text" pos) = Text "" pos
--- getDefaultValue (Type "Univ") = Univ "\empty"
 getDefaultValue (Type "Bool" pos) = Bool False pos
+-- getDefaultValue (Type "Univ" pos) = Univ "" pos
+getDefaultValue (Type "Text" pos) = Text "" pos
 -- getDefaultValue (Type "Pointer") = Pointer 0.0
 -- getDefaultValue (Type "Set[" <type> "]") = "Set[" <type> "]" "\empty"
 
-symtableInsert :: (Token,Token) -> [(Token, Token)] -> [(Token, Token)]
-symtableInsert symbol []  = [symbol]
-symtableInsert symbol symtable = symtable ++ [symbol]
+-- Get type
+getType :: Token -> [(Token, Token)] -> Token
+getType _ [] = error "Variable not found"
+getType (Id id1 p1) ((Id id2 _, value):t) = if id1 == id2 then value
+                                            else getType (Id id1 p1) t
 
-symtableUpdate :: (Token,Token) -> [(Token, Token)] -> [(Token, Token)]
-symtableUpdate _ [] = fail "Variable not found!"
-symtableUpdate (id1, v1) ((id2, v2):t) =
-    if id1 == id2 then (id1, v1) : t
-    else (id2, v2) : symtableUpdate (id1, v1) t
+-- Check whether types are compatible
+compatible :: Token -> Token -> Bool
+compatible (Nat _ _) (Nat _ _) = True
+compatible (Int _ _) (Int _ _) = True
+compatible (Real _ _) (Real _ _) = True
+compatible (Bool _ _) (Bool _ _) = True
+-- compatible (Univ _ _) (Univ _ _) = True
+compatible (Text _ _) (Text _ _) = True
+-- compatible (Pointer _ _) (Pointer _ _) = True
+compatible _ _ = False
 
-symtableRemove :: (Token,Token) -> [(Token, Token)] -> [(Token, Token)]
-symtableRemove _ [] = fail "Variable not found!"
-symtableRemove (id1, v1) ((id2, v2):t) =
-    if id1 == id2 then t
-    else (id2, v2) : symtableRemove (id1, v1) t
+
+
+-- -----------------------------------------------------------------------------
+-- funções para o avaliador de expressões
+-- -----------------------------------------------------------------------------
+
+--
+expression :: ParsecT [Token] [(Token,Token)] IO(Token)
+expression = try bin_expression <|> una_expression
+
+--
+una_expression :: ParsecT [Token] [(Token,Token)] IO(Token)
+una_expression = do
+                   a <- natToken <|> intToken <|> realToken <|> boolToken <|> textToken
+                   return (a)
+
+--
+bin_expression :: ParsecT [Token] [(Token,Token)] IO(Token)
+bin_expression = do
+                   a <- natToken <|> intToken <|> realToken
+                   b <- additionToken
+                   c <- natToken <|> intToken <|> realToken
+                   return (eval a b c)
+
+--
+eval :: Token -> Token -> Token -> Token
+eval (Nat x p) (Addition _) (Nat y _) = Nat (x + y) p
+eval (Int x p) (Addition _) (Int y _) = Int (x + y) p
+eval (Real x p) (Addition _) (Real y _) = Real (x + y) p
+
+--
+remainingStmts :: ParsecT [Token] [(Token, Token)] IO([Token])
+remainingStmts = (do a <- stmts
+                     return (a)) <|> (return [])
 
 
 
@@ -184,7 +236,9 @@ parser tokens = runParserT program [] "Error message" tokens
 
 -- Main
 main :: IO ()
-main = case unsafePerformIO (parser (getTokens "TestFiles/test-i.set")) of
+main = do
+    -- print (getTokens "TestFiles/test-i.set")
+    case unsafePerformIO (parser (getTokens "TestFiles/test-i.set")) of
     { Left err -> print err;
       Right ans -> print ans
     }
