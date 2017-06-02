@@ -2,3 +2,4 @@
 
 echo "Compiling..."
 ghc Parser.hs
+rm *.hi *.o
