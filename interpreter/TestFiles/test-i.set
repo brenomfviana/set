@@ -8,8 +8,8 @@ program main
 	# Pointer : p;
 
 	n := 1 + 2;
-	x := -1;
-	y := -0.5;
+	x := -1 * -4;
+	y := -0.5 - 2.0;
 	z := "Ohayo";
-	# b := true;
+	# b := True;
 end main

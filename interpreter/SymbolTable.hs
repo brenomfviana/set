@@ -14,8 +14,8 @@ symtableInsert symbol symtable = symtable ++ [symbol]
 symtableUpdate :: (Token, Token) -> [(Token, Token)] -> [(Token, Token)]
 symtableUpdate _ [] = fail "Variable not found!"
 symtableUpdate (Id id1 p1, v1) ((Id id2 p2, v2):t) =
-                               if id1 == id2 then (Id id1 p2, v1) : t
-                               else (Id id2 p2, v2) : symtableUpdate (Id id1 p1, v1) t
+    if id1 == id2 then (Id id1 p2, v1) : t
+    else (Id id2 p2, v2) : symtableUpdate (Id id1 p1, v1) t
 
 -- Remove a Token of symbol table
 symtableRemove :: (Token, Token) -> [(Token, Token)] -> [(Token, Token)]

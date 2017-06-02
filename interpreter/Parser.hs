@@ -82,8 +82,23 @@ textToken = tokenPrim show updatePositon getToken where
 
 -- Addition Token
 additionToken = tokenPrim show updatePositon getToken where
-  getToken (Addition p) = Just (Addition p)
-  getToken _       = Nothing
+    getToken (Addition p) = Just (Addition p)
+    getToken _       = Nothing
+
+-- Subtraction Token
+subtractionToken = tokenPrim show updatePositon getToken where
+    getToken (Subtraction p) = Just (Subtraction p)
+    getToken _       = Nothing
+
+-- Multiplication Token
+multiplicationToken = tokenPrim show updatePositon getToken where
+    getToken (Multiplication p) = Just (Multiplication p)
+    getToken _       = Nothing
+
+-- Division Token
+-- divisionToken = tokenPrim show updatePositon getToken where
+--     getToken (Division p) = Just (Division p)
+--     getToken _       = Nothing
 
 -- Update position
 updatePositon :: SourcePos -> Token -> [Token] -> SourcePos
@@ -95,7 +110,7 @@ updatePositon position _ []        = position
 -- Parser to nonterminals
 -- -----------------------------------------------------------------------------
 
---
+-- Program
 program :: ParsecT [Token] [(Token, Token)] IO ([Token])
 program = do
     a <- programToken
@@ -107,14 +122,14 @@ program = do
     eof
     return (a:[b] ++ c ++ d ++ e:[f])
 
---
+-- Variable declarations
 varDecls :: ParsecT [Token] [(Token, Token)] IO([Token])
 varDecls = do
     first <- varDecl
     next  <- remainingVarDecls
     return (first ++ next)
 
---
+-- Variable declaration
 varDecl :: ParsecT [Token] [(Token, Token)] IO([Token])
 varDecl = do
     a <- typeToken
@@ -126,19 +141,24 @@ varDecl = do
     liftIO (print s)
     return (a:b:[c])
 
---
+-- Variable declaration remaining
 remainingVarDecls :: ParsecT [Token] [(Token, Token)] IO([Token])
 remainingVarDecls = (do a <- varDecls
                         return (a)) <|> (return [])
 
---
+-- Statements
 stmts :: ParsecT [Token] [(Token, Token)] IO([Token])
 stmts = do
     first <- assign
     next  <- remainingStmts
     return (first ++ next)
 
---
+-- Statements remaining
+remainingStmts :: ParsecT [Token] [(Token, Token)] IO([Token])
+remainingStmts = (do a <- stmts
+                     return (a)) <|> (return [])
+
+-- Assing
 assign :: ParsecT [Token] [(Token, Token)] IO([Token])
 assign = do
     a <- idToken
@@ -154,7 +174,6 @@ assign = do
         s <- getState
         liftIO (print s)
         return (a:b:[c])
-
 
 
 -- -----------------------------------------------------------------------------
@@ -192,37 +211,43 @@ compatible _ _ = False
 
 
 -- -----------------------------------------------------------------------------
--- funções para o avaliador de expressões
+-- Expression evaluator
 -- -----------------------------------------------------------------------------
 
---
+-- Expressions
 expression :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression = try bin_expression <|> una_expression
+expression = try  binaryExpression <|> unaryExpression
 
---
-una_expression :: ParsecT [Token] [(Token,Token)] IO(Token)
-una_expression = do
-                   a <- natToken <|> intToken <|> realToken <|> boolToken <|> textToken
+-- Unary expression
+unaryExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
+unaryExpression = do
+                   a <- natToken <|> intToken <|> realToken <|> boolToken
+                        <|> textToken
                    return (a)
 
---
-bin_expression :: ParsecT [Token] [(Token,Token)] IO(Token)
-bin_expression = do
+-- Binary expression
+binaryExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
+binaryExpression = do
                    a <- natToken <|> intToken <|> realToken
-                   b <- additionToken
+                   b <- additionToken <|> subtractionToken
+                        <|> multiplicationToken
                    c <- natToken <|> intToken <|> realToken
                    return (eval a b c)
 
---
+-- Evaluation
 eval :: Token -> Token -> Token -> Token
-eval (Nat x p) (Addition _) (Nat y _) = Nat (x + y) p
-eval (Int x p) (Addition _) (Int y _) = Int (x + y) p
-eval (Real x p) (Addition _) (Real y _) = Real (x + y) p
-
---
-remainingStmts :: ParsecT [Token] [(Token, Token)] IO([Token])
-remainingStmts = (do a <- stmts
-                     return (a)) <|> (return [])
+eval (Nat x p)  (Addition _)       (Nat y _)  = Nat  (x + y) p
+eval (Int x p)  (Addition _)       (Int y _)  = Int  (x + y) p
+eval (Real x p) (Addition _)       (Real y _) = Real (x + y) p
+eval (Nat x p)  (Subtraction _)    (Nat y _)  = Nat  (x - y) p
+eval (Int x p)  (Subtraction _)    (Int y _)  = Int  (x - y) p
+eval (Real x p) (Subtraction _)    (Real y _) = Real (x - y) p
+eval (Nat x p)  (Multiplication _) (Nat y _)  = Nat  (x * y) p
+eval (Int x p)  (Multiplication _) (Int y _)  = Int  (x * y) p
+eval (Real x p) (Multiplication _) (Real y _) = Real (x * y) p
+-- eval (Nat x p) (Division _) (Nat y _) = Nat (x / y) p
+-- eval (Int x p) (Division _) (Int y _) = Int (x / y) p
+-- eval (Real x p) (Division _) (Real y _) = Real (x / y) p
 
 
 
@@ -237,8 +262,8 @@ parser tokens = runParserT program [] "Error message" tokens
 -- Main
 main :: IO ()
 main = do
-    -- print (getTokens "TestFiles/test-i.set")
     case unsafePerformIO (parser (getTokens "TestFiles/test-i.set")) of
-    { Left err -> print err;
-      Right ans -> print ans
+    {
+      Left err -> print err;
+      Right ans -> print "The program ran successfully!" -- ans
     }
