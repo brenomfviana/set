@@ -7,8 +7,9 @@ program main
 	# Univ : u;
 	# Pointer : p;
 
-	n := 1;
+	n := 1 + 2;
 	x := -1;
 	y := -0.5;
 	z := "Ohayo";
+	# b := true;
 end main
