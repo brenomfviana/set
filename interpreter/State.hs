@@ -27,8 +27,13 @@ type Key = (String, Integer)
 -- Parser types
 -- --------------------------------------------------------
 
+--
 type Parser      = ParsecT [Token] State Identity
+
+--
 type Interpreter = Parser  (Maybe (Type, Value))
+
+--
 type Statement   = Parser  (Maybe (Maybe (Type, Value)))
 
 -- -----------------------------------------------------------------------------
@@ -139,6 +144,10 @@ type Procedure = (String, Integer, [VarDecl], [Token])
 -- Procedure handler
 -- --------------------------------------
 
+-- - Insert procedure
+-- - Get procedure
+-- - Update procedure
+
 -- --------------------------------------------------------
 -- Function
 -- --------------------------------------------------------
@@ -162,6 +171,11 @@ type Function = (String, Integer, [VarDecl], Type, [Token])
 -- Function handler
 -- --------------------------------------
 
+-- - Insert function
+-- - Get function
+-- - Get function return type
+-- - Update function
+
 -- --------------------------------------------------------
 -- User types
 -- --------------------------------------------------------
@@ -180,11 +194,13 @@ type UserType = (String, [Field])
 -- Init values
 -- -----------------------------------------------------------------------------
 
--- Initializes the program state
+-- - Initializes the program state
 initState :: State
 initState = ([], [])
 
--- Get init values
+-- - Get init values
+-- Type   Variable type
+-- Return Initial variable value
 getInitValue :: Type -> Value
 getInitValue (AtomicType  "Nat") = NatValue  0
 getInitValue (AtomicType  "Int") = IntValue  0
