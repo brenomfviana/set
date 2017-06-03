@@ -23,6 +23,14 @@ type State = ([Var], [Statement])
 -- Integer Type scope ID
 type Key = (String, Integer)
 
+-- --------------------------------------------------------
+-- Parser types
+-- --------------------------------------------------------
+
+type Parser      = ParsecT [Token] State Identity
+type Interpreter = Parser  (Maybe (Type, Value))
+type Statement   = Parser  (Maybe (Maybe (Type, Value)))
+
 -- -----------------------------------------------------------------------------
 -- Memory
 -- -----------------------------------------------------------------------------
@@ -38,7 +46,7 @@ data Type =
 	| PointerType Type
 	| ProcType    ProcDecl
 	| FuncType    FuncDecl
-	deriving (Eq,Show)
+	deriving (Eq, Show)
 
 -- Values
 data Value =
@@ -52,12 +60,11 @@ data Value =
 	| ProcValue    Key
 	| FuncValue    Key
     | UserValue    [Value]
-	deriving (Eq,Show)
+	deriving (Eq, Show)
 
 -- --------------------------------------------------------
 -- Variables
 -- --------------------------------------------------------
-
 
 -- - Variable declaration
 -- String  Variable name
@@ -77,6 +84,36 @@ type Var = (String, Integer, Type, Value)
 -- Bool --
 type UpdatedVar = (Var, Bool)
 
+-- --------------------------------------
+-- Variable handler
+-- --------------------------------------
+
+-- - Insert variable
+-- VarDecl Variable declaration
+-- State   Current state
+-- Return  Updated state
+insertVariable :: VarDecl -> State -> State
+insertVariable (n, sc, t) (m, st) =
+	let nv = (n, sc, t, getInitValue t) in (nv:m, st)
+
+-- - Get variable
+-- State  Current state
+-- Key    Variable key
+-- Return Updated state
+getVariable :: State -> Key -> Var
+getVariable ((vn, vsc, vt, vv):m, st) (n, sc) =
+    if vn == n && vsc == sc then (vn, vsc, vt, vv)
+    else getVariable (m, st) (n, sc)  -- Isso remove items da tabela?
+
+-- - Get variable type
+-- State  Current state
+-- Key    Variable key
+-- Return Variable type
+getVariableType :: State -> Key -> Type
+getVariableType s k = let (_, _, t, _) = getVar s k in t
+
+-- - Update variable
+
 -- -----------------------------------------------------------------------------
 -- Statements
 -- -----------------------------------------------------------------------------
@@ -85,6 +122,19 @@ type UpdatedVar = (Var, Bool)
 -- Procedure
 -- --------------------------------------------------------
 
+-- - Procedure declaration
+-- String    Procedure name
+-- Integer   Procedure scope ID
+-- [VarDecl] Parameters
+type ProcDec = (String, Integer, [VarDecl])
+
+-- - Procedure
+-- String    Procedure name
+-- Integer   Procedure scope ID
+-- [VarDecl] Parameters
+-- [Token]   Statements
+type Procedure = (String, Integer, [VarDecl], [Token])
+
 -- --------------------------------------
 -- Procedure handler
 -- --------------------------------------
@@ -92,6 +142,21 @@ type UpdatedVar = (Var, Bool)
 -- --------------------------------------------------------
 -- Function
 -- --------------------------------------------------------
+
+-- - Function declaration
+-- String    Function name
+-- Integer   Function scope ID
+-- [VarDecl] Parameters
+-- Type      Return type
+type FuncDec = (String, Integer, [VarDecl], Type)
+
+-- - Function
+-- String    Function name
+-- Integer   Function scope ID
+-- [VarDecl] Parameters
+-- [Token]   Statements
+-- Type      Return type
+type Function = (String, Integer, [VarDecl], Type, [Token])
 
 -- --------------------------------------
 -- Function handler
