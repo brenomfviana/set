@@ -189,7 +189,7 @@ assign = do
     d <- semiColonToken
     s <- getState
     --
-    if (not (compatible (getType a s) c)) then fail "Type mismatch"
+    if (not (compatible (getType a s) c)) then fail "Type mismatch."
     else
       do
         updateState(symtableUpdate(a, c))

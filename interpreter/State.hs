@@ -23,19 +23,6 @@ type State = ([Var], [Statement])
 -- Integer Type scope ID
 type Key = (String, Integer)
 
--- --------------------------------------------------------
--- Parser types
--- --------------------------------------------------------
-
---
-type Parser      = ParsecT [Token] State Identity
-
---
-type Interpreter = Parser  (Maybe (Type, Value))
-
---
-type Statement   = Parser  (Maybe (Maybe (Type, Value)))
-
 -- -----------------------------------------------------------------------------
 -- Memory
 -- -----------------------------------------------------------------------------
@@ -55,16 +42,16 @@ data Type =
 
 -- Values
 data Value =
-      NatValue     Int
-    | IntValue     Int
-    | RealValue    Double
-  	| BoolValue    Bool
-  	| TextValue    String
-    | ArrayValue   [Value]
-	| PointerValue Key
-	| ProcValue    Key
-	| FuncValue    Key
-    | UserValue    [Value]
+      NatValue      Int
+    | IntValue      Int
+    | RealValue     Double
+  	| BoolValue     Bool
+  	| TextValue     String
+    | ArrayValue    [Value]
+	| PointerValue  Key
+	| ProcValue     Key
+	| FuncValue     Key
+    | UserTypeValue [Value]
 	deriving (Eq, Show)
 
 -- --------------------------------------------------------
@@ -83,11 +70,6 @@ type VarDecl = (String, Integer, Type)
 -- Type    Variable type
 -- Value   Variable value
 type Var = (String, Integer, Type, Value)
-
--- - Updated variable
--- Var  Variable
--- Bool --
-type UpdatedVar = (Var, Bool)
 
 -- --------------------------------------
 -- Variable handler
@@ -131,7 +113,7 @@ getVariableType s k = let (_, _, t, _) = getVar s k in t
 -- String    Procedure name
 -- Integer   Procedure scope ID
 -- [VarDecl] Parameters
-type ProcDec = (String, Integer, [VarDecl])
+type ProcDecl = (String, Integer, [VarDecl])
 
 -- - Procedure
 -- String    Procedure name

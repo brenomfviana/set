@@ -1,4 +1,5 @@
 program main
+
 	Nat : n;
 	Int : x;
 	Real : y;
@@ -13,3 +14,14 @@ program main
 	z := "Ohayo";
 	# b := True;
 end main
+
+
+# proc show (Nat number)
+#  	Nat : n;
+#  	n := number + 2;
+# endproc
+
+# func soma (Nat number)
+#  	Nat : n;
+#  	n := number + 2;
+# endfunc
