@@ -21,7 +21,8 @@ end main
 #  	n := number + 2;
 # endproc
 
-# func soma (Nat number)
-#  	Nat : n;
-#  	n := number + 2;
+# func soma (Nat number1, Nat number2)
+#  	Nat : sum;
+#  	sum := number1 + number2;
+#	return sum;
 # endfunc
