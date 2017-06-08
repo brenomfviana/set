@@ -94,6 +94,16 @@ subtractionToken = tokenPrim show updatePositon getToken where
 multiplicationToken = tokenPrim show updatePositon getToken where
     getToken (Multiplication p) = Just (Multiplication p)
     getToken _       = Nothing
+    
+-- - Open_Parentheses Token
+open_Parentheses = tokenPrim show updatePositon getToken where
+    getToken (Open_Parentheses p) = Just (Open_Parentheses p)
+    getToken _       = Nothing
+    
+-- - Close_Parentheses Token
+close_Parentheses = tokenPrim show updatePositon getToken where
+    getToken (Close_Parentheses p) = Just (Close_Parentheses p)
+    getToken _       = Nothing
 
 -- - Division Token
 -- divisionToken = tokenPrim show updatePositon getToken where
@@ -229,8 +239,8 @@ getType (Id id1 p1) ((Id id2 _, value):t) = if id1 == id2 then value
 -- [Token]          --
 -- [(Token, Token)] --
 compatible :: Token -> Token -> Bool
-compatible (Nat _ _) (Nat _ _) = True
-compatible (Int _ _) (Int _ _) = True
+compatible (Nat _ _)   (Nat _ _) = True
+compatible (Int _ _)   (Int _ _) = True
 compatible (Real _ _) (Real _ _) = True
 compatible (Bool _ _) (Bool _ _) = True
 -- compatible (Univ _ _) (Univ _ _) = True
@@ -249,7 +259,8 @@ compatible _ _ = False
 -- [Token]          --
 -- [(Token, Token)] --
 expression :: ParsecT [Token] [(Token,Token)] IO(Token)
-expression = try  binaryExpression <|> unaryExpression
+expression = try  binaryExpression <|> unaryExpression <|> parentExpression
+ 
 
 -- - Unary expression
 -- ParsecT          --
@@ -260,6 +271,18 @@ unaryExpression = do
                    a <- natToken <|> intToken <|> realToken <|> boolToken
                         <|> textToken
                    return (a)
+   
+
+-- - Unary expression
+-- ParsecT          --
+-- [Token]          --
+-- [(Token, Token)] --               
+parentExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
+parentExpression = do
+                  a <- open_Parentheses
+                  b <- expression <|> parentExpression
+                  c <- close_Parentheses
+                  return (b)                   
 
 -- - Binary expression
 -- ParsecT          --
@@ -267,18 +290,20 @@ unaryExpression = do
 -- [(Token, Token)] --
 binaryExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
 binaryExpression = do
-                   a <- natToken <|> intToken <|> realToken
-                   b <- additionToken <|> subtractionToken
-                        <|> multiplicationToken
-                   c <- natToken <|> intToken <|> realToken
-                   return (eval a b c)
+                   a <- natToken <|> intToken <|> realToken <|> parentExpression
+                   b <- additionToken <|> subtractionToken <|> multiplicationToken
+                   c <- expression 
 
+                   return (eval a b c)
+                   
 -- - Evaluation
 -- ParsecT          --
 -- [Token]          --
 -- [(Token, Token)] --
 eval :: Token -> Token -> Token -> Token
-eval (Nat x p)  (Addition _)       (Nat y _)  = Nat  (x + y) p
+eval (Nat x p)  (Addition _)       (Nat y _)  = Nat (x + y) p
+eval (Nat x p)  (Addition _)       (Int y _)  = Int  (x + y) p
+eval (Int x p)  (Addition _)       (Nat y _)  = Int  (x + y) p
 eval (Int x p)  (Addition _)       (Int y _)  = Int  (x + y) p
 eval (Real x p) (Addition _)       (Real y _) = Real (x + y) p
 eval (Nat x p)  (Subtraction _)    (Nat y _)  = Nat  (x - y) p

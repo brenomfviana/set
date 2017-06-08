@@ -3,10 +3,6 @@
 module State where
 
 -- Imports
-import Data.Functor.Identity
-import Text.ParserCombinators.Parsec
-import Text.Parsec.Combinator
-import Text.Parsec.Prim
 import Lexer
 
 -- -----------------------------------------------------------------------------

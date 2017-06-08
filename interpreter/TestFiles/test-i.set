@@ -1,17 +1,25 @@
 program main
 
 	Nat : n;
-	Int : x;
-	Real : y;
-	Text : z;
-	Bool : b;
+	# Int : x;
+	# Real : y;
+	# Text : z;
+	# Bool : b;
 	# Univ : u;
 	# Pointer : p;
 
-	n := 1 + 2;
-	x := -1 * -4;
-	y := -0.5 - 2.0;
-	z := "Ohayo";
+	n := (1 - 2) + 2 + (5 - 8);
+	n := ((1 - 2) + 2) + (5 - 8);
+	n := ((1 - 2) + 2 + 5) - 8;
+	n := (((1 - 2) + 2) + (5 - 8));
+	n := (2 * 3) + 2;
+	n := 2 * (3 + 2);
+	n := 2 + 3 * 2;
+	n := (2 + 3) * 2;
+	
+	# x := 1 + 4;
+	# y := 0.5 * 2.0;
+	# z  := "Ohayo";
 	# b := True;
 end main
 
