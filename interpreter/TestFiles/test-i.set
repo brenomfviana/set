@@ -1,13 +1,15 @@
 program main
 
 	Nat : n;
-	# Int : x;
-	# Real : y;
+	Int : x;
+	Real : y;
 	# Text : z;
 	# Bool : b;
 	# Univ : u;
 	# Pointer : p;
 
+	# x := -1;
+	# y := -1;
 	n := (1 - 2) + 2 + (5 - 8);
 	n := ((1 - 2) + 2) + (5 - 8);
 	n := ((1 - 2) + 2 + 5) - 8;
@@ -16,7 +18,7 @@ program main
 	n := 2 * (3 + 2);
 	n := 2 + 3 * 2;
 	n := (2 + 3) * 2;
-	
+
 	# x := 1 + 4;
 	# y := 0.5 * 2.0;
 	# z  := "Ohayo";
