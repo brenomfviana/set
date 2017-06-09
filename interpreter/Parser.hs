@@ -118,7 +118,7 @@ greaterToken = tokenPrim show updatePositon getToken where
 greaterOrEqualToken = tokenPrim show updatePositon getToken where
     getToken (GreaterOrEqual p) = Just (GreaterOrEqual p)
     getToken _                  = Nothing
-    
+
 -- - Smaller Token
 smallerToken = tokenPrim show updatePositon getToken where
     getToken (Smaller p) = Just (Smaller p)
@@ -240,7 +240,7 @@ assign = do
     if (not (compatible (getType a s) c)) then fail "Type mismatch."
     else
         do
-            updateState(symtableUpdate(a, (updateType (getType a s) c)))
+            updateState(symtableUpdate(a, (cast (getType a s) c)))
             s <- getState
             liftIO (print s)
             return (a:b:[c])
@@ -272,17 +272,21 @@ getType _ [] = error "Variable not found."
 getType (Id id1 p1) ((Id id2 _, value):t) = if id1 == id2 then value
                                             else getType (Id id1 p1) t
 
--- Cast
-updateType :: Token -> Token -> Token
-updateType (Nat _ _)   (Nat i p) = Nat i p
-updateType (Int _ _)   (Nat i p) = Int i p
-updateType (Int _ _)   (Int i p) = Int i p
-updateType (Real _ _)  (Nat i p) = let x = integerToFloat(i) in Real x p
-updateType (Real _ _)  (Int i p) = let x = integerToFloat(i) in Real x p
-updateType (Real _ _) (Real i p) = Real i p
-updateType (Bool _ _) (Bool i p) = Bool i p
-updateType (Text _ _) (Text i p) = Text i p
-updateType _ _ = error "Invalid cast."
+-- - Cast
+-- Token  Variable type
+-- Token  Expression type
+-- Return New expression type
+cast :: Token -> Token -> Token
+cast (Nat _ _)   (Nat i p) = if i < 0 then error "Invalid assignment."
+                             else Nat i p
+cast (Int _ _)   (Nat i p) = Int i p
+cast (Int _ _)   (Int i p) = Int i p
+cast (Real _ _)  (Nat i p) = let x = integerToFloat(i) in Real x p
+cast (Real _ _)  (Int i p) = let x = integerToFloat(i) in Real x p
+cast (Real _ _) (Real i p) = Real i p
+cast (Bool _ _) (Bool i p) = Bool i p
+cast (Text _ _) (Text i p) = Text i p
+cast _ _ = error "Invalid cast."
 
 -- - Check whether types are compatible
 -- ParsecT          ParsecT
@@ -343,13 +347,13 @@ numberOP = additionToken <|> subtractionToken <|> multiplicationToken
 -- - Expression with parentheses
 -- ParsecT          ParsecT
 -- [Token]          Token list
--- [(Token, Token)] State             
+-- [(Token, Token)] State
 parentExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
 parentExpression = do
                   a <- open_Parentheses
                   b <- expression <|> parentExpression
                   c <- close_Parentheses
-                  return (b)     
+                  return (b)
 
 -- - Binary expression
 -- ParsecT          ParsecT
@@ -359,7 +363,7 @@ binaryExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
 binaryExpression = do
                    a <- natToken <|> intToken <|> realToken <|> parentExpression <|> boolToken <|> textToken
                    b <- numberOP <|> booleanOP
-                   c <- expression 
+                   c <- expression
                    return (eval a b c)
 
 -- - Evaluation
