@@ -80,19 +80,33 @@ eval (Nat x p)  (Addition _)       (Nat y _)  = Nat  (x + y) p
 eval (Nat x p)  (Addition _)       (Int y _)  = Int  (x + y) p
 eval (Int x p)  (Addition _)       (Nat y _)  = Int  (x + y) p
 eval (Int x p)  (Addition _)       (Int y _)  = Int  (x + y) p
+eval (Real x p) (Addition _)       (Nat y _)  = Real (x + integerToFloat(y)) p
+eval (Real x p) (Addition _)       (Int y _)  = Real (x + integerToFloat(y)) p
 eval (Real x p) (Addition _)       (Real y _) = Real (x + y) p
 -- Subtraction
 eval (Nat x p)  (Subtraction _)    (Nat y _)  = Nat  (x - y) p
+eval (Nat x p)  (Subtraction _)    (Int y _)  = Int  (x - y) p
+eval (Int x p)  (Subtraction _)    (Nat y _)  = Int  (x - y) p
 eval (Int x p)  (Subtraction _)    (Int y _)  = Int  (x - y) p
+eval (Real x p) (Subtraction _)    (Nat y _)  = Real (x - integerToFloat(y)) p
+eval (Real x p) (Subtraction _)    (Int y _)  = Real (x - integerToFloat(y)) p
 eval (Real x p) (Subtraction _)    (Real y _) = Real (x - y) p
 -- Multiplication
 eval (Nat x p)  (Multiplication _) (Nat y _)  = Nat  (x * y) p
+eval (Nat x p)  (Multiplication _) (Int y _)  = Int  (x * y) p
+eval (Int x p)  (Multiplication _) (Nat y _)  = Int  (x * y) p
 eval (Int x p)  (Multiplication _) (Int y _)  = Int  (x * y) p
+eval (Real x p) (Multiplication _) (Nat y _)  = Real (x * integerToFloat(y)) p
+eval (Real x p) (Multiplication _) (Int y _)  = Real (x * integerToFloat(y)) p
 eval (Real x p) (Multiplication _) (Real y _) = Real (x * y) p
 -- Division
--- eval (Nat x p) (Division _) (Nat y _) = Nat (x / y) p
--- eval (Int x p) (Division _) (Int y _) = Int (x / y) p
--- eval (Real x p) (Division _) (Real y _) = Real (x / y) p
+eval (Nat x p)  (Division _) (Nat y _)  = let z = round(integerToFloat(x) / integerToFloat(y)) in Nat z p
+eval (Nat x p)  (Division _) (Int y _)  = let z = round(integerToFloat(x) / integerToFloat(y)) in Int z p
+eval (Int x p)  (Division _) (Nat y _)  = let z = round(integerToFloat(x) / integerToFloat(y)) in Int z p
+eval (Int x p)  (Division _) (Int y _)  = let z = round(integerToFloat(x) / integerToFloat(y)) in Int z p
+eval (Real x p) (Division _) (Nat y _)  = Real (x / integerToFloat(y)) p
+eval (Real x p) (Division _) (Int y _)  = Real (x / integerToFloat(y)) p
+eval (Real x p) (Division _) (Real y _) = Real (x / y) p
 -- Equality
 eval (Nat x p)  (Equality _)  (Nat y _) = Bool (x == y) p
 eval (Int x p)  (Equality _)  (Int y _) = Bool (x == y) p
