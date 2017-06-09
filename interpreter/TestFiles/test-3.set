@@ -1,2 +1,12 @@
 program main
+    Nat : n1;
+    Bool : b;
+    
+    print(n1);
+    
+    if (0 > 1)
+        n1 := 8;
+    endif
+    
+    print(n1);
 end main

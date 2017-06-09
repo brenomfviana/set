@@ -67,7 +67,7 @@ remainingVarDecls = (do a <- varDecls
 -- [(Token, Token)] State
 stmts :: ParsecT [Token] [(Token, Token)] IO([Token])
 stmts = do
-    first <- assign <|> printS
+    first <- assign <|> printS <|> ifStmt
     next  <- remainingStmts
     return (first ++ next)
 
@@ -112,6 +112,23 @@ printS = do
     e <- semiColonToken
     liftIO (print (getValue c))
     return (a:b:c:d:[e])
+
+-- - If statements
+ifStmt :: ParsecT [Token] [(Token, Token)] IO([Token])
+ifStmt = do
+    a <- ifToken
+    b <- openParenthesesToken
+    c <- expression
+    d <- closeParenthesesToken
+    s <- getState
+    e <- stmts
+    -- if (getValue c) then do {
+    --     e <- stmts
+    --     f <- endIfToken
+    --     return (a:b:c:[d] ++ e ++ [f])
+    -- }
+    f <- endIfToken
+    return (a:b:c:[d] ++ e ++ [f])
 
 -- - Cast
 -- Token  Variable type
