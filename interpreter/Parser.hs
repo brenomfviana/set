@@ -47,6 +47,12 @@ assignToken = tokenPrim show updatePositon getToken where
     getToken (Assign pos) = Just (Assign pos)
     getToken _            = Nothing
 
+
+
+-- --------------------------------------------------------
+-- Type tokens
+-- --------------------------------------------------------
+
 -- - Type Token
 typeToken :: ParsecT [Token] st IO(Token)
 typeToken = tokenPrim show updatePositon getToken where
@@ -91,6 +97,18 @@ textToken = tokenPrim show updatePositon getToken where
     getToken (Text x pos) = Just (Text x pos)
     getToken _            = Nothing
 
+
+
+-- --------------------------------------------------------
+-- Operator
+
+
+
+-- --------------------------------------------------------
+-- Expression tokens
+-- -------------------------------------------------------- tokens
+-- --------------------------------------------------------
+
 -- - Addition Token
 additionToken :: ParsecT [Token] st IO(Token)
 additionToken = tokenPrim show updatePositon getToken where
@@ -114,7 +132,6 @@ multiplicationToken = tokenPrim show updatePositon getToken where
 -- divisionToken = tokenPrim show updatePositon getToken where
 --     getToken (Division p) = Just (Division p)
 --     getToken _       = Nothing
-
 
 -- - Equality Token
 equalityToken :: ParsecT [Token] st IO(Token)
@@ -147,17 +164,35 @@ smallerOrEqualToken = tokenPrim show updatePositon getToken where
     getToken _                  = Nothing
 
 
--- - Open_Parentheses Token
-open_Parentheses :: ParsecT [Token] st IO(Token)
-open_Parentheses = tokenPrim show updatePositon getToken where
+-- - OpenParentheses Token
+openParenthesesToken :: ParsecT [Token] st IO(Token)
+openParenthesesToken = tokenPrim show updatePositon getToken where
     getToken (Open_Parentheses p) = Just (Open_Parentheses p)
     getToken _                    = Nothing
 
--- - Close_Parentheses Token
-close_Parentheses :: ParsecT [Token] st IO(Token)
-close_Parentheses = tokenPrim show updatePositon getToken where
+-- - CloseParentheses Token
+closeParenthesesToken :: ParsecT [Token] st IO(Token)
+closeParenthesesToken = tokenPrim show updatePositon getToken where
     getToken (Close_Parentheses p) = Just (Close_Parentheses p)
     getToken _                     = Nothing
+
+
+
+-- --------------------------------------------------------
+-- Native function tokens
+-- --------------------------------------------------------
+
+-- - Close_Parentheses Token
+printToken :: ParsecT [Token] st IO(Token)
+printToken = tokenPrim show updatePositon getToken where
+getToken (Print p) = Just (Print p)
+getToken _         = Nothing
+
+
+
+-- -----------------------------------------------------------------------------
+-- Other necessary functions
+-- -----------------------------------------------------------------------------
 
 -- - Update position
 -- SourcePos Position

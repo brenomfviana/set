@@ -53,10 +53,10 @@ numberOP = additionToken <|> subtractionToken <|> multiplicationToken
 -- [(Token, Token)] State
 parentExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
 parentExpression = do
-                  a <- open_Parentheses
-                  b <- expression <|> parentExpression
-                  c <- close_Parentheses
-                  return (b)
+                    a <- openParenthesesToken
+                    b <- expression <|> parentExpression
+                    c <- closeParenthesesToken
+                    return (b)
 
 -- - Binary expression
 -- ParsecT          ParsecT
@@ -64,11 +64,11 @@ parentExpression = do
 -- [(Token, Token)] State
 binaryExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
 binaryExpression = do
-                   a <- natToken <|> intToken <|> realToken <|> parentExpression
+                    a <- natToken <|> intToken <|> realToken <|> parentExpression
                         <|> boolToken <|> textToken
-                   b <- numberOP <|> booleanOP
-                   c <- expression
-                   return (eval a b c)
+                    b <- numberOP <|> booleanOP
+                    c <- expression
+                    return (eval a b c)
 
 -- - Evaluation
 -- ParsecT          ParsecT

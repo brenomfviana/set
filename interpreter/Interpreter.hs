@@ -49,7 +49,7 @@ varDecl = do
     d <- semiColonToken
     updateState(symtableInsert(c, getDefaultValue(a)))
     s <- getState
-    liftIO (print s)
+    -- liftIO (print s)
     return (a:b:[c])
 
 -- - Variable declaration remaining
@@ -66,7 +66,7 @@ remainingVarDecls = (do a <- varDecls
 -- [(Token, Token)] State
 stmts :: ParsecT [Token] [(Token, Token)] IO([Token])
 stmts = do
-    first <- assign
+    first <- assign <|> printS
     next  <- remainingStmts
     return (first ++ next)
 
@@ -95,9 +95,23 @@ assign = do
         do
             updateState(symtableUpdate(a, (cast (getType a s) c)))
             s <- getState
-            liftIO (print s)
+            -- liftIO (print s)
             return (a:b:[c])
 
+-- - Print
+-- ParsecT          ParsecT
+-- [Token]          Token list
+-- [(Token, Token)] State
+printS :: ParsecT [Token] [(Token, Token)] IO([Token])
+printS = do
+    a <- printToken
+    b <- openParenthesesToken
+    c <- expression
+    d <- closeParenthesesToken
+    e <- semiColonToken
+    liftIO (print c)
+    liftIO (print (getValue c))
+    return (a:b:c:d:[e])
 
 -- -----------------------------------------------------------------------------
 -- Type checking
@@ -124,6 +138,11 @@ getType :: Token -> [(Token, Token)] -> Token
 getType _ [] = error "Variable not found."
 getType (Id id1 p1) ((Id id2 _, value):t) = if id1 == id2 then value
                                             else getType (Id id1 p1) t
+
+-- - Get value
+getValue :: Token -> String
+getValue (Id value _) = show value
+getValue _ = error "Error."
 
 -- - Cast
 -- Token  Variable type
