@@ -9,7 +9,7 @@ program main
 	# Univ : u;
 	# Pointer : p;
 
-	n = 2;
+	n := 2;
 	x := 1;
     y := -7;
 	x := (1 - 2) + 2 + (5 - 8);
