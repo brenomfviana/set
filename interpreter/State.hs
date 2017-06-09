@@ -4,6 +4,7 @@ module State where
 
 -- Imports
 import Lexer
+import Types
 
 -- -----------------------------------------------------------------------------
 -- State
@@ -15,85 +16,67 @@ import Lexer
 type State = ([Var], [Statement])
 
 -- - Search key
--- String  Type name
--- Integer Type scope ID
-type Key = (String, Integer)
+-- String Variable name
+-- String Variable scope ID
+type Key = (String, String)
 
 -- -----------------------------------------------------------------------------
 -- Memory
 -- -----------------------------------------------------------------------------
 
 -- --------------------------------------------------------
--- Types
--- --------------------------------------------------------
-
--- Types
-data Type =
-      AtomicType  String
-  	| ArrayType   Integer Type
-	| PointerType Type
-	| ProcType    ProcDecl
-	| FuncType    FuncDecl
-	deriving (Eq, Show)
-
--- Values
-data Value =
-      NatValue      Int
-    | IntValue      Int
-    | RealValue     Double
-  	| BoolValue     Bool
-  	| TextValue     String
-    | ArrayValue    [Value]
-	| PointerValue  Key
-	| ProcValue     Key
-	| FuncValue     Key
-    | UserTypeValue [Value]
-	deriving (Eq, Show)
-
--- --------------------------------------------------------
 -- Variables
 -- --------------------------------------------------------
 
--- - Variable declaration
--- String  Variable name
--- Integer Variable scope ID
--- Type    Variable type
-type VarDecl = (String, Integer, Type)
-
 -- - Variable
--- String  Variable name
--- Integer Variable scope ID
--- Type    Variable type
--- Value   Variable value
-type Var = (String, Integer, Type, Value)
+-- (Token, Token) Variable and it's value
+-- String         Variable scope ID
+type Var = ((Token, Token), String)
 
 -- --------------------------------------
 -- Variable handler
 -- --------------------------------------
 
 -- - Insert variable
--- VarDecl Variable declaration
--- State   Current state
--- Return  Updated state
-insertVariable :: VarDecl -> State -> State
-insertVariable (n, sc, t) (m, st) =
-	let nv = (n, sc, t, getInitValue t) in (nv:m, st)
+-- Var    Variable
+-- State  Current state
+-- Return Updated state
+insertVariable :: Var -> State -> State
+insertVariable ((id, _), s) ([], st) = ([((id, getDefaultValue id), s)], st)
+insertVariable ((id, _), s) (m, st) =
+    let nv =  in (m ++ [((id, getDefaultValue id), s)], st)
+
+-- - Update variable
+-- Var    Variable
+-- State  Current state
+-- Return Updated state
+updateVariable :: Var -> State -> State
+updateVariable _ ([], _) = fail "Variable not found."
+updateVariable ((Id id1 p1, v1), s1) (((Id id2 p2, v2), s2):m, st) =
+    if id1 == id2 then (Id id1 p2, v1) : (m, st)
+    else ((Id id2 p2, v2), s2) : updateVariable ((Id id1 p1, v1), s1) (m, st)
+
+-- - Remove variable
+-- Var    Variable
+-- State  Current state
+-- Return Updated state
+removeVariable :: Var -> State -> State
+removeVariable _ ([], _) = fail "Variable not found."
+removeVariable ((Id id1 p1, v1), s1) (((Id id2 p2, v2),s2):m, st) =
+    if id1 == id2 then (m, st)
+    else (Id id2 p2, v2),s2) : removeVariable ((Id id1 p1, v1), s1) (m, st)
 
 -- - Get variable
--- State  Current state
--- Key    Variable key
--- Return Updated state
-getVariable :: State -> Key -> Var
-getVariable ((vn, vsc, vt, vv):m, st) (n, sc) =
-    if vn == n && vsc == sc then (vn, vsc, vt, vv)
-    else getVariable (m, st) (n, sc)  -- Isso remove items da tabela?
+-- Token  Variable ID
+-- State  State
+-- Return Variable
+getVariable :: Token -> State -> Var
+getVariable _ ([], _) = fail "Variable not found."
+getVariable ((Id id1 p1), s) ((((Id id2 _), value), s):m, st) =
+    if id1 == id2 then value
+    else getVariable ((Id id1 p1), s) m, st)
 
--- - Get variable type
--- State  Current state
--- Key    Variable key
--- Return Variable type
-getVariableType :: State -> Key -> Type
-getVariableType s k = let (_, _, t, _) = getVar s k in t
+-- getVariableValue :: Token -> State -> Var
 
 -- - Update variable
 
@@ -101,10 +84,13 @@ getVariableType s k = let (_, _, t, _) = getVar s k in t
 -- Statements
 -- -----------------------------------------------------------------------------
 
+type Statement = Var
+
 -- --------------------------------------------------------
 -- Procedure
 -- --------------------------------------------------------
 
+{-
 -- - Procedure declaration
 -- String    Procedure name
 -- Integer   Procedure scope ID
@@ -167,6 +153,7 @@ type Field = (String, Type)
 -- String  Type name
 -- [Field] Fields
 type UserType = (String, [Field])
+-}
 
 -- -----------------------------------------------------------------------------
 -- Init values
@@ -175,18 +162,3 @@ type UserType = (String, [Field])
 -- - Initializes the program state
 initState :: State
 initState = ([], [])
-
--- - Get init values
--- Type   Variable type
--- Return Initial variable value
-getInitValue :: Type -> Value
-getInitValue (AtomicType  "Nat") = NatValue  0
-getInitValue (AtomicType  "Int") = IntValue  0
-getInitValue (AtomicType "Real") = RealValue 0.0
-getInitValue (AtomicType "Bool") = BoolValue False
-getInitValue (AtomicType "Text") = TextValue ""
--- getInitValue (AtomicType _) = UserValue []
--- getInitValue (PointerType _) = PointerValue ("", 0)
--- getInitValue (ArrayType _ n) = ArrayValue []
--- getInitValue (FuncType _) = FuncValue ("", -1)
--- getInitValue (ProcType _) = ProcValue ("", -1)
