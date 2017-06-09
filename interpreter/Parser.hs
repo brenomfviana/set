@@ -129,10 +129,10 @@ multiplicationToken = tokenPrim show updatePositon getToken where
     getToken _                  = Nothing
 
 -- - Division Token
--- divisionToken :: ParsecT [Token] st IO(Token)
--- divisionToken = tokenPrim show updatePositon getToken where
---     getToken (Division p) = Just (Division p)
---     getToken _       = Nothing
+divisionToken :: ParsecT [Token] st IO(Token)
+divisionToken = tokenPrim show updatePositon getToken where
+    getToken (Division p) = Just (Division p)
+    getToken _       = Nothing
 
 -- - Equality Token
 equalityToken :: ParsecT [Token] st IO(Token)

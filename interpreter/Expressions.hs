@@ -7,6 +7,7 @@ import Control.Monad.IO.Class
 import Text.Parsec
 import Lexer
 import Parser
+import Types
 
 -- -----------------------------------------------------------------------------
 -- Expression evaluator
@@ -25,10 +26,19 @@ expression = try  binaryExpression <|> parentExpression <|> unaryExpression
 -- [(Token, Token)] State
 unaryExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
 unaryExpression = do
-                   a <- natToken <|> intToken <|> realToken <|> boolToken
-                        <|> textToken
-                   return (a)
+                    a <- natToken <|> intToken <|> realToken <|> boolToken
+                        <|> textToken <|> variable
+                    return (a)
 
+-- - Unary var
+-- ParsecT          ParsecT
+-- [Token]          Token list
+-- [(Token, Token)] State
+variable :: ParsecT [Token] [(Token,Token)] IO(Token)
+variable = do
+            a <- idToken
+            s <- getState
+            return (getType a s)
 
 -- - Boolean Operations
 -- ParsecT          ParsecT
@@ -65,7 +75,7 @@ parentExpression = do
 binaryExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
 binaryExpression = do
                     a <- natToken <|> intToken <|> realToken <|> parentExpression
-                        <|> boolToken <|> textToken
+                        <|> boolToken <|> textToken <|> variable
                     b <- numberOP <|> booleanOP
                     c <- expression
                     return (eval a b c)
