@@ -1,11 +1,11 @@
 program main
 
 	Nat : n;
-	Int : x;
-	Real : y;
-	Text : z;
-	Bool : b;
-	Bool : v;
+	# Int : x;
+	# Real : y;
+	# Text : z;
+	# Bool : b;
+	# Bool : v;
 	# Univ : u;
 	# Pointer : p;
 
@@ -25,10 +25,23 @@ program main
 	y := 2 * (2 - 3);
 	y := 2 + 3 * 2;
 	y := (2 + 3) * 2;
+=======
+	# x := 1;
+	print(-2);
+    # y := -7;
+	# x := (1 - 2) + 2 + (5 - 8);
+	# x := ((1 - 2) + 2) + (5 - 8);
+	# x := ((1 - 2) + 2 + 5) - 8;
+	# x := (((1 - 2) + 2) + (5 - 8));
+	# y := (2 * 3) + 2;
+	# y := 2 * (3 + 2);
+	# y := 2 + 3 * 2;
+	# y := (2 + 3) * 2;
+>>>>>>> 376c1ab6a9bfa3c25671b51d27b899f35114a8a7
 
-	v := "aa" = "bb";
-	v := "aa" = "aa";
-	v := 3 > 4;
+	# v := "aa" = "bb";
+	# v := "aa" = "aa";
+	# v := 3 > 4;
 
 end main
 
