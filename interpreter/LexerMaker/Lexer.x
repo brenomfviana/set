@@ -10,8 +10,8 @@ import System.IO.Unsafe
 $digit = 0-9        -- digits
 $alpha = [a-zA-Z]   -- alphabetic characters
 
-@natural = $digit
-@integer = [\-]$digit
+@natural = $digit+
+@integer = [\-]$digit+
 @real = [\-]?$digit+.$digit+
 @boolean = (true) | (false)
 @string = \" [^\" \\]* \"
