@@ -39,3 +39,20 @@ getValue (Real value _) = show value
 getValue (Bool value _) = show value
 getValue (Text value _) = show value
 getValue _ = error "Error."
+
+-- - Cast
+-- Token  Variable type
+-- Token  Expression type
+-- Return New expression type
+cast :: Token -> Token -> Token
+cast (Nat _ _)   (Nat i p) = if i < 0 then error "Invalid assignment."
+                             else Nat i p
+cast (Int _ _)   (Nat i p) = if i < 0 then Int i p
+                             else Nat i p
+cast (Int _ _)   (Int i p) = Int i p
+cast (Real _ _)  (Nat i p) = let x = integerToFloat(i) in Real x p
+cast (Real _ _)  (Int i p) = let x = integerToFloat(i) in Real x p
+cast (Real _ _) (Real i p) = Real i p
+cast (Bool _ _) (Bool i p) = Bool i p
+cast (Text _ _) (Text i p) = Text i p
+cast _ _ = error "Invalid cast."
