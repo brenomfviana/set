@@ -8,9 +8,9 @@ import System.IO.Unsafe
 import Text.Parsec
 import Lexer
 import Parser
-import SymbolTable
 import Expressions
 import Types
+import State
 
 -- -----------------------------------------------------------------------------
 -- Parser to nonterminals
@@ -48,9 +48,9 @@ varDecl = do
     b <- colonToken
     c <- idToken
     d <- semiColonToken
-    updateState(symtableInsert(c, getDefaultValue(a)))
     s <- getState
     liftIO (print s)
+    updateState(insertVariable(c,s))
     return (a:b:[c])
 
 -- - Variable declaration remaining
@@ -94,7 +94,7 @@ assign = do
     if (not (compatible (getType a s) c)) then fail "Type mismatch."
     else
         do
-            updateState(symtableUpdate(a, (cast (getType a s) c)))
+            updateState(updateVariable(a, (cast (getType a s) c)))
             s <- getState
             liftIO (print s)
             return (a:b:[c])
