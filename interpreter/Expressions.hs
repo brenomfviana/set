@@ -13,6 +13,32 @@ import Types
 -- Expression evaluator
 -- -----------------------------------------------------------------------------
 
+-- - Unary var
+-- ParsecT          ParsecT
+-- [Token]          Token list
+-- [(Token, Token)] State
+getVar :: ParsecT [Token] [(Token,Token)] IO(Token)
+getVar = do
+            a <- idToken
+            s <- getState
+            return (getType a s)
+
+-- - Boolean Operations
+-- ParsecT          ParsecT
+-- [Token]          Token list
+-- [(Token, Token)] State
+booleanOP :: ParsecT [Token] [(Token,Token)] IO(Token)
+booleanOP = equalityToken <|> greaterToken <|> greaterOrEqualToken
+            <|> smallerToken <|> smallerOrEqualToken
+
+
+-- - Aritmetic Operations
+-- ParsecT          ParsecT
+-- [Token]          Token list
+-- [(Token, Token)] State
+numberOP :: ParsecT [Token] [(Token,Token)] IO(Token)
+numberOP = additionToken <|> subtractionToken <|> multiplicationToken <|> divisionToken
+
 -- - Expressions
 -- ParsecT          ParsecT
 -- [Token]          Token list
@@ -27,35 +53,20 @@ expression = try  binaryExpression <|> parentExpression <|> unaryExpression
 unaryExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
 unaryExpression = do
                     a <- natToken <|> intToken <|> realToken <|> boolToken
-                        <|> textToken <|> variable
+                        <|> textToken <|> getVar
                     return (a)
 
--- - Unary var
+-- - Binary expression
 -- ParsecT          ParsecT
 -- [Token]          Token list
 -- [(Token, Token)] State
-variable :: ParsecT [Token] [(Token,Token)] IO(Token)
-variable = do
-            a <- idToken
-            s <- getState
-            return (getType a s)
-
--- - Boolean Operations
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-booleanOP :: ParsecT [Token] [(Token,Token)] IO(Token)
-booleanOP = equalityToken <|> greaterToken <|> greaterOrEqualToken
-            <|> smallerToken <|> smallerOrEqualToken
-
-
--- - Aritimetc Operations
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-numberOP :: ParsecT [Token] [(Token,Token)] IO(Token)
-numberOP = additionToken <|> subtractionToken <|> multiplicationToken
-
+binaryExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
+binaryExpression = do
+                    a <- natToken <|> intToken <|> realToken <|> parentExpression
+                        <|> boolToken <|> textToken <|> getVar
+                    b <- numberOP <|> booleanOP
+                    c <- expression
+                    return (eval a b c)
 
 -- - Expression with parentheses
 -- ParsecT          ParsecT
@@ -66,19 +77,8 @@ parentExpression = do
                     a <- openParenthesesToken
                     b <- expression <|> parentExpression
                     c <- closeParenthesesToken
+                    liftIO (print b)
                     return (b)
-
--- - Binary expression
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-binaryExpression :: ParsecT [Token] [(Token,Token)] IO(Token)
-binaryExpression = do
-                    a <- natToken <|> intToken <|> realToken <|> parentExpression
-                        <|> boolToken <|> textToken <|> variable
-                    b <- numberOP <|> booleanOP
-                    c <- expression
-                    return (eval a b c)
 
 -- - Evaluation
 -- ParsecT          ParsecT
@@ -110,10 +110,10 @@ eval (Real x p) (Multiplication _) (Nat y _)  = Real (x * integerToFloat(y)) p
 eval (Real x p) (Multiplication _) (Int y _)  = Real (x * integerToFloat(y)) p
 eval (Real x p) (Multiplication _) (Real y _) = Real (x * y) p
 -- Division
-eval (Nat x p)  (Division _) (Nat y _)  = let z = round(integerToFloat(x) / integerToFloat(y)) in Nat z p
-eval (Nat x p)  (Division _) (Int y _)  = let z = round(integerToFloat(x) / integerToFloat(y)) in Int z p
-eval (Int x p)  (Division _) (Nat y _)  = let z = round(integerToFloat(x) / integerToFloat(y)) in Int z p
-eval (Int x p)  (Division _) (Int y _)  = let z = round(integerToFloat(x) / integerToFloat(y)) in Int z p
+eval (Nat x p)  (Division _) (Nat y _)  = let z = truncate(integerToFloat(x) / integerToFloat(y)) in Nat z p
+eval (Nat x p)  (Division _) (Int y _)  = let z = truncate(integerToFloat(x) / integerToFloat(y)) in Int z p
+eval (Int x p)  (Division _) (Nat y _)  = let z = truncate(integerToFloat(x) / integerToFloat(y)) in Int z p
+eval (Int x p)  (Division _) (Int y _)  = let z = truncate(integerToFloat(x) / integerToFloat(y)) in Int z p
 eval (Real x p) (Division _) (Nat y _)  = Real (x / integerToFloat(y)) p
 eval (Real x p) (Division _) (Int y _)  = Real (x / integerToFloat(y)) p
 eval (Real x p) (Division _) (Real y _) = Real (x / y) p

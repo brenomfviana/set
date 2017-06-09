@@ -120,7 +120,8 @@ printS = do
 cast :: Token -> Token -> Token
 cast (Nat _ _)   (Nat i p) = if i < 0 then error "Invalid assignment."
                              else Nat i p
-cast (Int _ _)   (Nat i p) = Int i p
+cast (Int _ _)   (Nat i p) = if i < 0 then Int i p
+                             else Nat i p
 cast (Int _ _)   (Int i p) = Int i p
 cast (Real _ _)  (Nat i p) = let x = integerToFloat(i) in Real x p
 cast (Real _ _)  (Int i p) = let x = integerToFloat(i) in Real x p
