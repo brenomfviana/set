@@ -62,7 +62,7 @@ typeToken = tokenPrim show updatePositon getToken where
 -- - Nat Token
 natToken :: ParsecT [Token] st IO(Token)
 natToken = tokenPrim show updatePositon getToken where
-    getToken (Nat x pos) = if i < 0 then error "Invalid assignment."
+    getToken (Nat x pos) = if x < 0 then error "Invalid assignment."
                            else Just (Nat x pos)
     getToken _           = Nothing
 
