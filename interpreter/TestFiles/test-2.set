@@ -1,2 +1,23 @@
+#Testing Int expressions 
 program main
+    Int : n1;
+    Int : n2;
+    Int : n3;
+    
+    n1 := 8;
+    print(n1);
+    n2 := 11 + 9 + 4;
+    print(n2);
+    n3 := n2 - n1;
+    print(n3);
+    n3 := n2 / n1;
+    print(n3);
+    n1 := n3 * n2 ;
+    print(n1);
+    n1 := n3 * n2 + 3;
+    print(n1);
+    n1 := 3 + n3 * n2;
+    print(n1);
+    n1 := (3 * 24) + 3;
+    print(n1);
 end main

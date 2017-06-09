@@ -183,13 +183,35 @@ closeParenthesesToken = tokenPrim show updatePositon getToken where
 -- Native function tokens
 -- --------------------------------------------------------
 
--- - Close_Parentheses Token
+-- - Print Token
 printToken :: ParsecT [Token] st IO(Token)
 printToken = tokenPrim show updatePositon getToken where
-getToken (Print p) = Just (Print p)
-getToken _         = Nothing
+    getToken (Print p) = Just (Print p)
+    getToken _         = Nothing
 
+-- - If Token
+ifToken :: ParsecT [Token] st IO(Token)
+ifToken = tokenPrim show updatePositon getToken where
+    getToken (If p) = Just (If p)
+    getToken _      = Nothing
 
+-- - Else Token
+elseToken :: ParsecT [Token] st IO(Token)
+elseToken = tokenPrim show updatePositon getToken where
+    getToken (Else p) = Just (Else p)
+    getToken _        = Nothing
+
+-- - Else_If Token
+elseIfToken :: ParsecT [Token] st IO(Token)
+elseIfToken = tokenPrim show updatePositon getToken where
+    getToken (Else_If p) = Just (Else_If p)
+    getToken _           = Nothing
+
+-- - End_If Token
+endIfToken :: ParsecT [Token] st IO(Token)
+endIfToken = tokenPrim show updatePositon getToken where
+    getToken (End_If p) = Just (End_If p)
+    getToken _          = Nothing
 
 -- -----------------------------------------------------------------------------
 -- Other necessary functions
