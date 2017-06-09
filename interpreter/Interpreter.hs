@@ -109,7 +109,6 @@ printS = do
     c <- expression
     d <- closeParenthesesToken
     e <- semiColonToken
-    liftIO (print c)
     liftIO (print (getValue c))
     return (a:b:c:d:[e])
 
@@ -141,7 +140,11 @@ getType (Id id1 p1) ((Id id2 _, value):t) = if id1 == id2 then value
 
 -- - Get value
 getValue :: Token -> String
-getValue (Id value _) = show value
+getValue (Nat value _)  = show value
+getValue (Int value _)  = show value
+getValue (Real value _) = show value
+getValue (Bool value _) = show value
+getValue (Text value _) = show value
 getValue _ = error "Error."
 
 -- - Cast
