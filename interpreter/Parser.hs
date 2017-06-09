@@ -253,6 +253,8 @@ updateType (Int _ _)   (Int i p) = Int i p
 updateType (Real _ _)  (Nat i p) = let x = integerToFloat(i) in Real x p
 updateType (Real _ _)  (Int i p) = let x = integerToFloat(i) in Real x p
 updateType (Real _ _) (Real i p) = Real i p
+updateType (Bool _ _) (Bool i p) = Bool i p
+updateType (Text _ _) (Text i p) = Text i p
 updateType _ _ = error "Invalid cast."
 
 -- - Check whether types are compatible
