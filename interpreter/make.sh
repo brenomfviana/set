@@ -2,5 +2,5 @@
 clear
 clear
 echo "Compiling..."
-ghc Parser.hs
+ghc set.hs
 rm *.hi *.o
