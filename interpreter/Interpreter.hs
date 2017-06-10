@@ -2,88 +2,86 @@
 -- Version: 09/06/2017
 module Interpreter where
 
--- Imports
+-- External imports
 import Control.Monad.IO.Class
 import System.IO.Unsafe
 import Text.Parsec
+-- Internal imports
 import Lexer
-import Parser
-import Expressions
 import Types
+import Parser
 import State
+import Expressions
 
 -- -----------------------------------------------------------------------------
 -- Parser to nonterminals
 -- -----------------------------------------------------------------------------
 
 -- - Program
-program :: ParsecT [Token] [(Token, Token)] IO([Token])
+program :: ParsecT [Token] ([Var], [Statement]) IO([Token])
 program = do
     a <- programToken
     b <- idToken
-    c <- varDecls
-    d <- stmts
-    e <- endToken
-    f <- idToken
+    c <- stmts
+    d <- endToken
+    e <- idToken
     eof
-    return (a:[b] ++ c ++ d ++ e:[f])
+    return (a:[b] ++ c ++ [e])
 
 -- - Variable declarations
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-varDecls :: ParsecT [Token] [(Token, Token)] IO([Token])
+-- ParsecT              ParsecT
+-- [Token]              Token list
+-- ([Var], [Statement]) State
+varDecls :: ParsecT [Token] ([Var], [Statement]) IO([Token])
 varDecls = do
     first <- varDecl
     next  <- remainingVarDecls
     return (first ++ next)
 
 -- - Variable declaration
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-varDecl :: ParsecT [Token] [(Token, Token)] IO([Token])
+-- ParsecT              ParsecT
+-- [Token]              Token list
+-- ([Var], [Statement]) State
+varDecl :: ParsecT [Token] ([Var], [Statement]) IO([Token])
 varDecl = do
     a <- typeToken
     b <- colonToken
     c <- idToken
     d <- semiColonToken
-    s <- getState
-    liftIO (print s)
-    updateState(insertVariable(c,s))
+    updateState(insertVariable((c, getDefaultValue(a)), "m"))
     return (a:b:[c])
 
 -- - Variable declaration remaining
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-remainingVarDecls :: ParsecT [Token] [(Token, Token)] IO([Token])
+-- ParsecT              ParsecT
+-- [Token]              Token list
+-- ([Var], [Statement]) State
+remainingVarDecls :: ParsecT [Token] ([Var], [Statement]) IO([Token])
 remainingVarDecls = (do a <- varDecls
                         return (a)) <|> (return [])
 
 -- - Statements
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-stmts :: ParsecT [Token] [(Token, Token)] IO([Token])
+-- ParsecT              ParsecT
+-- [Token]              Token list
+-- ([Var], [Statement]) State
+stmts :: ParsecT [Token] ([Var], [Statement]) IO([Token])
 stmts = do
-    first <- assign <|> printS <|> ifStmt
+    first <- assign <|> varDecls <|> printf <|> ifStmt
     next  <- remainingStmts
     return (first ++ next)
 
 -- - Statements remaining
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-remainingStmts :: ParsecT [Token] [(Token, Token)] IO([Token])
+-- ParsecT              ParsecT
+-- [Token]              Token list
+-- ([Var], [Statement]) State
+remainingStmts :: ParsecT [Token] ([Var], [Statement]) IO([Token])
 remainingStmts = (do a <- stmts
                      return (a)) <|> (return [])
 
 -- - Assign
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-assign :: ParsecT [Token] [(Token, Token)] IO([Token])
+-- ParsecT              ParsecT
+-- [Token]              Token list
+-- ([Var], [Statement]) State
+assign :: ParsecT [Token] ([Var], [Statement]) IO([Token])
 assign = do
     a <- idToken
     b <- assignToken
@@ -91,20 +89,20 @@ assign = do
     d <- semiColonToken
     s <- getState
     -- Check if the types are compatible
-    if (not (compatible (getType a s) c)) then fail "Type mismatch."
+    if (not (compatible (getVariableType a s) c)) then fail "Type mismatch."
     else
         do
-            updateState(updateVariable(a, (cast (getType a s) c)))
+            updateState(updateVariable(((a, (cast (getVariableType a s) c)), "m")))
             s <- getState
             liftIO (print s)
             return (a:b:[c])
 
 -- - Print
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-printS :: ParsecT [Token] [(Token, Token)] IO([Token])
-printS = do
+-- ParsecT              ParsecT
+-- [Token]              Token list
+-- ([Var], [Statement]) State
+printf :: ParsecT [Token] ([Var], [Statement]) IO([Token])
+printf = do
     a <- printToken
     b <- openParenthesesToken
     c <- expression
@@ -114,7 +112,7 @@ printS = do
     return (a:b:c:d:[e])
 
 -- - If statements
-ifStmt :: ParsecT [Token] [(Token, Token)] IO([Token])
+ifStmt :: ParsecT [Token] ([Var], [Statement]) IO([Token])
 ifStmt = do
     a <- ifToken
     b <- openParenthesesToken
@@ -130,40 +128,6 @@ ifStmt = do
     f <- endIfToken
     return (a:b:c:[d] ++ e ++ [f])
 
--- - Cast
--- Token  Variable type
--- Token  Expression type
--- Return New expression type
-cast :: Token -> Token -> Token
-cast (Nat _ _)   (Nat i p) = if i < 0 then error "Invalid assignment."
-                             else Nat i p
-cast (Int _ _)   (Nat i p) = if i < 0 then Int i p
-                             else Nat i p
-cast (Int _ _)   (Int i p) = Int i p
-cast (Real _ _)  (Nat i p) = let x = integerToFloat(i) in Real x p
-cast (Real _ _)  (Int i p) = let x = integerToFloat(i) in Real x p
-cast (Real _ _) (Real i p) = Real i p
-cast (Bool _ _) (Bool i p) = Bool i p
-cast (Text _ _) (Text i p) = Text i p
-cast _ _ = error "Invalid cast."
-
--- - Check whether types are compatible
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-compatible :: Token -> Token -> Bool
-compatible (Nat _ _)   (Nat _ _) = True
-compatible (Int _ _)   (Int _ _) = True
-compatible (Int _ _)   (Nat _ _) = True
-compatible (Real _ _) (Real _ _) = True
-compatible (Real _ _)  (Int _ _) = True
-compatible (Real _ _)  (Nat _ _) = True
-compatible (Bool _ _) (Bool _ _) = True
--- compatible (Univ _ _) (Univ _ _) = True
-compatible (Text _ _) (Text _ _) = True
--- compatible (Pointer _ _) (Pointer _ _) = True
-compatible _ _ = False
-
 
 
 -- -----------------------------------------------------------------------------
@@ -173,4 +137,4 @@ compatible _ _ = False
 -- - Parser
 -- [Token]          Token list
 parser :: [Token] -> IO (Either ParseError [Token])
-parser tokens = runParserT program [] "Error message" tokens
+parser tokens = runParserT program initState "Error message" tokens

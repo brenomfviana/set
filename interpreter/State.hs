@@ -15,10 +15,7 @@ import Types
 -- [Statement] Statments (Functions, Procedures and UserTypes)
 type State = ([Var], [Statement])
 
--- - Search key
--- String Variable name
--- String Variable scope ID
-type Key = (String, String)
+
 
 -- -----------------------------------------------------------------------------
 -- Memory
@@ -42,39 +39,50 @@ type Var = ((Token, Token), String)
 -- State  Current state
 -- Return Updated state
 insertVariable :: Var -> State -> State
-insertVariable ((id, _), s) ([], st) = ([((id, getDefaultValue id), s)], st)
-insertVariable ((id, _), s) (m, st) =
-    let nv =  in (m ++ [((id, getDefaultValue id), s)], st)
+insertVariable ((id, v), s) ([], st) = ([((id, v), s)], st)
+insertVariable ((id, v), s) (m, st) = let nv = ((id, v), s) in (m ++ [nv], st)
 
 -- - Update variable
 -- Var    Variable
 -- State  Current state
 -- Return Updated state
 updateVariable :: Var -> State -> State
-updateVariable _ ([], _) = fail "Variable not found."
-updateVariable ((Id id1 p1, v1), s1) (((Id id2 p2, v2), s2):m, st) =
-    if id1 == id2 then (Id id1 p2, v1) : (m, st)
-    else ((Id id2 p2, v2), s2) : updateVariable ((Id id1 p1, v1), s1) (m, st)
+updateVariable _ ([], _) = error "Variable not found."
+updateVariable ((Id id1 p1, v1), s1) (((Id id2 p2, v2), s2) : m1, st1) =
+    if id1 == id2 then (((Id id1 p2, v1), s1) : m1, st1)
+    else let (m2, st2) = updateVariable ((Id id1 p1, v1), s1) (m1, st1)
+         in (((Id id2 p2, v2), s2) : m2, st2)
 
 -- - Remove variable
 -- Var    Variable
 -- State  Current state
 -- Return Updated state
 removeVariable :: Var -> State -> State
-removeVariable _ ([], _) = fail "Variable not found."
-removeVariable ((Id id1 p1, v1), s1) (((Id id2 p2, v2),s2):m, st) =
-    if id1 == id2 then (m, st)
-    else (Id id2 p2, v2),s2) : removeVariable ((Id id1 p1, v1), s1) (m, st)
+removeVariable _ ([], _) = error "Variable not found."
+removeVariable ((Id id1 p1, v1), s1) (((Id id2 p2, v2), s2) : m1, st1) =
+    if id1 == id2 then (m1, st1)
+    else let (m2, st2) = removeVariable ((Id id1 p1, v1), s1) (m1, st1)
+         in (((Id id2 p2, v2), s2) : m2, st2)
 
 -- - Get variable
 -- Token  Variable ID
 -- State  State
 -- Return Variable
 getVariable :: Token -> State -> Var
-getVariable _ ([], _) = fail "Variable not found."
-getVariable ((Id id1 p1), s) ((((Id id2 _), value), s):m, st) =
+getVariable _ ([], _) = error "Variable not found."
+getVariable (Id id1 p1) ((((Id id2 p2), value), s2) : m, st) =
+    if id1 == id2 then (((Id id2 p2), value), s2)
+    else getVariable (Id id1 p1) (m, st)
+
+-- - Get type and value
+-- Token  Variable ID
+-- State  State
+-- Return Variable
+getVariableType :: Token -> State -> Token
+getVariableType _ ([], _) = error "Variable not found."
+getVariableType (Id id1 p1) ((((Id id2 p2), value), s2) : m, st) =
     if id1 == id2 then value
-    else getVariable ((Id id1 p1), s) m, st)
+    else getVariableType (Id id1 p1) (m, st)
 
 -- getVariableValue :: Token -> State -> Var
 
