@@ -21,6 +21,8 @@ getDefaultValue (Type "Text" pos) = Text "" pos
 -- getDefaultValue (Type "Pointer") = Pointer 0.0
 
 -- - Get value
+-- Token  Literal token
+-- String Value
 getValue :: Token -> String
 getValue (Nat  value _) = show value
 getValue (Int  value _) = show value
@@ -28,6 +30,15 @@ getValue (Real value _) = show value
 getValue (Bool value _) = show value
 getValue (Text value _) = show value
 getValue _ = error "Error."
+
+-- - Get ID name
+-- Token  ID token
+-- String Name
+getIdName :: Token -> String
+getIdName (Id name _) = name
+getIdName _ = error "Error: Name not found."
+
+
 
 -- -----------------------------------------------------------------------------
 -- Type checking

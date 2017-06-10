@@ -15,54 +15,54 @@ import State
 -- -----------------------------------------------------------------------------
 
 -- - Unary var
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-getVar :: ParsecT [Token] ([Var], [Statement]) IO(Token)
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+getVar :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 getVar = do
             a <- idToken
             s <- getState
             return (getVariableType a s)
 
 -- - Boolean Operations
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-booleanOP :: ParsecT [Token] ([Var], [Statement]) IO(Token)
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+booleanOP :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 booleanOP = equalityToken <|> greaterToken <|> greaterOrEqualToken
             <|> smallerToken <|> smallerOrEqualToken
 
 
 -- - Aritmetic Operations
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-numberOP :: ParsecT [Token] ([Var], [Statement]) IO(Token)
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+numberOP :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 numberOP = additionToken <|> subtractionToken <|> multiplicationToken
            <|> divisionToken
 
 -- - Expressions
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-expression :: ParsecT [Token] ([Var], [Statement]) IO(Token)
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+expression :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 expression = try  binaryExpression <|> parentExpression <|> unaryExpression
 
 -- - Unary expression
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-unaryExpression :: ParsecT [Token] ([Var], [Statement]) IO(Token)
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+unaryExpression :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 unaryExpression = do
                     a <- natToken <|> intToken <|> realToken <|> boolToken
                         <|> textToken <|> getVar
                     return (a)
 
 -- - Binary expression
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-binaryExpression :: ParsecT [Token] ([Var], [Statement]) IO(Token)
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+binaryExpression :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 binaryExpression = do
                     a <- natToken <|> intToken <|> realToken <|> parentExpression
                         <|> boolToken <|> textToken <|> getVar
@@ -71,10 +71,10 @@ binaryExpression = do
                     return (eval a b c)
 
 -- - Expression with parentheses
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
-parentExpression :: ParsecT [Token] ([Var], [Statement]) IO(Token)
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+parentExpression :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 parentExpression = do
                     a <- openParenthesesToken
                     b <- expression <|> parentExpression
@@ -82,9 +82,9 @@ parentExpression = do
                     return (b)
 
 -- - Evaluation
--- ParsecT          ParsecT
--- [Token]          Token list
--- [(Token, Token)] State
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
 eval :: Token -> Token -> Token -> Token
 -- Addition
 eval (Nat x p)  (Addition _)       (Nat y _)  = Nat  (x + y) p

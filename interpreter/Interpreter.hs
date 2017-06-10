@@ -18,31 +18,36 @@ import Expressions
 -- -----------------------------------------------------------------------------
 
 -- - Program
-program :: ParsecT [Token] ([Var], [Statement]) IO([Token])
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+program :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 program = do
     a <- programToken
     b <- idToken
+    updateState(insertScope(getIdName b))
     c <- stmts
     d <- endToken
+    updateState(removeScope(getIdName b))
     e <- idToken
     eof
     return (a:[b] ++ c ++ [e])
 
 -- - Variable declarations
--- ParsecT              ParsecT
--- [Token]              Token list
--- ([Var], [Statement]) State
-varDecls :: ParsecT [Token] ([Var], [Statement]) IO([Token])
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+varDecls :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 varDecls = do
     first <- varDecl
     next  <- remainingVarDecls
     return (first ++ next)
 
 -- - Variable declaration
--- ParsecT              ParsecT
--- [Token]              Token list
--- ([Var], [Statement]) State
-varDecl :: ParsecT [Token] ([Var], [Statement]) IO([Token])
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+varDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 varDecl = do
     a <- typeToken
     b <- colonToken
@@ -52,36 +57,36 @@ varDecl = do
     return (a:b:[c])
 
 -- - Variable declaration remaining
--- ParsecT              ParsecT
--- [Token]              Token list
--- ([Var], [Statement]) State
-remainingVarDecls :: ParsecT [Token] ([Var], [Statement]) IO([Token])
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+remainingVarDecls :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 remainingVarDecls = (do a <- varDecls
                         return (a)) <|> (return [])
 
 -- - Statements
--- ParsecT              ParsecT
--- [Token]              Token list
--- ([Var], [Statement]) State
-stmts :: ParsecT [Token] ([Var], [Statement]) IO([Token])
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+stmts :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 stmts = do
     first <- assign <|> varDecls <|> printf <|> ifStmt
     next  <- remainingStmts
     return (first ++ next)
 
 -- - Statements remaining
--- ParsecT              ParsecT
--- [Token]              Token list
--- ([Var], [Statement]) State
-remainingStmts :: ParsecT [Token] ([Var], [Statement]) IO([Token])
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+remainingStmts :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 remainingStmts = (do a <- stmts
                      return (a)) <|> (return [])
 
 -- - Assign
--- ParsecT              ParsecT
--- [Token]              Token list
--- ([Var], [Statement]) State
-assign :: ParsecT [Token] ([Var], [Statement]) IO([Token])
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+assign :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 assign = do
     a <- idToken
     b <- assignToken
@@ -92,16 +97,17 @@ assign = do
     if (not (compatible (getVariableType a s) c)) then fail "Type mismatch."
     else
         do
-            updateState(updateVariable(((a, (cast (getVariableType a s) c)), "m")))
+            updateState(updateVariable(((a, (cast (getVariableType a s) c)),
+                        "m")))
             s <- getState
             liftIO (print s)
             return (a:b:[c])
 
 -- - Print
--- ParsecT              ParsecT
--- [Token]              Token list
--- ([Var], [Statement]) State
-printf :: ParsecT [Token] ([Var], [Statement]) IO([Token])
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+printf :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 printf = do
     a <- printToken
     b <- openParenthesesToken
@@ -112,7 +118,7 @@ printf = do
     return (a:b:c:d:[e])
 
 -- - If statements
-ifStmt :: ParsecT [Token] ([Var], [Statement]) IO([Token])
+ifStmt :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 ifStmt = do
     a <- ifToken
     b <- openParenthesesToken
