@@ -6,6 +6,7 @@ module Parser where
 import Control.Monad.IO.Class
 import Text.Parsec
 import Lexer
+import Types
 
 -- -----------------------------------------------------------------------------
 -- Parser to Tokens
@@ -101,13 +102,7 @@ textToken = tokenPrim show updatePositon getToken where
 
 
 -- --------------------------------------------------------
--- Operator
-
-
-
--- --------------------------------------------------------
--- Expression tokens
--- -------------------------------------------------------- tokens
+-- Operator tokens
 -- --------------------------------------------------------
 
 -- - Addition Token
@@ -165,19 +160,6 @@ smallerOrEqualToken = tokenPrim show updatePositon getToken where
     getToken _                  = Nothing
 
 
--- - OpenParentheses Token
-openParenthesesToken :: ParsecT [Token] st IO(Token)
-openParenthesesToken = tokenPrim show updatePositon getToken where
-    getToken (Open_Parentheses p) = Just (Open_Parentheses p)
-    getToken _                    = Nothing
-
--- - CloseParentheses Token
-closeParenthesesToken :: ParsecT [Token] st IO(Token)
-closeParenthesesToken = tokenPrim show updatePositon getToken where
-    getToken (Close_Parentheses p) = Just (Close_Parentheses p)
-    getToken _                     = Nothing
-
-
 
 -- --------------------------------------------------------
 -- Native function tokens
@@ -213,6 +195,26 @@ endIfToken = tokenPrim show updatePositon getToken where
     getToken (End_If p) = Just (End_If p)
     getToken _          = Nothing
 
+
+
+-- --------------------------------------------------------
+-- Other tokens
+-- --------------------------------------------------------
+
+-- - OpenParentheses Token
+openParenthesesToken :: ParsecT [Token] st IO(Token)
+openParenthesesToken = tokenPrim show updatePositon getToken where
+    getToken (Open_Parentheses p) = Just (Open_Parentheses p)
+    getToken _                    = Nothing
+
+-- - CloseParentheses Token
+closeParenthesesToken :: ParsecT [Token] st IO(Token)
+closeParenthesesToken = tokenPrim show updatePositon getToken where
+    getToken (Close_Parentheses p) = Just (Close_Parentheses p)
+    getToken _                     = Nothing
+
+
+
 -- -----------------------------------------------------------------------------
 -- Other necessary functions
 -- -----------------------------------------------------------------------------
@@ -225,10 +227,3 @@ endIfToken = tokenPrim show updatePositon getToken where
 updatePositon :: SourcePos -> Token -> [Token] -> SourcePos
 updatePositon position _ (token:_) = position -- necessita melhoria
 updatePositon position _ []        = position
-
--- - Convert int in float
--- Int    Integer value
--- Return Float value
-integerToFloat :: Int -> Float
-integerToFloat i = do
-    let r = fromIntegral(toInteger i) / fromIntegral 1 in r
