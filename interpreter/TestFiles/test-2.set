@@ -1,23 +1,41 @@
-#Testing Int expressions 
 program main
+    
+    print("----- Testing Int expressions -----");
+
     Int : n1;
     Int : n2;
     Int : n3;
+    Int : expected_value;
     
     n1 := 8;
-    print(n1);
     n2 := 11 + 9 + 4;
-    print(n2);
+    expected_value := 24;
+    
+    print("Expected value ["+expected_value+"], value ["+n2+"]");
+    
     n3 := n2 - n1;
-    print(n3);
+    expected_value := 16;
+    print("Expected value ["+expected_value+"], value ["+n3+"]");
+    
     n3 := n2 / n1;
-    print(n3);
+    expected_value := 2;
+    print("Expected value ["+expected_value+"], value ["+n3+"]");
+    
     n1 := n3 * n2 ;
-    print(n1);
+    expected_value := 48;
+    print("Expected value ["+expected_value+"], value ["+n1+"]");
+    
     n1 := n3 * n2 + 3;
-    print(n1);
+    expected_value := 51;
+    print("Expected value ["+expected_value+"], value ["+n1+"]");
+    
     n1 := 3 + n3 * n2;
-    print(n1);
-    n1 := (3 * 24) + 3;
-    print(n1);
+    expected_value := 51;
+    print("Expected value ["+expected_value+"], value ["+n1+"]");
+    
+    n1 := (n3 * n2) + 3;
+    expected_value := 51;
+    print("Expected value ["+expected_value+"], value ["+n1+"]");
+    
+    print("----- FIM TESTE -----");
 end main
