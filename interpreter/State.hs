@@ -11,7 +11,7 @@ import Types
 -- -----------------------------------------------------------------------------
 
 -- - State
--- Int         Controller counter 
+-- Int         Controller counter
 -- Scope       Current Scope
 -- [Var]       Memory    (Variables)
 -- [Statement] Statments (Functions, Procedures and UserTypes)

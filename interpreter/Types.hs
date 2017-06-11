@@ -24,7 +24,7 @@ getDefaultValue (Type "Text" pos) = Text "" pos
 -- Token  Literal token
 -- String Value
 getValue :: Token -> String
-getValue (Text value _) = show value
+getValue (Text value _) = removeQuote(show value)
 getValue (Nat  value _) = show value
 getValue (Int  value _) = show value
 getValue (Real value _) = show value
