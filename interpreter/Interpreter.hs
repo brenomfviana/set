@@ -73,7 +73,7 @@ varDecl = do
 -- (Scope, [Var], [Statement]) State
 stmts :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 stmts = do
-    first <- assign <|> varDecls <|> printf <|> ifStmt <?> "expecting"
+    first <- assign <|> varDecls <|> printf <|> inputf <|> ifStmt <?> "expecting"
     next  <- remainingStmts
     return (first ++ next)
 
@@ -241,6 +241,20 @@ printf = do
     liftIO (putStrLn ((getValue c)))
     return (a:b:c:d:[e])
 
+-- - Input
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+inputf :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+inputf = do
+    a <- inputToken
+    b <- idToken
+    c <- semiColonToken
+    d <- liftIO $ getLine
+    liftIO (print d)
+    s <- getState
+    updateState(updateVariable((b, (cast (getVariableType b s) (Text (show d) (let (Id _ y) = b in y)))), "m"))
+    return (a:b:[c])
 
 -- -----------------------------------------------------------------------------
 -- Starts parser

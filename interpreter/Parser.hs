@@ -173,6 +173,12 @@ printToken = tokenPrim show updatePositon getToken where
     getToken (Print p) = Just (Print p)
     getToken _         = Nothing
 
+-- - Input Token
+inputToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+inputToken = tokenPrim show updatePositon getToken where
+    getToken (Input p) = Just (Input p)
+    getToken _         = Nothing
+
 -- - If Token
 ifToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 ifToken = tokenPrim show updatePositon getToken where
