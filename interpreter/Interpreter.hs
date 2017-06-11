@@ -43,6 +43,14 @@ varDecls = do
     next  <- remainingVarDecls
     return (first ++ next)
 
+-- - Variable declaration remaining
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+remainingVarDecls :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+remainingVarDecls = (do a <- varDecls
+                        return (a)) <|> (return [])
+
 -- - Variable declaration
 -- ParsecT                     ParsecT
 -- [Token]                     Token list
@@ -53,16 +61,9 @@ varDecl = do
     b <- colonToken
     c <- idToken
     d <- semiColonToken
+    -- updateState(updateVariable(((a, (cast (getVariableType a s) c))
     updateState(insertVariable((c, getDefaultValue(a)), "m"))
     return (a:b:[c])
-
--- - Variable declaration remaining
--- ParsecT                     ParsecT
--- [Token]                     Token list
--- (Scope, [Var], [Statement]) State
-remainingVarDecls :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
-remainingVarDecls = (do a <- varDecls
-                        return (a)) <|> (return [])
 
 -- - Statements
 -- ParsecT                     ParsecT
@@ -100,8 +101,43 @@ assign = do
             updateState(updateVariable(((a, (cast (getVariableType a s) c)),
                         "m")))
             s <- getState
-            liftIO (print s)
+            -- liftIO (print s)
             return (a:b:[c])
+
+-- - If
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+ifStmt :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+ifStmt = do
+    s <- getState
+    a <- ifToken
+    b <- openParenthesesToken
+    c <- expression
+    d <- closeParenthesesToken
+    updateState(insertScope(("if" ++ (show (getScopeLength s)))))
+    if ((getValue c) == "True") then do
+        e <- stmts
+        f <- endIfToken
+        updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+        return (a:b:c:[d] ++ e ++ [f])
+    else do
+        e <- stmts
+        f <- endIfToken
+        -- g <- endIfToken
+        updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+        return (a:b:c:[d] ++ e ++ [f])
+
+-- - Else
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+elseStmt :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+elseStmt = do
+    a <- elseToken
+    b <- stmts
+    c <- endIfToken
+    return (a:b ++ [c])
 
 -- - Print
 -- ParsecT                     ParsecT
@@ -114,26 +150,8 @@ printf = do
     c <- expression
     d <- closeParenthesesToken
     e <- semiColonToken
-    liftIO (print (getValue c))
+    liftIO (putStrLn ((getValue c)))
     return (a:b:c:d:[e])
-
--- - If statements
-ifStmt :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
-ifStmt = do
-    a <- ifToken
-    b <- openParenthesesToken
-    c <- expression
-    d <- closeParenthesesToken
-    s <- getState
-    e <- stmts
-    -- if (getValue c) then do {
-    --     e <- stmts
-    --     f <- endIfToken
-    --     return (a:b:c:[d] ++ e ++ [f])
-    -- }
-    f <- endIfToken
-    return (a:b:c:[d] ++ e ++ [f])
-
 
 
 -- -----------------------------------------------------------------------------
