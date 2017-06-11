@@ -3,6 +3,7 @@
 module Interpreter where
 
 -- External imports
+import Data.List
 import Text.Parsec
 import Control.Monad
 import System.IO.Unsafe
@@ -72,7 +73,7 @@ varDecl = do
 -- (Scope, [Var], [Statement]) State
 stmts :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 stmts = do
-    first <- assign <|> varDecls <|> printf <|> ifStmt
+    first <- assign <|> varDecls <|> printf <|> ifStmt <?> "expecting"
     next  <- remainingStmts
     return (first ++ next)
 
@@ -119,27 +120,92 @@ ifStmt = do
     updateState(insertScope(("if" ++ (show (getScopeLength s)))))
     if ((getValue c) == "True") then do
         e <- stmts
-        f <- endIfToken
-        updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-        return (a:b:c:[d] ++ e ++ [f])
-    else do
         let loop = do
-            e <- ignoreToken
-            when (((columnEndStmt e) /= (columnIfStmt a))) loop
+            f <- ignoreToken
+            when (((columnEndStmt f) /= (columnIfStmt a))) loop
         loop
         updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-        return (a:b:c:[d])
+        return (a:b:c:[d] ++ e)
+    else do
+        updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+        updateState(insertScope(("if" ++ (show (getScopeLength s)))))
+        bs <- getInput
+        let loop = do
+            f <- ignoreToken
+            when (((columnElseStmt f) /= (columnIfStmt a))
+                && ((columnElseIfStmt f) /= (columnIfStmt a))
+                && ((columnEndStmt f) /= (columnIfStmt a))) loop
+        loop
+        af <- getInput
+        setInput (let y:x = reverse (bs \\ af) in y:af)
+        bs <- getInput
+        e <- endIfToken <|> elseToken <|> elseIfToken
+        if ((checkElseStmt e) == "True") then do
+            e <- stmts
+            f <- endIfToken
+            updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+            return (a:b:c:[d])
+        else
+            if ((checkElseIfStmt e) == "True") then do
+                af <- getInput
+                setInput (let y:x = reverse (bs \\ af) in y:af)
+                f <- elseIfStmt
+                updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                return (a:b:c:[d])
+            else do
+                updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                return (a:b:c:[d])
 
--- - Else
+-- - If
 -- ParsecT                     ParsecT
 -- [Token]                     Token list
 -- (Scope, [Var], [Statement]) State
-elseStmt :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
-elseStmt = do
-    a <- elseToken
-    b <- stmts
-    c <- endIfToken
-    return (a:b ++ [c])
+elseIfStmt :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+elseIfStmt = do
+    s <- getState
+    a <- elseIfToken
+    b <- openParenthesesToken
+    c <- expression
+    d <- closeParenthesesToken
+    updateState(insertScope(("if" ++ (show (getScopeLength s)))))
+    if ((getValue c) == "True") then do
+        e <- stmts
+        let loop = do
+            f <- ignoreToken
+            when (((columnEndStmt f) /= (columnElseIfStmt a))) loop
+        loop
+        updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+        return (a:b:[c] ++ e)
+    else do
+        updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+        updateState(insertScope(("if" ++ (show (getScopeLength s)))))
+        bs <- getInput
+        let loop = do
+            f <- ignoreToken
+            when (((columnElseStmt f) /= (columnIfStmt a))
+                && ((columnElseIfStmt f) /= (columnIfStmt a))
+                && ((columnEndStmt f) /= (columnIfStmt a))) loop
+        loop
+        af <- getInput
+        setInput (let y:x = reverse (bs \\ af) in y:af)
+        e <- endIfToken <|> elseToken <|> elseIfToken
+        bs <- getInput
+        liftIO (print af)
+        if ((checkElseStmt e) == "True") then do
+            e <- stmts
+            f <- endIfToken
+            updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+            return (a:b:c:[d])
+        else
+            if ((checkElseIfStmt e) == "True") then do
+                af <- getInput
+                setInput (let y:x = reverse (bs \\ af) in y:af)
+                f <- elseIfStmt
+                updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                return (a:b:c:[d])
+            else do
+                updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                return (a:b:c:[d])
 
 -- - Print
 -- ParsecT                     ParsecT

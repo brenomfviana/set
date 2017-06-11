@@ -2,27 +2,21 @@ program main
     Nat : n1;
     Bool : b;
 
-    n1 := 18;
     print(n1);
 
-    if (1 > 0)
+    if (0 > 1)
         print(n1);
-        if (1 > 0)
-            n1 := 8;
+    elseif (1 > 0)
+        print("asdasd");
+        if (0 > 1)
             print(n1);
+        elseif (1 > 0)
+            print("asdasd");
             if (0 > 1)
-                if (1 > 0)
-                    if (1 > 0)
-                        if (1 > 0)
-                            n1 := 8;
-                        endif
-                        n1 := 8;
-                    endif
-                    n1 := 8;
-                endif
-                n1 := 8;
+                print(n1);
+            elseif (1 > 0)
+                print("asdasd");
             endif
-            n1 := 18;
         endif
     endif
 

@@ -38,29 +38,63 @@ getIdName :: Token -> String
 getIdName (Id name _) = name
 getIdName _ = error "Error: Name not found."
 
--- -
--- Token  Literal token
+
+
+-- -----------------------------------------------------------------------------
+-- Keywords checking
+-- -----------------------------------------------------------------------------
+
+-- - Check if statement
+-- Token  If token
 -- String Value
 checkIfStmt :: Token -> String
 checkIfStmt (If _) = show True
 checkIfStmt _ = show False
 
--- -
--- Token  Literal token
+-- - Get column if token
+-- Token  If token
 -- String Value
 columnIfStmt :: Token -> Int
 columnIfStmt (If (_, c)) = c
 columnIfStmt _ = -1
 
--- -
--- Token  Literal token
+-- - Check else statement
+-- Token  Else token
+-- String Value
+checkElseStmt :: Token -> String
+checkElseStmt (Else _) = show True
+checkElseStmt _ = show False
+
+-- - Get column else token
+-- Token  Else token
+-- String Value
+columnElseIfStmt :: Token -> Int
+columnElseIfStmt (Else_If (_, c)) = c
+columnElseIfStmt _ = -1
+
+-- - Check else statement
+-- Token  ElseIf token
+-- String Value
+checkElseIfStmt :: Token -> String
+checkElseIfStmt (Else_If _) = show True
+checkElseIfStmt _ = show False
+
+-- - Get column else token
+-- Token  Else token
+-- String Value
+columnElseStmt :: Token -> Int
+columnElseStmt (Else (_, c)) = c
+columnElseStmt _ = -1
+
+-- - Check end statement
+-- Token  End token
 -- String Value
 checkEndStmt :: Token -> String
 checkEndStmt (End_If _) = show True
 checkEndStmt _ = show False
 
--- -
--- Token  Literal token
+-- - Get column end token
+-- Token  End token
 -- String Value
 columnEndStmt :: Token -> Int
 columnEndStmt (End_If (_, c)) = c
