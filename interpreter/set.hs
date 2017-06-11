@@ -2,10 +2,11 @@
 -- Version: 09/06/2017
 module Main (main) where
 
--- Imports
+-- External imports
 import Control.Monad.IO.Class
 import System.Environment
 import System.IO.Unsafe
+-- Internal imports
 import Interpreter
 import Lexer
 
