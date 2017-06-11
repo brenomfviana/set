@@ -2,7 +2,7 @@
 -- Version: 09/06/2017
 module Types where
 
--- Imports
+-- Internal imports
 import Lexer
 
 -- -----------------------------------------------------------------------------
@@ -24,12 +24,12 @@ getDefaultValue (Type "Text" pos) = Text "" pos
 -- Token  Literal token
 -- String Value
 getValue :: Token -> String
+getValue (Text value _) = show value
 getValue (Nat  value _) = show value
 getValue (Int  value _) = show value
 getValue (Real value _) = show value
 getValue (Bool value _) = show value
-getValue (Text value _) = show value
-getValue _ = error "Error."
+getValue _ = error "Error: Value not found."
 
 -- - Get ID name
 -- Token  ID token
@@ -65,7 +65,7 @@ compatible _ _ = False
 -- Token  Expression type
 -- Return New expression type
 cast :: Token -> Token -> Token
-cast (Nat  _ _)  (Nat i p) = if i < 0 then error "Invalid assignment."
+cast (Nat  _ _)  (Nat i p) = if i < 0 then error "Error: Invalid assignment."
                              else Nat i p
 cast (Int  _ _)  (Nat i p) = if i < 0 then Int i p
                              else Nat i p
@@ -75,7 +75,9 @@ cast (Real _ _)  (Int i p) = let x = integerToFloat(i) in Real x p
 cast (Real _ _) (Real i p) = Real i p
 cast (Bool _ _) (Bool i p) = Bool i p
 cast (Text _ _) (Text i p) = Text i p
-cast _ _ = error "Invalid cast."
+cast _ _ = error "Error: Invalid cast."
+
+
 
 -- -----------------------------------------------------------------------------
 -- Other necessary functions
@@ -87,3 +89,12 @@ cast _ _ = error "Invalid cast."
 integerToFloat :: Int -> Float
 integerToFloat i = do
     let r = (fromIntegral(toInteger i) / fromIntegral 1) in r
+
+-- - Remove quotes
+-- String String
+-- String String
+removeQuote :: String -> String
+removeQuote s = let s1:a = s
+                    s2:b = reverse a
+                    y = reverse b
+                    in y
