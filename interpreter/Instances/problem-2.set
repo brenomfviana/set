@@ -1,0 +1,30 @@
+program main
+    Real : x;
+    Int : y;
+    input x;
+    
+    while(x >= 0)
+    
+        if(x >= 0)
+            if(x <= 25)
+                y = y + 1;
+            endif
+        elseif(x >= 26)
+            if(x <= 50)
+                y = y + 1;
+            endif
+        elseif(x >= 51)
+            if(x <= 75)
+                y = y + 1;
+            endif
+        elseif(x >= 76)
+            if(x <= 100)
+                y = y + 1;
+            endif
+        endif
+        
+        input x;
+    endwhile
+    
+    print(y);
+end main

@@ -1,0 +1,16 @@
+program main
+    Real : x;
+    Real : y;
+    Int : c;
+    
+    #input x;
+    #input y;
+    #input c;
+    
+    x := 2.0;
+    y := 3.0;
+    c := 1;
+    
+    print(((x*x) - y) + c);
+    
+end main
