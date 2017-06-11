@@ -160,6 +160,12 @@ smallerOrEqualToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 smallerOrEqualToken = tokenPrim show updatePositon getToken where
     getToken (SmallerOrEqual p) = Just (SmallerOrEqual p)
     getToken _                  = Nothing
+    
+-- - Denial Token
+denialToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+denialToken = tokenPrim show updatePositon getToken where
+    getToken (Denial p) = Just (Denial p)
+    getToken _                  = Nothing
 
 
 

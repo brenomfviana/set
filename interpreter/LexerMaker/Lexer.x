@@ -73,7 +73,7 @@ tokens :-
   >=                                   { \p s -> GreaterOrEqual (getLC p) }
   "<"                                  { \p s -> Smaller (getLC p) }
   "<="                                 { \p s -> SmallerOrEqual (getLC p) }
-  !                                    { \p s -> Denial (getLC p) }
+  "!="                                 { \p s -> Denial (getLC p) }
   =                                    { \p s -> Equality (getLC p) }
   "\in"                                { \p s -> Belongs (getLC p) }
   "\cap"                               { \p s -> Intersection (getLC p) }
