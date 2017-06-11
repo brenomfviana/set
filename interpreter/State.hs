@@ -2,7 +2,7 @@
 -- Version: 03/06/2017
 module State where
 
--- Imports
+-- Internal imports
 import Lexer
 import Types
 
@@ -11,6 +11,7 @@ import Types
 -- -----------------------------------------------------------------------------
 
 -- - State
+-- Int         Controller counter 
 -- Scope       Current Scope
 -- [Var]       Memory    (Variables)
 -- [Statement] Statments (Functions, Procedures and UserTypes)
@@ -54,7 +55,7 @@ insertVariable ((vid, vv), vs) (sc, m, st) =
 -- State  Current state
 -- Return Updated state
 updateVariable :: Var -> State -> State
-updateVariable _ (_, [], _) = error "Variable not found."
+updateVariable _ (_, [], _) = error "Error: Variable not found."
 updateVariable ((Id id1 p1, v1), s1) (sc1, ((Id id2 p2, v2), s2) : m1, st1) =
     if id1 == id2 then (sc1, ((Id id1 p2, v1), s1) : m1, st1)
     else let (sc2, m2, st2) = updateVariable ((Id id1 p1, v1), s1) (sc1, m1, st1)
@@ -65,7 +66,7 @@ updateVariable ((Id id1 p1, v1), s1) (sc1, ((Id id2 p2, v2), s2) : m1, st1) =
 -- State  Current state
 -- Return Updated state
 removeVariable :: Var -> State -> State
-removeVariable _ (_, [], _) = error "Variable not found."
+removeVariable _ (_, [], _) = error "Error: Variable not found."
 removeVariable ((Id id1 p1, v1), s1) (sc1, ((Id id2 p2, v2), s2) : m1, st1) =
     if id1 == id2 then (sc1, m1, st1)
     else let (sc2, m2, st2) = removeVariable ((Id id1 p1, v1), s1) (sc1, m1, st1)
@@ -76,7 +77,7 @@ removeVariable ((Id id1 p1, v1), s1) (sc1, ((Id id2 p2, v2), s2) : m1, st1) =
 -- State  State
 -- Return Variable
 getVariable :: Token -> State -> Var
-getVariable _ (_, [], _) = error "Variable not found."
+getVariable _ (_, [], _) = error "Error: Variable not found."
 getVariable (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
     if id1 == id2 then (((Id id2 p2), value), s2)
     else getVariable (Id id1 p1) (sc, m, st)
@@ -86,7 +87,7 @@ getVariable (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
 -- State  State
 -- Return Variable
 getVariableType :: Token -> State -> Token
-getVariableType _ (_, [], _) = error "Variable not found."
+getVariableType _ (_, [], _) = error "Error: Variable not found."
 getVariableType (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
     if id1 == id2 then value
     else getVariableType (Id id1 p1) (sc, m, st)
@@ -102,6 +103,10 @@ getVariableType (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
 
 type Scope = [String]
 
+-- --------------------------------------
+-- Scope handler
+-- --------------------------------------
+
 -- - Insert scope
 -- String Current scope
 -- State  State
@@ -115,11 +120,18 @@ insertScope s (sc, m, st) = (s:sc, m, st)
 -- State  State
 -- Return Updated state
 removeScope :: String -> State -> State
-removeScope _  ([], _, _) = error "The scope doesn't exits."
+removeScope _  ([], _, _) = error "Error: The scope doesn't exits."
 removeScope s1 (s2 : sc1, m1, st1) =
     if (s1 == s2) then (sc1, m1, st1)
     else let (sc2, m2, st2) = removeScope s1 (sc1, m1, st1)
          in (s2 : sc2, m2, st2)
+
+-- - Get scope length
+-- State Current state
+-- Int   Scope length
+getScopeLength :: State -> Int
+getScopeLength (sc, _, _) = length(sc)
+getScopeLength _ = error "Error: The state doesn't exits."
 
 
 
