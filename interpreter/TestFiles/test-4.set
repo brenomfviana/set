@@ -1,2 +1,9 @@
 program main
+    Text : t;
+    input(t);
+    print(t);
+
+    Real : n;
+    input(n);
+    print(n);
 end main

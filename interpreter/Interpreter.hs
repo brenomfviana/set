@@ -248,12 +248,14 @@ printf = do
 inputf :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 inputf = do
     a <- inputToken
-    b <- idToken
-    c <- semiColonToken
-    d <- liftIO $ getLine
-    liftIO (print d)
+    b <- openParenthesesToken
+    c <- idToken
+    d <- closeParenthesesToken
+    e <- semiColonToken
+    f <- liftIO $ getLine
     s <- getState
-    updateState(updateVariable((b, (cast (getVariableType b s) (Text (show d) (let (Id _ y) = b in y)))), "m"))
+    updateState(updateVariable((c,
+        (inputCast (getVariableType c s) (Text (show f) (let (Id _ y) = c in y)))), "m"))
     return (a:b:[c])
 
 -- -----------------------------------------------------------------------------

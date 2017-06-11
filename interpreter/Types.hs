@@ -139,18 +139,48 @@ cast (Bool _ _) (Bool i p) = Bool i p
 cast (Text _ _) (Text i p) = Text i p
 cast _ _ = error "Error: Invalid cast."
 
+-- - Cast
+-- Token  Variable type
+-- Token  Expression type
+-- Return New expression type
+inputCast :: Token -> Token -> Token
+inputCast (Text _ _) (Text i p) = Text (removeQuote(i)) p
+inputCast (Nat  _ _) (Text i p) = let x = stringToInt(removeQuote(i))   in Nat  x p
+inputCast (Int  _ _) (Text i p) = let x = stringToInt(removeQuote(i))   in Int  x p
+inputCast (Real _ _) (Text i p) = let x = stringToFloat(removeQuote(i)) in Real x p
+inputCast (Bool _ _) (Text i p) = let x = stringToBool(removeQuote(i))  in Bool x p
+inputCast _ _ = error "Error: Invalid cast."
+
 
 
 -- -----------------------------------------------------------------------------
 -- Other necessary functions
 -- -----------------------------------------------------------------------------
 
--- - Convert int in float
+-- - Convert int to float
 -- Int    Integer value
 -- Return Float value
 integerToFloat :: Int -> Float
 integerToFloat i = do
     let r = (fromIntegral(toInteger i) / fromIntegral 1) in r
+
+-- - Convert string to int
+-- Int    String value
+-- Return Integer value
+stringToInt :: String -> Int
+stringToInt i = read i :: Int
+
+-- - Convert string to float
+-- Int    String value
+-- Return Float value
+stringToFloat :: String -> Float
+stringToFloat i = read i :: Float
+
+-- - Convert string to bool
+-- Int    String value
+-- Return Bool value
+stringToBool :: String -> Bool
+stringToBool i = read i :: Bool
 
 -- - Remove quotes
 -- String String

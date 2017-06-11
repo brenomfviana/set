@@ -228,10 +228,11 @@ ignoreToken = tokenPrim show updatePositon getToken where
     getToken _ = Nothing
 
 -- - CloseParentheses Token
-arrayToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-arrayToken = tokenPrim show updatePositon getToken where
-    getToken (Array p) = Just (Array p)
-    getToken _         = Nothing
+-- arrayToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+-- arrayToken = tokenPrim show updatePositon getToken where
+--     getToken (Array p) = Just (Array p)
+--     getToken _         = Nothing
+
 
 
 -- -----------------------------------------------------------------------------
