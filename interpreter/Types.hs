@@ -48,9 +48,23 @@ checkIfStmt _ = show False
 -- -
 -- Token  Literal token
 -- String Value
+columnIfStmt :: Token -> Int
+columnIfStmt (If (_, c)) = c
+columnIfStmt _ = -1
+
+-- -
+-- Token  Literal token
+-- String Value
 checkEndStmt :: Token -> String
 checkEndStmt (End_If _) = show True
 checkEndStmt _ = show False
+
+-- -
+-- Token  Literal token
+-- String Value
+columnEndStmt :: Token -> Int
+columnEndStmt (End_If (_, c)) = c
+columnEndStmt _ = -1
 
 
 

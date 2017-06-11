@@ -125,8 +125,7 @@ ifStmt = do
     else do
         let loop = do
             e <- ignoreToken
-            if ((checkIfStmt e) == "True") then loop
-            when ((checkEndStmt e) /= "True") loop
+            when (((columnEndStmt e) /= (columnIfStmt a))) loop
         loop
         updateState(removeScope(("if" ++ (show (getScopeLength s)))))
         return (a:b:c:[d])
