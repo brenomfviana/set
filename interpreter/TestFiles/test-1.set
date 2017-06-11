@@ -1,16 +1,18 @@
-#Testing Nat expressions 
+#Testing Nat expressions
 program main
 	Nat : n1;
-	Nat : n2;
-	Nat : n3;
-	Nat : n4;
-	
 	n1 := 3 + 6;
-	print(n1);
+	print("Result=" + n1 + n1);
+
+	Nat : n2;
 	n2 := n1 / 3;
-	print(n2);
+	print("Result=" + n2);
+
+	Nat : n3;
 	n3 := n2 * 2;
-	print(n3);
+	print("Result=" + n3);
+
+	Nat : n4;
 	n4 := n1 - 4;
-	print(n4);
+	print("Result=" + n4);
 end main
