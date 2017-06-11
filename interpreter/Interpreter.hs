@@ -3,9 +3,10 @@
 module Interpreter where
 
 -- External imports
-import Control.Monad.IO.Class
-import System.IO.Unsafe
 import Text.Parsec
+import Control.Monad
+import System.IO.Unsafe
+import Control.Monad.IO.Class
 -- Internal imports
 import Lexer
 import Types
@@ -122,11 +123,14 @@ ifStmt = do
         updateState(removeScope(("if" ++ (show (getScopeLength s)))))
         return (a:b:c:[d] ++ e ++ [f])
     else do
-        e <- stmts
-        f <- endIfToken
-        -- g <- endIfToken
-        updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-        return (a:b:c:[d] ++ e ++ [f])
+        let loop = do
+            liftIO (putStrLn "as")
+            when (0 > 1) loop
+            -- e <- ignoreToken
+            -- f <- endIfToken
+            -- updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+        loop
+        return (a:b:c:[d])
 
 -- - Else
 -- ParsecT                     ParsecT
