@@ -2,9 +2,10 @@
 -- Version: 09/06/2017
 module Expressions where
 
--- Imports
+-- External imports
 import Control.Monad.IO.Class
 import Text.Parsec
+-- Internal imports
 import Lexer
 import Parser
 import Types
@@ -139,3 +140,9 @@ eval (Real x p) (Smaller _) (Real y _) = Bool (x < y) p
 eval (Nat x p)  (SmallerOrEqual _)  (Nat y _) = Bool (x <= y) p
 eval (Int x p)  (SmallerOrEqual _)  (Int y _) = Bool (x <= y) p
 eval (Real x p) (SmallerOrEqual _) (Real y _) = Bool (x <= y) p
+--
+eval (Text x p)  (Addition _)       (Text y _)  = Text (x ++ y) p
+eval (Text x p)  (Addition _)       (Nat  y _)  = Text (x ++ (show y)) p
+eval (Text x p)  (Addition _)       (Int  y _)  = Text (x ++ (show y)) p
+eval (Text x p)  (Addition _)       (Real y _)  = Text (x ++ (show y)) p
+eval (Text x p)  (Addition _)       (Bool y _)  = Text (x ++ (show y)) p
