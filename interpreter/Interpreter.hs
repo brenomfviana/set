@@ -73,7 +73,8 @@ varDecl = do
 -- (Scope, [Var], [Statement]) State
 stmts :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 stmts = do
-    first <- assign <|> varDecls <|> printf <|> inputf <|> ifStmt <?> "expecting"
+    first <- assign <|> varDecls <|> printf <|> inputf <|> ifStmt
+             <?> "expecting"
     next  <- remainingStmts
     return (first ++ next)
 
@@ -124,45 +125,91 @@ ifStmt = do
     c <- expression
     d <- closeParenthesesToken
     updateState(insertScope(("if" ++ (show (getScopeLength s)))))
+    -- Check if the expression is true
     if ((getValue c) == "True") then do
-        e <- stmts
-        let loop = do
-            f <- ignoreToken
-            when (((columnEndStmt f) /= (columnIfStmt a))) loop
-        loop
-        updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-        return (a:b:c:[d] ++ e)
+        e <- ignoreToken
+        af <- getInput
+        setInput (e:af)
+        -- Check if the token is a END_IF
+        if (((checkEndIfStmt e) == "True")) then do
+            e <- endIfToken
+            updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+            return (a:b:c:d:[e])
+        else
+            -- Check if the token is a ELSE or ELSE_IF
+            if (((checkElseIfStmt e) == "True")
+                    || ((checkElseStmt e) == "True")) then do
+                -- Ignore statements
+                bf <- getInput
+                let loop = do
+                    f <- ignoreToken
+                    when (((columnEndIfStmt f) /= (columnIfStmt a))) loop
+                loop
+                af <- getInput
+                updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                return (a:b:c:[d] ++ (bf \\ af))
+            else do
+                -- Run statements
+                e <- stmts
+                -- Ignore other statements
+                bf <- getInput
+                let loop = do
+                    f <- ignoreToken
+                    when (((columnEndIfStmt f) /= (columnIfStmt a))) loop
+                loop
+                af <- getInput
+                updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                return (a:b:c:[d] ++ e ++ (bf \\ af))
     else do
         updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-        updateState(insertScope(("if" ++ (show (getScopeLength s)))))
-        bs <- getInput
-        let loop = do
-            f <- ignoreToken
-            when (((columnElseStmt f) /= (columnIfStmt a))
-                && ((columnElseIfStmt f) /= (columnIfStmt a))
-                && ((columnEndStmt f) /= (columnIfStmt a))) loop
-        loop
+        e <- ignoreToken
         af <- getInput
-        setInput (let y:x = reverse (bs \\ af) in y:af)
-        bs <- getInput
-        e <- endIfToken <|> elseToken <|> elseIfToken
-        if ((checkElseStmt e) == "True") then do
-            e <- stmts
-            f <- endIfToken
-            updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-            return (a:b:c:[d])
-        else
-            if ((checkElseIfStmt e) == "True") then do
+        setInput (e:af)
+        -- Check if the token is a END_IF
+        if (((checkEndIfStmt e) == "True")) then do
+            e <- endIfToken
+            return (a:b:c:d:[e])
+        else do
+            updateState(insertScope(("if" ++ (show (getScopeLength s)))))
+            -- Ignore other statements
+            bf <- getInput
+            let loop = do
+                f <- ignoreToken
+                when (((columnElseStmt f) /= (columnIfStmt a))
+                    && ((columnElseIfStmt f) /= (columnIfStmt a))
+                    && ((columnEndIfStmt f) /= (columnIfStmt a))) loop
+            loop
+            af <- getInput
+            setInput (let y:x = reverse (bf \\ af) in y:af)
+            bf <- getInput
+            e <- endIfToken <|> elseToken <|> elseIfToken
+            -- Check if the token is a ELSE
+            if ((checkElseStmt e) == "True") then do
+                e <- ignoreToken
                 af <- getInput
-                setInput (let y:x = reverse (bs \\ af) in y:af)
-                f <- elseIfStmt
-                updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-                return (a:b:c:[d])
-            else do
-                updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-                return (a:b:c:[d])
+                setInput (e:af)
+                -- Check if the token is a END_IF
+                if (((checkEndIfStmt e) == "True")) then do
+                    e <- endIfToken
+                    return (a:b:c:d:[e])
+                else do
+                    e <- stmts
+                    f <- endIfToken
+                    updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                    return (a:b:c:[d] ++ e ++ [f])
+            else
+                -- Check if the token is a ELSE_IF
+                if ((checkElseIfStmt e) == "True") then do
+                    af <- getInput
+                    setInput (let y:x = reverse (bf \\ af) in y:af)
+                    f <- elseIfStmt
+                    updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                    return (a:b:c:[d])
+                else do
+                    updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                    return (a:b:c:[d])
 
--- - If
+-- - Else if
 -- ParsecT                     ParsecT
 -- [Token]                     Token list
 -- (Scope, [Var], [Statement]) State
@@ -174,44 +221,88 @@ elseIfStmt = do
     c <- expression
     d <- closeParenthesesToken
     updateState(insertScope(("if" ++ (show (getScopeLength s)))))
+    -- Check if the expression is true
     if ((getValue c) == "True") then do
-        e <- stmts
-        let loop = do
-            f <- ignoreToken
-            when (((columnEndStmt f) /= (columnElseIfStmt a))) loop
-        loop
-        updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-        return (a:b:[c] ++ e)
+        e <- ignoreToken
+        af <- getInput
+        setInput (e:af)
+        -- Check if the token is a END_IF
+        if (((checkEndIfStmt e) == "True")) then do
+            e <- endIfToken
+            updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+            return (a:b:c:d:[e])
+        else
+            -- Check if the token is a ELSE or ELSE_IF
+            if (((checkElseIfStmt e) == "True")
+                    || ((checkElseStmt e) == "True")) then do
+                bf <- getInput
+                let loop = do
+                    f <- ignoreToken
+                    when (((columnEndIfStmt f) /= (columnElseIfStmt a))) loop
+                loop
+                af <- getInput
+                updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                return (a:b:c:[d] ++ (bf \\ af))
+            else do
+                -- Run statements
+                e <- stmts
+                -- Ignore other statements
+                bf <- getInput
+                let loop = do
+                    f <- ignoreToken
+                    when (((columnEndIfStmt f) /= (columnElseIfStmt a))) loop
+                loop
+                af <- getInput
+                updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                return (a:b:c:[d] ++ e ++ (bf \\ af))
     else do
         updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-        updateState(insertScope(("if" ++ (show (getScopeLength s)))))
-        bs <- getInput
-        let loop = do
-            f <- ignoreToken
-            when (((columnElseStmt f) /= (columnIfStmt a))
-                && ((columnElseIfStmt f) /= (columnIfStmt a))
-                && ((columnEndStmt f) /= (columnIfStmt a))) loop
-        loop
+        e <- ignoreToken
         af <- getInput
-        setInput (let y:x = reverse (bs \\ af) in y:af)
-        e <- endIfToken <|> elseToken <|> elseIfToken
-        bs <- getInput
-        liftIO (print af)
-        if ((checkElseStmt e) == "True") then do
-            e <- stmts
-            f <- endIfToken
-            updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-            return (a:b:c:[d])
-        else
-            if ((checkElseIfStmt e) == "True") then do
+        setInput (e:af)
+        -- Check if the token is a END_IF
+        if (((checkEndIfStmt e) == "True")) then do
+            e <- endIfToken
+            return (a:b:c:d:[e])
+        else do
+            updateState(insertScope(("if" ++ (show (getScopeLength s)))))
+            -- Ignore other statements
+            bf <- getInput
+            let loop = do
+                f <- ignoreToken
+                when (((columnElseStmt f) /= (columnIfStmt a))
+                    && ((columnElseIfStmt f) /= (columnIfStmt a))
+                    && ((columnEndIfStmt f) /= (columnIfStmt a))) loop
+            loop
+            af <- getInput
+            setInput (let y:x = reverse (bf \\ af) in y:af)
+            bf <- getInput
+            e <- endIfToken <|> elseToken <|> elseIfToken
+            -- Check if the token is a ELSE
+            if ((checkElseStmt e) == "True") then do
+                e <- ignoreToken
                 af <- getInput
-                setInput (let y:x = reverse (bs \\ af) in y:af)
-                f <- elseIfStmt
-                updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-                return (a:b:c:[d])
-            else do
-                updateState(removeScope(("if" ++ (show (getScopeLength s)))))
-                return (a:b:c:[d])
+                setInput (e:af)
+                -- Check if the token is a END_IF
+                if (((checkEndIfStmt e) == "True")) then do
+                    e <- endIfToken
+                    return (a:b:c:d:[e])
+                else do
+                    e <- stmts
+                    f <- endIfToken
+                    updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                    return (a:b:c:[d])
+            else
+                -- Check if the token is a ELSE_IF
+                if ((checkElseIfStmt e) == "True") then do
+                    af <- getInput
+                    setInput (let y:x = reverse (bf \\ af) in y:af)
+                    f <- elseIfStmt
+                    updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                    return (a:b:c:[d])
+                else do
+                    updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+                    return (a:b:c:[d])
 
 
 
@@ -255,8 +346,11 @@ inputf = do
     f <- liftIO $ getLine
     s <- getState
     updateState(updateVariable((c,
-        (inputCast (getVariableType c s) (Text (show f) (let (Id _ y) = c in y)))), "m"))
+        (inputCast (getVariableType c s)
+            (Text (show f) (let (Id _ y) = c in y)))), "m"))
     return (a:b:[c])
+
+
 
 -- -----------------------------------------------------------------------------
 -- Starts parser
