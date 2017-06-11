@@ -3,11 +3,22 @@ program main
     Real : y;
     Int : c;
     
+    Real : aux;
+    
     input (x);
     input (y);
     input (c);
     
+    aux := x * x;
+    aux := aux - y;
+    aux := aux + c;
+    
+    print(aux);
+    
+    print(c + 1.0);
+    
+    
     #print(x*x - y + c); # Deveria rodar assim
-    print(((x*x) - y) + c);
+    #print(((x*x) - y) + c);
     
 end main
