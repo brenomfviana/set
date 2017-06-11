@@ -65,8 +65,9 @@ unaryExpression = do
 -- (Scope, [Var], [Statement]) State
 binaryExpression :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 binaryExpression = do
-                    a <- natToken <|> intToken <|> realToken <|> parentExpression
-                        <|> boolToken <|> textToken <|> getVar
+                    a <- natToken <|> intToken <|> realToken
+                        <|> parentExpression <|> boolToken <|> textToken
+                        <|> getVar
                     b <- numberOP <|> booleanOP
                     c <- expression
                     return (eval a b c)
@@ -112,35 +113,42 @@ eval (Real x p) (Multiplication _) (Nat y _)  = Real (x * integerToFloat(y)) p
 eval (Real x p) (Multiplication _) (Int y _)  = Real (x * integerToFloat(y)) p
 eval (Real x p) (Multiplication _) (Real y _) = Real (x * y) p
 -- Division
-eval (Nat x p)  (Division _) (Nat y _)  = let z = truncate(integerToFloat(x) / integerToFloat(y)) in Nat z p
-eval (Nat x p)  (Division _) (Int y _)  = let z = truncate(integerToFloat(x) / integerToFloat(y)) in Int z p
-eval (Int x p)  (Division _) (Nat y _)  = let z = truncate(integerToFloat(x) / integerToFloat(y)) in Int z p
-eval (Int x p)  (Division _) (Int y _)  = let z = truncate(integerToFloat(x) / integerToFloat(y)) in Int z p
-eval (Real x p) (Division _) (Nat y _)  = Real (x / integerToFloat(y)) p
-eval (Real x p) (Division _) (Int y _)  = Real (x / integerToFloat(y)) p
-eval (Real x p) (Division _) (Real y _) = Real (x / y) p
+eval (Nat x p)  (Division _) (Nat y _)  =
+    let z = truncate(integerToFloat(x) / integerToFloat(y)) in Nat z p
+eval (Nat x p)  (Division _) (Int y _)  =
+    let z = truncate(integerToFloat(x) / integerToFloat(y)) in Int z p
+eval (Int x p)  (Division _) (Nat y _)  =
+    let z = truncate(integerToFloat(x) / integerToFloat(y)) in Int z p
+eval (Int x p)  (Division _) (Int y _)  =
+    let z = truncate(integerToFloat(x) / integerToFloat(y)) in Int z p
+eval (Real x p) (Division _) (Nat y _)  =
+    Real (x / integerToFloat(y)) p
+eval (Real x p) (Division _) (Int y _)  =
+    Real (x / integerToFloat(y)) p
+eval (Real x p) (Division _) (Real y _) =
+    Real (x / y) p
 -- Equality
 eval (Nat x p)  (Equality _)  (Nat y _) = Bool (x == y) p
 eval (Int x p)  (Equality _)  (Int y _) = Bool (x == y) p
 eval (Real x p) (Equality _) (Real y _) = Bool (x == y) p
 eval (Text x p) (Equality _) (Text y _) = Bool (x == y) p
---
+-- Greater than
 eval (Nat x p)  (Greater _)  (Nat y _) = Bool (x > y) p
 eval (Int x p)  (Greater _)  (Int y _) = Bool (x > y) p
 eval (Real x p) (Greater _) (Real y _) = Bool (x > y) p
---
+-- Greater or equal than
 eval (Nat x p)  (GreaterOrEqual _)  (Nat y _) = Bool (x >= y) p
 eval (Int x p)  (GreaterOrEqual _)  (Int y _) = Bool (x >= y) p
 eval (Real x p) (GreaterOrEqual _) (Real y _) = Bool (x >= y) p
---
+-- Smaller than
 eval (Nat x p)  (Smaller _)  (Nat y _) = Bool (x < y) p
 eval (Int x p)  (Smaller _)  (Int y _) = Bool (x < y) p
 eval (Real x p) (Smaller _) (Real y _) = Bool (x < y) p
---
+-- Smaller or equal than
 eval (Nat x p)  (SmallerOrEqual _)  (Nat y _) = Bool (x <= y) p
 eval (Int x p)  (SmallerOrEqual _)  (Int y _) = Bool (x <= y) p
 eval (Real x p) (SmallerOrEqual _) (Real y _) = Bool (x <= y) p
---
+-- Concat
 eval (Text x p)  (Addition _)       (Text y _)  = Text (x ++ y) p
 eval (Text x p)  (Addition _)       (Nat  y _)  = Text (x ++ (show y)) p
 eval (Text x p)  (Addition _)       (Int  y _)  = Text (x ++ (show y)) p

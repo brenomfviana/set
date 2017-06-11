@@ -5,19 +5,36 @@ program main
     print(n1);
 
     if (0 > 1)
-        print(n1);
+    endif
+
+    if (0 > 1)
+    else
+    endif
+
+    if (0 > 1)
+    elseif (0 > 1)
+    endif
+
+    if (0 > 1)
     elseif (1 > 0)
-        print("asdasd");
-        if (0 > 1)
-            print(n1);
-        elseif (1 > 0)
-            print("asdasd");
-            if (0 > 1)
-                print(n1);
-            elseif (1 > 0)
-                print("asdasd");
-            endif
-        endif
+    endif
+
+    if (0 > 1)
+    elseif (1 > 0)
+    elseif (1 > 0)
+    endif
+
+    if (0 > 1)
+    elseif (0 > 1)
+    elseif (1 > 0)
+    endif
+
+    if (0 > 1)
+    elseif (0 > 1)
+    elseif (0 > 1)
+    elseif (0 > 1)
+    elseif (0 > 1)
+    elseif (1 > 0)
     endif
 
     print(n1);

@@ -58,8 +58,9 @@ updateVariable :: Var -> State -> State
 updateVariable _ (_, [], _) = error "Error: Variable not found."
 updateVariable ((Id id1 p1, v1), s1) (sc1, ((Id id2 p2, v2), s2) : m1, st1) =
     if id1 == id2 then (sc1, ((Id id1 p2, v1), s1) : m1, st1)
-    else let (sc2, m2, st2) = updateVariable ((Id id1 p1, v1), s1) (sc1, m1, st1)
-         in (sc1, ((Id id2 p2, v2), s2) : m2, st2)
+    else
+        let (sc2, m2, st2) = updateVariable ((Id id1 p1, v1), s1) (sc1, m1, st1)
+        in (sc1, ((Id id2 p2, v2), s2) : m2, st2)
 
 -- - Remove variable
 -- Var    Variable
@@ -69,8 +70,9 @@ removeVariable :: Var -> State -> State
 removeVariable _ (_, [], _) = error "Error: Variable not found."
 removeVariable ((Id id1 p1, v1), s1) (sc1, ((Id id2 p2, v2), s2) : m1, st1) =
     if id1 == id2 then (sc1, m1, st1)
-    else let (sc2, m2, st2) = removeVariable ((Id id1 p1, v1), s1) (sc1, m1, st1)
-         in (sc2, ((Id id2 p2, v2), s2) : m2, st2)
+    else
+        let (sc2, m2, st2) = removeVariable ((Id id1 p1, v1), s1) (sc1, m1, st1)
+        in (sc2, ((Id id2 p2, v2), s2) : m2, st2)
 
 -- - Get variable
 -- Token  Variable ID

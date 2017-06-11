@@ -41,68 +41,6 @@ getIdName _ = error "Error: Name not found."
 
 
 -- -----------------------------------------------------------------------------
--- Keywords checking
--- -----------------------------------------------------------------------------
-
--- - Check if statement
--- Token  If token
--- String Value
-checkIfStmt :: Token -> String
-checkIfStmt (If _) = show True
-checkIfStmt _ = show False
-
--- - Get column if token
--- Token  If token
--- String Value
-columnIfStmt :: Token -> Int
-columnIfStmt (If (_, c)) = c
-columnIfStmt _ = -1
-
--- - Check else statement
--- Token  Else token
--- String Value
-checkElseStmt :: Token -> String
-checkElseStmt (Else _) = show True
-checkElseStmt _ = show False
-
--- - Get column else token
--- Token  Else token
--- String Value
-columnElseIfStmt :: Token -> Int
-columnElseIfStmt (Else_If (_, c)) = c
-columnElseIfStmt _ = -1
-
--- - Check else statement
--- Token  ElseIf token
--- String Value
-checkElseIfStmt :: Token -> String
-checkElseIfStmt (Else_If _) = show True
-checkElseIfStmt _ = show False
-
--- - Get column else token
--- Token  Else token
--- String Value
-columnElseStmt :: Token -> Int
-columnElseStmt (Else (_, c)) = c
-columnElseStmt _ = -1
-
--- - Check end statement
--- Token  End token
--- String Value
-checkEndIfStmt :: Token -> String
-checkEndIfStmt (End_If _) = show True
-checkEndIfStmt _ = show False
-
--- - Get column end token
--- Token  End token
--- String Value
-columnEndIfStmt :: Token -> Int
-columnEndIfStmt (End_If (_, c)) = c
-columnEndIfStmt _ = -1
-
-
-
--- -----------------------------------------------------------------------------
 -- Type checking
 -- -----------------------------------------------------------------------------
 
@@ -144,11 +82,16 @@ cast _ _ = error "Error: Invalid cast."
 -- Token  Expression type
 -- Return New expression type
 inputCast :: Token -> Token -> Token
-inputCast (Text _ _) (Text i p) = Text (removeQuote(i)) p
-inputCast (Nat  _ _) (Text i p) = let x = stringToInt(removeQuote(i))   in Nat  x p
-inputCast (Int  _ _) (Text i p) = let x = stringToInt(removeQuote(i))   in Int  x p
-inputCast (Real _ _) (Text i p) = let x = stringToFloat(removeQuote(i)) in Real x p
-inputCast (Bool _ _) (Text i p) = let x = stringToBool(removeQuote(i))  in Bool x p
+inputCast (Text _ _) (Text i p) =
+    Text (removeQuote(i)) p
+inputCast (Nat  _ _) (Text i p) = let x = stringToInt(removeQuote(i))
+    in Nat  x p
+inputCast (Int  _ _) (Text i p) = let x = stringToInt(removeQuote(i))
+    in Int  x p
+inputCast (Real _ _) (Text i p) = let x = stringToFloat(removeQuote(i))
+    in Real x p
+inputCast (Bool _ _) (Text i p) = let x = stringToBool(removeQuote(i))
+    in Bool x p
 inputCast _ _ = error "Error: Invalid cast."
 
 
