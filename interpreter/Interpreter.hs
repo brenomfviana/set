@@ -124,12 +124,11 @@ ifStmt = do
         return (a:b:c:[d] ++ e ++ [f])
     else do
         let loop = do
-            liftIO (putStrLn "as")
-            when (0 > 1) loop
-            -- e <- ignoreToken
-            -- f <- endIfToken
-            -- updateState(removeScope(("if" ++ (show (getScopeLength s)))))
+            e <- ignoreToken
+            if ((checkIfStmt e) == "True") then loop
+            when ((checkEndStmt e) /= "True") loop
         loop
+        updateState(removeScope(("if" ++ (show (getScopeLength s)))))
         return (a:b:c:[d])
 
 -- - Else

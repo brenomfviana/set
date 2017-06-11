@@ -5,7 +5,9 @@ program main
     print(n1);
 
     if (0 > 1)
-        n1 := 8;
+        if (1 > 0)
+            n1 := 8;
+        endif
     endif
 
     print(n1);

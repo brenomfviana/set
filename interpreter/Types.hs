@@ -38,6 +38,20 @@ getIdName :: Token -> String
 getIdName (Id name _) = name
 getIdName _ = error "Error: Name not found."
 
+-- -
+-- Token  Literal token
+-- String Value
+checkIfStmt :: Token -> String
+checkIfStmt (If _) = show True
+checkIfStmt _ = show False
+
+-- -
+-- Token  Literal token
+-- String Value
+checkEndStmt :: Token -> String
+checkEndStmt (End_If _) = show True
+checkEndStmt _ = show False
+
 
 
 -- -----------------------------------------------------------------------------
