@@ -1,5 +1,5 @@
 -- Expression evaluator
--- Version: 09/06/2017
+-- Version: 11/06/2017
 module Expressions where
 
 -- External imports

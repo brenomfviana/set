@@ -1,5 +1,5 @@
--- Parser (Syntax Analyzer)
--- Version: 09/06/2017
+-- Interpreter
+-- Version: 11/06/2017
 module Interpreter where
 
 -- External imports
@@ -106,6 +106,12 @@ assign = do
             -- liftIO (print s)
             return (a:b:[c])
 
+
+
+-- -----------------------------------------------------------------------------
+-- IF STATEMENT
+-- -----------------------------------------------------------------------------
+
 -- - If
 -- ParsecT                     ParsecT
 -- [Token]                     Token list
@@ -206,6 +212,20 @@ elseIfStmt = do
             else do
                 updateState(removeScope(("if" ++ (show (getScopeLength s)))))
                 return (a:b:c:[d])
+
+
+
+-- -----------------------------------------------------------------------------
+-- WHILE STATEMENT
+-- -----------------------------------------------------------------------------
+
+
+
+
+
+-- -----------------------------------------------------------------------------
+-- OTHER STATEMENTS
+-- -----------------------------------------------------------------------------
 
 -- - Print
 -- ParsecT                     ParsecT
