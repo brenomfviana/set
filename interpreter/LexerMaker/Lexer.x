@@ -18,6 +18,7 @@ $alpha = [a-zA-Z]   -- alphabetic characters
 -- @pointer = $digit
 -- @univ = [\-]$digit | [\-]?$digit+.$digit+ | $alpha | @boolean | @string
 
+
 tokens :-
 
   $white+                              ;
@@ -36,6 +37,7 @@ tokens :-
   Pointer                              { \p s -> Type s (getLC p) }
   "set["                               { \p s -> Set_of (getLC p) }
   "]"                                  { \p s -> End_Set_of (getLC p) }
+  "Array"                              { \p s -> Array_of (getLC p) }
   if                                   { \p s -> If (getLC p) }
   else                                 { \p s -> Else (getLC p) }
   elseif                               { \p s -> Else_If (getLC p) }
@@ -106,6 +108,7 @@ data Token =
   Text String (Int, Int)       |
   -- Pointer Pointer (Int, Int)   |
   Set_of (Int, Int)            |
+  Array_of (Int, Int)          |
   End_Set_of (Int, Int)        |
   If (Int, Int)                |
   Else (Int, Int)              |
