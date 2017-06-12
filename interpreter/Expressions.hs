@@ -65,6 +65,7 @@ unaryExpression = do
 -- (Scope, [Var], [Statement]) State
 binaryExpression :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 binaryExpression = do
+                    i <- getInput
                     a <- natToken <|> intToken <|> realToken
                         <|> parentExpression <|> boolToken <|> textToken
                         <|> getVar
@@ -148,7 +149,7 @@ eval (Real x p) (Division _) (Nat y _)  =
     let z = x / integerToFloat(y) in Real z p
 eval (Real x p) (Division _) (Int y _)  =
     let z = x / integerToFloat(y) in Real z p
-    
+
 -- Equality
 eval (Nat x p)  (Equality _)  (Nat y _) = Bool (integerToFloat(x) == integerToFloat(y)) p
 eval (Int x p)  (Equality _)  (Int y _) = Bool (integerToFloat(x) == integerToFloat(y)) p

@@ -1,2 +1,7 @@
 program main
+    if (2 != 2)
+        print("Errado");
+    elseif (2 == 2)
+        print("Certo");
+    endif
 end main

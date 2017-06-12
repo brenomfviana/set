@@ -19,16 +19,16 @@ $alpha = [a-zA-Z]   -- alphabetic characters
 -- @univ = [\-]$digit | [\-]?$digit+.$digit+ | $alpha | @boolean | @string
 
 
- @vectorOfInt  = "Vector<Int>" 
- @vectorOfReal = "Vector<Real>" 
- @vectorOfNat  = "Vector<Nat>" 
- @vectorOfBool = "Vector<Bool>" 
+ @vectorOfInt  = "Vector<Int>"
+ @vectorOfReal = "Vector<Real>"
+ @vectorOfNat  = "Vector<Nat>"
+ @vectorOfBool = "Vector<Bool>"
  @vectorOfText = "Vector<Text>"
- @matrixOfInt  = "Vector<Int>" 
- @matrixOfReal = "Vector<Real>" 
- @matrixOfNat  = "Vector<Nat>" 
- @matrixOfBool = "Vector<Bool>" 
- @matrixOfText = "Vector<Text>" 
+ @matrixOfInt  = "Vector<Int>"
+ @matrixOfReal = "Vector<Real>"
+ @matrixOfNat  = "Vector<Nat>"
+ @matrixOfBool = "Vector<Bool>"
+ @matrixOfText = "Vector<Text>"
 
 tokens :-
 
@@ -95,7 +95,7 @@ tokens :-
   "<"                                  { \p s -> Smaller (getLC p) }
   "<="                                 { \p s -> SmallerOrEqual (getLC p) }
   "!="                                 { \p s -> Denial (getLC p) }
-  =                                    { \p s -> Equality (getLC p) }
+  ==                                    { \p s -> Equality (getLC p) }
   "\in"                                { \p s -> Belongs (getLC p) }
   "\cap"                               { \p s -> Intersection (getLC p) }
   "\cup"                               { \p s -> Union (getLC p) }
@@ -121,22 +121,22 @@ data Token =
   Comma                    (Int, Int)   |
   Id            String     (Int, Int)   |
   Type          String     (Int, Int)   |
-  VectorOfInt   [Int]      (Int, Int)   |    
-  VectorOfReal  [Float]    (Int, Int)   |    
-  VectorOfNat   [Int]      (Int, Int)   |    
-  VectorOfBool  [Bool]     (Int, Int)   |     
-  VectorOfText  [String]   (Int, Int)   |    
-  MatrixOfInt   [[Int]]    (Int, Int)   |    
-  MatrixOfReal  [[Float]]  (Int, Int)   |    
-  MatrixOfNat   [[Int] ]   (Int, Int)   |    
-  MatrixOfBool  [[Bool]]   (Int, Int)   |     
-  MatrixOfText  [[String]] (Int, Int)   |   
+  VectorOfInt   [Int]      (Int, Int)   |
+  VectorOfReal  [Float]    (Int, Int)   |
+  VectorOfNat   [Int]      (Int, Int)   |
+  VectorOfBool  [Bool]     (Int, Int)   |
+  VectorOfText  [String]   (Int, Int)   |
+  MatrixOfInt   [[Int]]    (Int, Int)   |
+  MatrixOfReal  [[Float]]  (Int, Int)   |
+  MatrixOfNat   [[Int] ]   (Int, Int)   |
+  MatrixOfBool  [[Bool]]   (Int, Int)   |
+  MatrixOfText  [[String]] (Int, Int)   |
   Nat           Int        (Int, Int)   |
   Int           Int        (Int, Int)   |
   Real          Float      (Int, Int)   |
   Bool          Bool       (Int, Int)   |
   Text          String     (Int, Int)   |
--- Univ          String     (Int, Int)   | 
+-- Univ          String     (Int, Int)   |
 -- Pointer       Pointer    (Int, Int)   |
   Set_of                   (Int, Int)   |
   Array_of                 (Int, Int)   |
