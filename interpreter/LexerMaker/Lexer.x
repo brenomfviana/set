@@ -19,6 +19,17 @@ $alpha = [a-zA-Z]   -- alphabetic characters
 -- @univ = [\-]$digit | [\-]?$digit+.$digit+ | $alpha | @boolean | @string
 
 
+ @vectorOfInt  = "Vector<Int>" 
+ @vectorOfReal = "Vector<Real>" 
+ @vectorOfNat  = "Vector<Nat>" 
+ @vectorOfBool = "Vector<Bool>" 
+ @vectorOfText = "Vector<Text>"
+ @matrixOfInt  = "Vector<Int>" 
+ @matrixOfReal = "Vector<Real>" 
+ @matrixOfNat  = "Vector<Nat>" 
+ @matrixOfBool = "Vector<Bool>" 
+ @matrixOfText = "Vector<Text>" 
+
 tokens :-
 
   $white+                              ;
@@ -37,6 +48,16 @@ tokens :-
   Pointer                              { \p s -> Type s (getLC p) }
   "set["                               { \p s -> Set_of (getLC p) }
   "]"                                  { \p s -> End_Set_of (getLC p) }
+  @vectorOfInt                         { \p s -> Type s (getLC p) }
+  @vectorOfReal                        { \p s -> Type s (getLC p) }
+  @vectorOfNat                         { \p s -> Type s (getLC p) }
+  @vectorOfBool                        { \p s -> Type s (getLC p) }
+  @vectorOfText                        { \p s -> Type s (getLC p) }
+  @matrixOfInt                         { \p s -> Type s (getLC p) }
+  @matrixOfReal                        { \p s -> Type s (getLC p) }
+  @matrixOfNat                         { \p s -> Type s (getLC p) }
+  @matrixOfBool                        { \p s -> Type s (getLC p) }
+  @matrixOfText                        { \p s -> Type s (getLC p) }
   "Array"                              { \p s -> Array_of (getLC p) }
   if                                   { \p s -> If (getLC p) }
   else                                 { \p s -> Else (getLC p) }
@@ -58,9 +79,9 @@ tokens :-
   @integer                             { \p s -> Int (read s) (getLC p) }
   @real                                { \p s -> Real (read s) (getLC p) }
   @boolean                             { \p s -> Bool (read s) (getLC p) }
-  -- @univ                                { \p s -> Univ (read s) (getLC p) }
+  -- @univ                             { \p s -> Univ (read s) (getLC p) }
   @string                              { \p s -> Text s (getLC p) }
-  -- @pointer                             { \p s -> Pointer (read s) (getLC p) }
+  -- @pointer                          { \p s -> Pointer (read s) (getLC p) }
   $alpha [$alpha $digit \_ \']*        { \p s -> Id s (getLC p) }
   true                                 { \p s -> Bool True (getLC p) }
   false                                { \p s -> Bool False (getLC p) }
@@ -93,61 +114,71 @@ getLC (AlexPn _ l c) = (l, c)
 -- Each action has type :: String -> Token
 -- The token type:
 data Token =
-  Program (Int, Int)           |
-  End (Int, Int)               |
-  Colon (Int, Int)             |
-  SemiColon (Int, Int)         |
-  Comma (Int, Int)             |
-  Id String (Int, Int)         |
-  Type String (Int, Int)       |
-  Nat Int (Int, Int)           |
-  Int Int (Int, Int)           |
-  Real Float (Int, Int)        |
-  Bool Bool (Int, Int)         |
-  -- Univ String (Int, Int)       |
-  Text String (Int, Int)       |
-  -- Pointer Pointer (Int, Int)   |
-  Set_of (Int, Int)            |
-  Array_of (Int, Int)          |
-  End_Set_of (Int, Int)        |
-  If (Int, Int)                |
-  Else (Int, Int)              |
-  Else_If (Int, Int)           |
-  End_If (Int, Int)            |
-  Function (Int, Int)          |
-  End_Function (Int, Int)      |
-  Proc (Int, Int)              |
-  End_Proc (Int, Int)          |
-  While (Int, Int)             |
-  End_While (Int, Int)         |
-  Typedef (Int, Int)           |
-  Print (Int, Int)             |
-  Input (Int, Int)             |
-  Exit (Int, Int)              |
-  Break (Int, Int)             |
-  Continue (Int, Int)          |
-  Assign (Int, Int)            |
-  Addition (Int, Int)          |
-  Subtraction (Int, Int)       |
-  Multiplication (Int, Int)    |
-  Division (Int, Int)          |
-  Greater (Int, Int)           |
-  GreaterOrEqual (Int, Int)    |
-  Smaller (Int, Int)           |
-  SmallerOrEqual (Int, Int)    |
-  Denial (Int, Int)            |
-  Equality (Int, Int)          |
-  Belongs (Int, Int)           |
-  Intersection (Int, Int)      |
-  Union (Int, Int)             |
-  Subset (Int, Int)            |
-  Complement (Int, Int)        |
-  Empty_Set (Int, Int)         |
-  Open_Bracket (Int, Int)      |
-  Close_Bracket (Int, Int)     |
-  Open_Parentheses (Int, Int)  |
-  Close_Parentheses (Int, Int) |
-  String String (Int, Int)
+  Program                  (Int, Int)   |
+  End                      (Int, Int)   |
+  Colon                    (Int, Int)   |
+  SemiColon                (Int, Int)   |
+  Comma                    (Int, Int)   |
+  Id            String     (Int, Int)   |
+  Type          String     (Int, Int)   |
+  VectorOfInt   [Int]      (Int, Int)   |    
+  VectorOfReal  [Float]    (Int, Int)   |    
+  VectorOfNat   [Int]      (Int, Int)   |    
+  VectorOfBool  [Bool]     (Int, Int)   |     
+  VectorOfText  [String]   (Int, Int)   |    
+  MatrixOfInt   [[Int]]    (Int, Int)   |    
+  MatrixOfReal  [[Float]]  (Int, Int)   |    
+  MatrixOfNat   [[Int] ]   (Int, Int)   |    
+  MatrixOfBool  [[Bool]]   (Int, Int)   |     
+  MatrixOfText  [[String]] (Int, Int)   |   
+  Nat           Int        (Int, Int)   |
+  Int           Int        (Int, Int)   |
+  Real          Float      (Int, Int)   |
+  Bool          Bool       (Int, Int)   |
+  Text          String     (Int, Int)   |
+-- Univ          String     (Int, Int)   | 
+-- Pointer       Pointer    (Int, Int)   |
+  Set_of                   (Int, Int)   |
+  Array_of                 (Int, Int)   |
+  End_Set_of               (Int, Int)   |
+  If                       (Int, Int)   |
+  Else                     (Int, Int)   |
+  Else_If                  (Int, Int)   |
+  End_If                   (Int, Int)   |
+  Function                 (Int, Int)   |
+  End_Function             (Int, Int)   |
+  Proc                     (Int, Int)   |
+  End_Proc                 (Int, Int)   |
+  While                    (Int, Int)   |
+  End_While                (Int, Int)   |
+  Typedef                  (Int, Int)   |
+  Print                    (Int, Int)   |
+  Input                    (Int, Int)   |
+  Exit                     (Int, Int)   |
+  Break                    (Int, Int)   |
+  Continue                 (Int, Int)   |
+  Assign                   (Int, Int)   |
+  Addition                 (Int, Int)   |
+  Subtraction              (Int, Int)   |
+  Multiplication           (Int, Int)   |
+  Division                 (Int, Int)   |
+  Greater                  (Int, Int)   |
+  GreaterOrEqual           (Int, Int)   |
+  Smaller                  (Int, Int)   |
+  SmallerOrEqual           (Int, Int)   |
+  Denial                   (Int, Int)   |
+  Equality                 (Int, Int)   |
+  Belongs                  (Int, Int)   |
+  Intersection             (Int, Int)   |
+  Union                    (Int, Int)   |
+  Subset                   (Int, Int)   |
+  Complement               (Int, Int)   |
+  Empty_Set                (Int, Int)   |
+  Open_Bracket             (Int, Int)   |
+  Close_Bracket            (Int, Int)   |
+  Open_Parentheses         (Int, Int)   |
+  Close_Parentheses        (Int, Int)   |
+  String        String     (Int, Int)
   deriving (Eq,Show)
 
 getTokens fn = unsafePerformIO (getTokensAux fn)
