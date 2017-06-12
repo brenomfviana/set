@@ -9,10 +9,11 @@ program main
     if (0 > 1)
         print("Eu nunca vou aparecer [0]");
     elseif (2 > 5)
-        print("Se tirarem o endif o resto do codigo é ignorado [0]");
+        print("Se tirarem o endif o resto do codigo eh ignorado [0]");
     else
-        print("Se tirarem o endif o resto do codigo é ignorado [0]");
-    endif
+        print("Se tirarem o endif o resto do codigo eh ignorado [0]");
+    
+    #endif #COMENTAR!!!!! 
 
     print("fim do teste [0]");
     print("");
@@ -20,20 +21,16 @@ program main
 
     #-------------------------Teste [1] identacao------------------------------
 
-    # Se o if for falso e houver outros ifs dentro dele, estes precisam estar
-    # identado
+    #OK!
 
     print("inicio do teste [1]");
 
-    if (0 > 1)
-        print("Eu nunca vou aparecer [1]");
-        if(1 > 0)
-            print("O meu if precisa estar identado [1]");
+    if (1 > 0.0)
+        if(0 > 1)
+            print("BAD!");
+        elseif (3 > 0)
+            print("OK!");
         endif
-    elseif (2 > 0)
-        print("Eu entrei no elseif [1]");
-    else
-        print("Eu nunca vou entrar pq o elseif não pode ser false [1]");
     endif
 
     print("fim do teste [1]");
@@ -47,10 +44,12 @@ program main
 
     if (0 > 1)
         print("Eu nunca vou aparecer [2]");
-    elseif (2 > 0)
+    elseif (0 > 1)
         if(1 > 0)
             print("O meu elseif precisa ser verdadeiro [2]");
         endif
+    elseif (2 > 0)
+        print("OK!");
     endif
 
     print("fim do teste [2]");

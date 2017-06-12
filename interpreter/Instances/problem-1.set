@@ -17,7 +17,6 @@ program main
     
     print(c + 1.0);
     
-    
     #print(x*x - y + c); # Deveria rodar assim
     #print(((x*x) - y) + c);
     
