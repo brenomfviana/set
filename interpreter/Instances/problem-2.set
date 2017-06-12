@@ -1,30 +1,46 @@
 program main
+    # Entrada do usuário
     Real : x;
-    Int : y;
+    # Entre 0 e 25
+    Nat : n1;
+    # Entre 26 e 50
+    Nat : n2;
+    # Entre 51 e 75
+    Nat : n3;
+    # Entre 76 e 100
+    Nat : n4;
+
+    # Recebe a primeira entrada do usuário
     input(x);
-    
+
+    # Conta os números informados
     while(x >= 0)
-    
+
         if(x >= 0)
             if(x <= 25)
-                y := y + 1;
+                n1 := n1 + 1;
             endif
         elseif(x >= 26)
             if(x <= 50)
-                y := y + 1;
+                n2 := n2 + 1;
             endif
         elseif(x >= 51)
             if(x <= 75)
-                y := y + 1;
+                n3 := n3 + 1;
             endif
         elseif(x >= 76)
             if(x <= 100)
-                y := y + 1;
+                n4 := n4 + 1;
             endif
         endif
-        
+
+        # Recebe mais uma entrada do usuário
         input(x);
     endwhile
-    
-    print(y);
+
+    # Imprime os resultados
+    print("Numeros entre 0 e 25   = " + n1);
+    print("Numeros entre 26 e 50  = " + n2);
+    print("Numeros entre 50 e 75  = " + n3);
+    print("Numeros entre 76 e 100 = " + n4);
 end main
