@@ -68,7 +68,7 @@ varDecl = do
     d <- semiColonToken <?> "semicolon."
     s <- getState
     -- Check if the variable already exists
-    if (variableIsSet c s) then do
+    if ((variableIsSet c s) == False) then do
         -- Add the declared variable
         updateState(insertVariable((c, getDefaultValue(a)), "m"))
         return (a:b:[c])
