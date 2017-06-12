@@ -1,2 +1,4 @@
 program main
+	Matrix<Int> : nums;
+	
 end main

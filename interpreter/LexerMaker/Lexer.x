@@ -24,11 +24,11 @@ $alpha = [a-zA-Z]   -- alphabetic characters
  @vectorOfNat  = "Vector<Nat>"
  @vectorOfBool = "Vector<Bool>"
  @vectorOfText = "Vector<Text>"
- @matrixOfInt  = "Vector<Int>"
- @matrixOfReal = "Vector<Real>"
+ @matrixOfInt  = "Matrix<Int>"
+ @matrixOfReal = "Matrix<Real>"
  @matrixOfNat  = "Vector<Nat>"
- @matrixOfBool = "Vector<Bool>"
- @matrixOfText = "Vector<Text>"
+ @matrixOfBool = "Matrix<Bool>"
+ @matrixOfText = "Matrix<Text>"
 
 tokens :-
 

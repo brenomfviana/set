@@ -102,6 +102,18 @@ textToken = tokenPrim show updatePositon getToken where
     getToken _            = Nothing
 
 
+-- - MatrixOfReal Token
+matrixOfRealToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+matrixOfRealToken = tokenPrim show updatePositon getToken where
+    getToken (MatrixOfReal x pos) = Just (MatrixOfReal x pos)
+    getToken _                    = Nothing
+    
+-- - MatrixOfInt Token
+matrixOfIntToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+matrixOfIntToken = tokenPrim show updatePositon getToken where
+    getToken (MatrixOfInt x pos) = Just (MatrixOfInt x pos)
+    getToken _                   = Nothing
+
 
 -- --------------------------------------------------------
 -- Operator tokens
