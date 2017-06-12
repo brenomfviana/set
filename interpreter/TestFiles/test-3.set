@@ -1,30 +1,30 @@
 program main
-   
+
     #-------------------------Teste [0] else------------------------------
-    
+
     # Se esquecer de colocar o endif ele ignora o resto do código e não da erro
-    
+
     print("inicio do teste [0]");
-    
+
     if (0 > 1)
         print("Eu nunca vou aparecer [0]");
-    elseif (2 > 0)
+    elseif (2 > 5)
         print("Se tirarem o endif o resto do codigo é ignorado [0]");
     else
         print("Se tirarem o endif o resto do codigo é ignorado [0]");
-    endif 
-    
+    endif
+
     print("fim do teste [0]");
     print("");
-     
-    
+
+
     #-------------------------Teste [1] identacao------------------------------
-    
+
     # Se o if for falso e houver outros ifs dentro dele, estes precisam estar
     # identado
-    
+
     print("inicio do teste [1]");
-    
+
     if (0 > 1)
         print("Eu nunca vou aparecer [1]");
         if(1 > 0)
@@ -34,17 +34,17 @@ program main
         print("Eu entrei no elseif [1]");
     else
         print("Eu nunca vou entrar pq o elseif não pode ser false [1]");
-    endif 
-    
+    endif
+
     print("fim do teste [1]");
     print("");
-    
+
     #-------------------------Teste [2] identacao------------------------------
-    
+
     # O elseif não pode ser falso, e só poder ter 1
-    
+
     print("inicio do teste [2]");
-    
+
     if (0 > 1)
         print("Eu nunca vou aparecer [2]");
     elseif (2 > 0)
@@ -52,69 +52,69 @@ program main
             print("O meu elseif precisa ser verdadeiro [2]");
         endif
     endif
-    
+
     print("fim do teste [2]");
     print("");
-    
-    
+
+
     #------------------Teste [3] conteúdo nos elseifs---------------------------
-    
+
     # OK!
-    
+
     print("inicio do teste [3]");
     print("OK!");
-    
+
     if (0 > 1)
     elseif (1 > 0)
         #print("Eu nao preciso estar aqui [3]!");
     endif
-    
-    print("fim do teste [3]");   
-    print(""); 
-    
+
+    print("fim do teste [3]");
+    print("");
+
     #------------------Teste [4] conteúdo nos elses---------------------------
-    
+
     # OK!
-    
+
     print("inicio do teste [4]");
     print("OK!");
-    
+
     if (0 > 1)
     elseif (1 > 0)
         #print("Eu nao preciso estar aqui [4]!");
     endif
-    
-    print("fim do teste [4]");   
-    print(""); 
-    
-    
+
+    print("fim do teste [4]");
+    print("");
+
+
     #---------------------Teste [5] conteúdo nos ifs----------------------------
-    
+
     # OK!
-    
+
     print("inicio do teste [5]");
     print("OK!");
-    
+
     if (1 > 0)
         #print("Eu nao preciso estar aqui [5]!");
     endif
-    
+
     print("fim do teste [5]");
     print("");
-    
+
     #-----------------Teste [6] miscelânia de if/elseifs------------------------
-    
+
     #Error: ele só verifica até o primeiro elseif, se ele for falso, da pau
-    
+
     print("inicio do teste [6]");
-    
+
     if (0 > 0)
         if (0 > 1)
             print("A");
         elseif (1 > 0)
             print("B");
         endif
-    elseif (1 > 0)   
+    elseif (1 > 0)
         if (0 > 1)
             print("C");
         elseif (3 > 2)
@@ -122,8 +122,8 @@ program main
         elseif (4 > 3)
             print("Mesmo que meu elseif seja true e nenhum anterior n for, eu não entro [6]");
         endif
-        
-        
+
+
         if (0 > 3)
             print("D");
         elseif (5 > 4)
@@ -139,5 +139,5 @@ program main
     endif
 
     print("fim do teste [6]");
-    
+
 end main
