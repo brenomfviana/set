@@ -1,4 +1,5 @@
 program main
-	Matrix<Int> : nums;
-	
+	Vector<Int> : nums;
+	input(nums);
+	print(nums);
 end main

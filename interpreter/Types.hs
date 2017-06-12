@@ -32,6 +32,9 @@ getDefaultValue (Type "Int"  pos) = Int 0 pos
 getDefaultValue (Type "Real" pos) = Real 0.0 pos
 getDefaultValue (Type "Bool" pos) = Bool False pos
 getDefaultValue (Type "Text" pos) = Text "" pos
+getDefaultValue (Type "Vector<Nat>" pos)  = VectorOfNat [] pos
+getDefaultValue (Type "Vector<Int>" pos)  = VectorOfInt [] pos
+getDefaultValue (Type "Vector<Real>" pos) = VectorOfReal [] pos
 -- getDefaultValue (Type "Pointer") = Pointer 0.0
 
 -- - Get value

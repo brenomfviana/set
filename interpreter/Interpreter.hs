@@ -71,9 +71,12 @@ varDecl = do
     if ((variableIsSet c s) == False) then do
         -- Add the declared variable
         updateState(insertVariable((c, getDefaultValue(a)), "m"))
+        s <- getState
+        liftIO (print s)
         return (a:b:[c])
     else
-        error ("The variable " ++ (getTokenName c) ++ " in position " ++ (getTokenPosition c) ++ " already exists.")
+        error ("The variable " ++ (getTokenName c) ++ " in position "
+            ++ (getTokenPosition c) ++ " already exists.")
 
 -- - Statements
 -- ParsecT                     ParsecT
