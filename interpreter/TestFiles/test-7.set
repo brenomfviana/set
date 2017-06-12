@@ -1,7 +1,13 @@
 program main
-    if (2 != 2)
-        print("Errado");
-    elseif (2 == 2)
-        print("Certo");
+    if (((2 > 1) && (1 < 2)) || (2 < 1))
+        print("YEAH!");
+    else
+        print("OH, NOOOOO!");
+    endif
+    
+    if ((2 < 1) || (0 > 1))
+        print("YEAH!");
+    else
+        print("OH, NOOOOO!");
     endif
 end main

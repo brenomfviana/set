@@ -11,30 +11,24 @@ program main
     Nat : n4;
 
     # Recebe a primeira entrada do usuário
+    print("Digite um valor natural (valores menores que 0 encerram o programa)");
     input(x);
 
     # Conta os números informados
     while(x >= 0)
 
-        if(x >= 0)
-            if(x <= 25)
-                n1 := n1 + 1;
-            endif
-        elseif(x >= 26)
-            if(x <= 50)
-                n2 := n2 + 1;
-            endif
-        elseif(x >= 51)
-            if(x <= 75)
-                n3 := n3 + 1;
-            endif
-        elseif(x >= 76)
-            if(x <= 100)
-                n4 := n4 + 1;
-            endif
+        if((x <= 25) && (x >= 0))
+            n1 := n1 + 1;
+        elseif((x <= 50) && (x >= 26))
+            n2 := n2 + 1;
+        elseif((x <= 75) && (x >= 51))
+            n3 := n3 + 1;
+        elseif((x <= 100) && (x >= 76))
+            n4 := n4 + 1;
         endif
 
         # Recebe mais uma entrada do usuário
+        print("Digite um valor natural (valores menores que 0 encerram o programa)");
         input(x);
     endwhile
 

@@ -1,23 +1,30 @@
 program main
+    Real : numX;
+    Real : denX;
+    Real : numY;
+    Real : denY;
+    
     Real : x;
     Real : y;
     Int : c;
     
-    Real : aux;
+    print("Digite o valor do numerador do X:");
+    input (numX);
+    print("Digite o valor do denominador do X:");
+    input (denX);
     
-    input (x);
-    input (y);
+    print("Digite o valor do numerador do Y:");
+    input (numY);
+    print("Digite o valor do denominador do Y:");
+    input (denY);
+    
+    print("Digite o valor do C:");
     input (c);
     
-    aux := x * x;
-    aux := aux - y;
-    aux := aux + c;
-    
-    print(aux);
-    
-    print(c + 1.0);
+    x := numX / denX;
+    y := numY / denY;
     
     #print(x*x - y + c); # Deveria rodar assim
-    #print(((x*x) - y) + c);
+    print(((x*x) - y) + c);
     
 end main
