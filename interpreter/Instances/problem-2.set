@@ -20,15 +20,18 @@ program main
             if(x <= 25)
                 n1 := n1 + 1;
             endif
-        elseif(x >= 26)
+        endif
+        if(x >= 26)
             if(x <= 50)
                 n2 := n2 + 1;
             endif
-        elseif(x >= 51)
+        endif
+        if(x >= 51)
             if(x <= 75)
                 n3 := n3 + 1;
             endif
-        elseif(x >= 76)
+        endif
+        if(x >= 76)
             if(x <= 100)
                 n4 := n4 + 1;
             endif
