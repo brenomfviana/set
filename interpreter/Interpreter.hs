@@ -155,6 +155,7 @@ ifStmt = do
                 bf <- getInput
                 let loop = do
                     f <- ignoreToken
+                    when ((checkEndStmt f) == "True") (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnIfStmt a))) loop
                 loop
                 af <- getInput
@@ -168,6 +169,7 @@ ifStmt = do
                 bf <- getInput
                 let loop = do
                     f <- ignoreToken
+                    when ((checkEndStmt f) == "True") (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnIfStmt a))) loop
                 loop
                 af <- getInput
@@ -195,6 +197,7 @@ ifStmt = do
                 bf <- getInput
                 let loop = do
                     f <- ignoreToken
+                    when ((checkEndStmt f) == "True") (error "endif statement not found.")
                     when (((columnElseStmt f) /= (columnIfStmt a))
                         && ((columnElseIfStmt f) /= (columnIfStmt a))
                         && ((columnEndIfStmt f) /= (columnIfStmt a))) loop
@@ -276,6 +279,7 @@ elseIfStmt = do
                 bf <- getInput
                 let loop = do
                     f <- ignoreToken
+                    when ((checkEndStmt f) == "True") (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnElseIfStmt a))) loop
                 loop
                 af <- getInput
@@ -289,6 +293,7 @@ elseIfStmt = do
                 bf <- getInput
                 let loop = do
                     f <- ignoreToken
+                    when ((checkEndStmt f) == "True") (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnElseIfStmt a))) loop
                 loop
                 af <- getInput
@@ -316,6 +321,7 @@ elseIfStmt = do
                 bf <- getInput
                 let loop = do
                     f <- ignoreToken
+                    when ((checkEndStmt f) == "True") (error "endif statement not found.")
                     when (((columnElseStmt f) /= (columnElseIfStmt a))
                         && ((columnElseIfStmt f) /= (columnElseIfStmt a))
                         && ((columnEndIfStmt f) /= (columnElseIfStmt a))) loop

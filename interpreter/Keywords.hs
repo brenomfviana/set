@@ -37,7 +37,7 @@ columnElseIfStmt :: Token -> Int
 columnElseIfStmt (Else_If (_, c)) = c
 columnElseIfStmt _ = -1
 
--- - Check else statement
+-- - Check elseif statement
 -- Token  ElseIf token
 -- String Value
 checkElseIfStmt :: Token -> String
@@ -51,7 +51,7 @@ columnElseStmt :: Token -> Int
 columnElseStmt (Else (_, c)) = c
 columnElseStmt _ = -1
 
--- - Check end statement
+-- - Check endif statement
 -- Token  End token
 -- String Value
 checkEndIfStmt :: Token -> String
@@ -72,7 +72,7 @@ columnEndWhileStmt :: Token -> Int
 columnEndWhileStmt (End_While (_, c)) = c
 columnEndWhileStmt _ = -1
 
--- - Check end statement
+-- - Check endwhile statement
 -- Token  End token
 -- String Value
 checkEndWhileStmt :: Token -> String
@@ -85,3 +85,10 @@ checkEndWhileStmt _ = show False
 columnWhileStmt :: Token -> Int
 columnWhileStmt (While (_, c)) = c
 columnWhileStmt _ = -1
+
+-- - Check end
+-- Token  End token
+-- String Value
+checkEndStmt :: Token -> String
+checkEndStmt (End _) = show True
+checkEndStmt _ = show False
