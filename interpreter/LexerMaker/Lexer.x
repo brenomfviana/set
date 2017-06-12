@@ -102,8 +102,8 @@ tokens :-
   "\subset"                            { \p s -> Subset (getLC p) }
   "\stcomp"                            { \p s -> Complement (getLC p) }
   "\emptyset"                          { \p s -> Empty_Set (getLC p) }
-  "{"                                  { \p s -> Open_Bracket (getLC p) }
-  "}"                                  { \p s -> Close_Bracket (getLC p) }
+  "["                                  { \p s -> Open_Bracket (getLC p) }
+  "]"                                  { \p s -> Close_Bracket (getLC p) }
   "("                                  { \p s -> Open_Parentheses (getLC p) }
   ")"                                  { \p s -> Close_Parentheses (getLC p) }
 {
