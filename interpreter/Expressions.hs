@@ -31,7 +31,8 @@ getVar = do
 -- (Scope, [Var], [Statement]) State
 booleanOP :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 booleanOP = equalityToken <|> greaterToken <|> greaterOrEqualToken
-            <|> smallerToken <|> smallerOrEqualToken <|> denialToken
+            <|> smallerToken <|> smallerOrEqualToken <|> denialToken 
+            <|> orToken <|> andToken
 
 
 -- - Aritmetic Operations
@@ -47,7 +48,8 @@ numberOP = additionToken <|> subtractionToken <|> multiplicationToken
 -- [Token]                     Token list
 -- (Scope, [Var], [Statement]) State
 expression :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-expression = try  binaryExpression <|> parentExpression <|> unaryExpression
+expression = try  binaryExpression <|> parentExpression <|> unaryExpression 
+
 
 -- - Unary expression
 -- ParsecT                     ParsecT
@@ -229,6 +231,11 @@ eval (Int x p)  (Denial _)  (Nat y _)  = Bool (integerToFloat(x) /= integerToFlo
 eval (Int x p)  (Denial _)  (Real y _) = Bool (integerToFloat(x) /= y) p
 eval (Real x p) (Denial _)  (Nat y _)  = Bool (x /= integerToFloat(y)) p
 eval (Real x p) (Denial _)  (Int y _)  = Bool (x /= integerToFloat(y)) p
+
+
+-- Denial than
+eval (Bool x p)  (And _)  (Bool y _) = Bool (x && y) p
+eval (Bool x p)  (Or _)  (Bool y _) = Bool (x || y) p
 
 -- Concat
 eval (Text x p)  (Addition _)       (Text y _)  = Text (x ++ y) p
