@@ -12,8 +12,8 @@ program main
         print("Se tirarem o endif o resto do codigo eh ignorado [0]");
     else
         print("Se tirarem o endif o resto do codigo eh ignorado [0]");
-    
-    #endif #COMENTAR!!!!! 
+
+    #endif #COMENTAR!!!!!
 
     print("fim do teste [0]");
     print("");
