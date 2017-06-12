@@ -106,6 +106,8 @@ tokens :-
   "]"                                  { \p s -> Close_Bracket (getLC p) }
   "("                                  { \p s -> Open_Parentheses (getLC p) }
   ")"                                  { \p s -> Close_Parentheses (getLC p) }
+  "&&"                                 { \p s -> And (getLC p) }
+  "||"                                 { \p s -> Or (getLC p) }
 {
 
 -- Token Position
@@ -138,6 +140,8 @@ data Token =
   Text          String     (Int, Int)   |
 -- Univ          String     (Int, Int)   |
 -- Pointer       Pointer    (Int, Int)   |
+  And                      (Int, Int)   | 
+  Or                       (Int, Int)   |    
   Set_of                   (Int, Int)   |
   Array_of                 (Int, Int)   |
   End_Set_of               (Int, Int)   |
