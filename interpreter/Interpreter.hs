@@ -67,15 +67,13 @@ varDecl = do
     c <- idToken <?> "variable name."
     d <- semiColonToken <?> "semicolon."
     s <- getState
-    {--- Check if the variable already exists
-    result <- try updateState(updateVariable((a, (cast (getVariableType a s) c))))
-    case result of {
-        Nothing -> error "The variable already exists.";
-        Right ans -> Nothing
-    }-}
-    -- Add the declared variable
-    updateState(insertVariable((c, getDefaultValue(a)), "m"))
-    return (a:b:[c])
+    -- Check if the variable already exists
+    if (variableIsSet c s) then do
+        -- Add the declared variable
+        updateState(insertVariable((c, getDefaultValue(a)), "m"))
+        return (a:b:[c])
+    else
+        error ("The variable " ++ (getTokenName c) ++ " in position " ++ (getTokenPosition c) ++ " already exists.")
 
 -- - Statements
 -- ParsecT                     ParsecT
@@ -239,10 +237,7 @@ ifStmt = do
                         -- Update scope
                         updateState(removeScope(("if" ++ (show (getScopeLength s)))))
                         return (a:b:c:[d] ++ (bf \\ af) ++ e)
-                    else do
-                        af1 <- getInput
-                        -- Add back the last readed statement
-                        setInput (e:af1)
+                    else
                         {-e <- stmts
                         f <- endIfToken
                         -- Update scope
@@ -359,14 +354,14 @@ elseIfStmt = do
                 else
                     -- Check if the token is a ELSE_IF
                     if ((checkElseIfStmt e) == "True") then do
+                        af1 <- getInput
+                        -- Add back the last readed statement
+                        setInput (let y:x = reverse (bf1 \\ af1) in y:af)
                         f <- elseIfStmt
                         -- Update scope
                         updateState(removeScope(("if" ++ (show (getScopeLength s)))))
                         return (a:b:c:[d])
-                    else do
-                        af1 <- getInput
-                        -- Add back the last readed statement
-                        setInput (e:af1)
+                    else
                         {-e <- stmts
                         f <- endIfToken
                         -- Update scope

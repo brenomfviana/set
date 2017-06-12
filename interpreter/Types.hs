@@ -12,6 +12,20 @@ import Lexer
 -- - Get default value of different types
 -- Type   Variable type
 -- Return Initial variable value
+getTokenName :: Token -> String
+getTokenName (Id s _) = s
+getTokenName _ = error "Invalid token format."
+
+-- - Get default value of different types
+-- Type   Variable type
+-- Return Initial variable value
+getTokenPosition :: Token -> String
+getTokenPosition (Id _ pos) = show pos
+getTokenPosition _ = error "Invalid token format."
+
+-- - Get default value of different types
+-- Type   Variable type
+-- Return Initial variable value
 getDefaultValue :: Token -> Token
 getDefaultValue (Type "Nat"  pos) = Nat 0 pos
 getDefaultValue (Type "Int"  pos) = Int 0 pos

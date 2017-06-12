@@ -78,6 +78,16 @@ removeVariable ((Id id1 p1, v1), s1) (sc1, ((Id id2 p2, v2), s2) : m1, st1) =
 -- Token  Variable ID
 -- State  State
 -- Return Variable
+variableIsSet :: Token -> State -> Bool
+variableIsSet _ (_, [], _) = False
+variableIsSet (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
+    if id1 == id2 then True
+    else variableIsSet (Id id1 p1) (sc, m, st)
+
+-- - Get variable
+-- Token  Variable ID
+-- State  State
+-- Return Variable
 getVariable :: Token -> State -> Var
 getVariable _ (_, [], _) = error "Error: Variable not found."
 getVariable (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
