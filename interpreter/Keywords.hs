@@ -92,3 +92,10 @@ columnWhileStmt _ = -1
 checkEndStmt :: Token -> String
 checkEndStmt (End _) = show True
 checkEndStmt _ = show False
+
+-- - Check end
+-- Token  End token
+-- String Value
+checkCloseParenthesesStmt :: Token -> String
+checkCloseParenthesesStmt (Close_Parentheses _) = show True
+checkCloseParenthesesStmt _ = show False

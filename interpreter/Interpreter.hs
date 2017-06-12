@@ -377,11 +377,42 @@ elseIfStmt = do
 -- (Scope, [Var], [Statement]) State
 whileStmt :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 whileStmt = do
+    -- Get Input
+    wb <- getInput
+    a <- whileToken
+    -- Check while block
+    let loop = do
+        f <- ignoreToken
+        when ((checkEndStmt f) == "True") (error "endwhile statement not found.")
+        when (((columnEndWhileStmt f) /= (columnWhileStmt a))) loop
+    loop
+    we <- getInput
+    -- Executes while
+    let loopwhile = do
+        setInput (wb \\ we)
+        f <- ignoreToken
+        f <- ignoreToken
+        c <- expression
+        setInput (wb \\ we)
+        w <- runWhile
+        when ((getValue c) == "True") loopwhile
+    loopwhile
+    setInput (we)
+    return (we)
+
+-- - While statement
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+runWhile :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+runWhile = do
     s <- getState
     a <- whileToken
     b <- openParenthesesToken
+    -- Calculates the expression
     c <- expression
     d <- closeParenthesesToken
+    -- Update scope
     updateState(insertScope(("while" ++ (show (getScopeLength s)))))
     -- Check if the expression is true
     if ((getValue c) == "True") then do
@@ -410,33 +441,12 @@ whileStmt = do
             updateState(removeScope(("while" ++ (show (getScopeLength s)))))
             return (a:b:c:[d] ++ e ++ (bf \\ af))
     else do
-        -- Update scope
-        updateState(removeScope(("while" ++ (show (getScopeLength s)))))
-        -- Get the next statement
-        e <- ignoreToken
-        af <- getInput
-        -- Add back the last readed statement
-        setInput (e:af)
-        -- Check if the token is a END_WHILE
-        if (((checkEndWhileStmt e) == "True")) then do
-            e <- endWhileToken
-            return (a:b:c:d:[e])
-        else do
-            -- Update scope
-            updateState(insertScope(("while" ++ (show (getScopeLength s)))))
-            -- Ignore other statements
-            bf <- getInput
-            let loop = do
-                f <- ignoreToken
-                when ((columnEndWhileStmt f) /= (columnWhileStmt a)) loop
-            loop
-            af <- getInput
-            -- Add back the last readed statement
-            setInput (let y:x = reverse (bf \\ af) in y:af)
-            bf <- getInput
-            e <- endWhileToken
-            updateState(removeScope(("while" ++ (show (getScopeLength s)))))
+        -- Check if the expression is false
+        if ((getValue c) == "False") then do
             return (a:b:c:[d])
+        else do
+            error "Error: it's not a boolean expresion."
+
 
 
 -- -----------------------------------------------------------------------------
