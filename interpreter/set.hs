@@ -14,8 +14,7 @@ import Lexer
 run :: String -> IO()
 run "" = error "ERROR"
 run command = do
-    case unsafePerformIO (parser (getTokens command)) of
-    {
+    case unsafePerformIO (parser (getTokens command)) of {
         Left err -> print err;
         Right ans -> putStrLn "The program ran successfully!" -- print ans
     }

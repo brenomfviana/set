@@ -96,7 +96,6 @@ getVariableType (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
 
 -- getVariableValue :: Token -> State -> Var
 
--- - Update variable
 
 
 -- -----------------------------------------------------------------------------
@@ -134,6 +133,8 @@ removeScope s1 (s2 : sc1, m1, st1) =
 getScopeLength :: State -> Int
 getScopeLength (sc, _, _) = length(sc)
 getScopeLength _ = error "Error: The state doesn't exits."
+
+-- getScope ::
 
 
 

@@ -26,15 +26,15 @@ import Expressions
 -- (Scope, [Var], [Statement]) State
 program :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 program = do
-    a <- programToken
-    b <- idToken
+    a <- programToken <?> "program statement."
+    b <- idToken <?> "program name."
     -- Update scope
     updateState(insertScope(getIdName b))
     c <- stmts
-    d <- endToken
+    d <- endToken <?> "end statement."
     -- Update scope
     updateState(removeScope(getIdName b))
-    e <- idToken
+    e <- idToken <?> "program name."
     eof
     return (a:[b] ++ c ++ [e])
 
@@ -62,12 +62,17 @@ remainingVarDecls = (do a <- varDecls
 -- (Scope, [Var], [Statement]) State
 varDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 varDecl = do
-    a <- typeToken
-    b <- colonToken
-    c <- idToken
-    d <- semiColonToken
-    -- Check if the variable already exists
-    -- updateState(updateVariable(((a, (cast (getVariableType a s) c))
+    a <- typeToken <?> "variable type."
+    b <- colonToken <?> "colon."
+    c <- idToken <?> "variable name."
+    d <- semiColonToken <?> "semicolon."
+    s <- getState
+    {--- Check if the variable already exists
+    result <- try updateState(updateVariable((a, (cast (getVariableType a s) c))))
+    case result of {
+        Nothing -> error "The variable already exists.";
+        Right ans -> Nothing
+    }-}
     -- Add the declared variable
     updateState(insertVariable((c, getDefaultValue(a)), "m"))
     return (a:b:[c])
@@ -79,7 +84,6 @@ varDecl = do
 stmts :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 stmts = do
     first <- assign <|> varDecls <|> printf <|> inputf <|> ifStmt <|> whileStmt
-             <?> "expecting"
     next  <- remainingStmts
     return (first ++ next)
 
@@ -97,11 +101,11 @@ remainingStmts = (do a <- stmts
 -- (Scope, [Var], [Statement]) State
 assign :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 assign = do
-    a <- idToken
-    b <- assignToken
+    a <- idToken <?> "variable name."
+    b <- assignToken <?> "assign."
     -- Calculates the expression
     c <- expression
-    d <- semiColonToken
+    d <- semiColonToken <?> "semicolon."
     s <- getState
     -- Check if the types are compatible
     if (not (compatible (getVariableType a s) c)) then fail "Type mismatch."
