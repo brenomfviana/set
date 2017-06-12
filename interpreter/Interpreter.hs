@@ -352,6 +352,9 @@ elseIfStmt = do
                 else
                     -- Check if the token is a ELSE_IF
                     if ((checkElseIfStmt e) == "True") then do
+                        af1 <- getInput
+                        -- Add back the last readed statement
+                        setInput (let y:x = reverse (bf1 \\ af1) in y:af)
                         f <- elseIfStmt
                         -- Update scope
                         updateState(removeScope(("if" ++ (show (getScopeLength s)))))
