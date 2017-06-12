@@ -64,3 +64,24 @@ checkEndIfStmt _ = show False
 columnEndIfStmt :: Token -> Int
 columnEndIfStmt (End_If (_, c)) = c
 columnEndIfStmt _ = -1
+
+-- - Get column end token
+-- Token  End token
+-- String Value
+columnEndWhileStmt :: Token -> Int
+columnEndWhileStmt (End_While (_, c)) = c
+columnEndWhileStmt _ = -1
+
+-- - Check end statement
+-- Token  End token
+-- String Value
+checkEndWhileStmt :: Token -> String
+checkEndWhileStmt (End_While _) = show True
+checkEndWhileStmt _ = show False
+
+-- - Get column while token
+-- Token  While token
+-- String Value
+columnWhileStmt :: Token -> Int
+columnWhileStmt (While (_, c)) = c
+columnWhileStmt _ = -1

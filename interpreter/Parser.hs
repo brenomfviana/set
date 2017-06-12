@@ -209,7 +209,17 @@ endIfToken = tokenPrim show updatePositon getToken where
     getToken (End_If p) = Just (End_If p)
     getToken _          = Nothing
 
+-- - While Token
+whileToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+whileToken = tokenPrim show updatePositon getToken where
+    getToken (While p) = Just (While p)
+    getToken _         = Nothing
 
+-- - End_While Token
+endWhileToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+endWhileToken = tokenPrim show updatePositon getToken where
+    getToken (End_While p) = Just (End_While p)
+    getToken _             = Nothing
 
 -- --------------------------------------------------------
 -- Other tokens

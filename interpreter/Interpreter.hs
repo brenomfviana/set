@@ -78,7 +78,7 @@ varDecl = do
 -- (Scope, [Var], [Statement]) State
 stmts :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 stmts = do
-    first <- assign <|> varDecls <|> printf <|> inputf <|> ifStmt
+    first <- assign <|> varDecls <|> printf <|> inputf <|> ifStmt <|> whileStmt
              <?> "expecting"
     next  <- remainingStmts
     return (first ++ next)
@@ -365,8 +365,72 @@ elseIfStmt = do
 -- WHILE STATEMENT
 -- -----------------------------------------------------------------------------
 
-
-
+-- - While statement
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+whileStmt :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+whileStmt = do
+    s <- getState
+    a <- whileToken
+    b <- openParenthesesToken
+    c <- expression
+    d <- closeParenthesesToken
+    updateState(insertScope(("while" ++ (show (getScopeLength s)))))
+    -- Check if the expression is true
+    if ((getValue c) == "True") then do
+        -- Get the next statement
+        e <- ignoreToken
+        af <- getInput
+        -- Add back the last readed statement
+        setInput (e:af)
+        -- Check if the token is a END_WHILE
+        if (((checkEndWhileStmt e) == "True")) then do
+            e <- endWhileToken
+            -- Update scope
+            updateState(removeScope(("while" ++ (show (getScopeLength s)))))
+            return (a:b:c:d:[e])
+        else do
+            -- Run statements
+            e <- stmts
+            -- Ignore other statements
+            bf <- getInput
+            let loop = do
+                f <- ignoreToken
+                when (((columnEndWhileStmt f) /= (columnWhileStmt a))) loop
+            loop
+            af <- getInput
+            -- Update scope
+            updateState(removeScope(("while" ++ (show (getScopeLength s)))))
+            return (a:b:c:[d] ++ e ++ (bf \\ af))
+    else do
+        -- Update scope
+        updateState(removeScope(("while" ++ (show (getScopeLength s)))))
+        -- Get the next statement
+        e <- ignoreToken
+        af <- getInput
+        -- Add back the last readed statement
+        setInput (e:af)
+        -- Check if the token is a END_WHILE
+        if (((checkEndWhileStmt e) == "True")) then do
+            e <- endWhileToken
+            return (a:b:c:d:[e])
+        else do
+            -- Update scope
+            updateState(insertScope(("while" ++ (show (getScopeLength s)))))
+            -- Ignore other statements
+            bf <- getInput
+            let loop = do
+                f <- ignoreToken
+                when ((columnEndWhileStmt f) /= (columnWhileStmt a)) loop
+            loop
+            af <- getInput
+            -- Add back the last readed statement
+            setInput (let y:x = reverse (bf \\ af) in y:af)
+            bf <- getInput
+            e <- endWhileToken
+            updateState(removeScope(("while" ++ (show (getScopeLength s)))))
+            return (a:b:c:[d])
 
 
 -- -----------------------------------------------------------------------------
