@@ -22,18 +22,18 @@ import Keywords
 -- (Scope, [Var], [Statement]) State
 getVar :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 getVar = do
-            a <- ignoreToken <?> "variable name."
-            af <- getInput
-            -- Add back the last readed statement
-            setInput (a:af)
-            s <- getState
-            -- Check if is an array
-            if ((checkArrayType(getVariableType a s)) == True) then do
-                b <- try  getVarArrayValue <|> getVarArray
-                return (b)
-            else do
-                a <- idToken
-                return (getVariableType a s)
+    a <- ignoreToken <?> "variable name."
+    af <- getInput
+    -- Add back the last readed statement
+    setInput (a:af)
+    s <- getState
+    -- Check if is an array
+    if ((checkArrayType(getVariableType a s)) == True) then do
+        a <- try  getVarArrayValue <|> getVarArray
+        return (a)
+    else do
+        a <- idToken
+        return (getVariableType a s)
 
 -- - Array var
 -- ParsecT                     ParsecT
@@ -41,9 +41,9 @@ getVar = do
 -- (Scope, [Var], [Statement]) State
 getVarArray :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 getVarArray = do
-                a <- idToken
-                s <- getState
-                return (getVariableType a s)
+    a <- idToken
+    s <- getState
+    return (getVariableType a s)
 
 -- - Array value
 -- ParsecT                     ParsecT
@@ -51,16 +51,16 @@ getVarArray = do
 -- (Scope, [Var], [Statement]) State
 getVarArrayValue :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 getVarArrayValue = do
-                a <- idToken
-                b <- openBracketToken
-                c <- expression
-                d <- closeBracketToken
-                s <- getState
-                -- Check index
-                if ((checkNatType c) == True) then do
-                    return (getArrayItem(getVariableType a s) c)
-                else
-                    error "Error: Invalid index."
+    a <- idToken
+    b <- openBracketToken
+    c <- expression
+    d <- closeBracketToken
+    s <- getState
+    -- Check index
+    if ((checkNatType c) == True) then do
+        return (getArrayItem(getVariableType a s) c)
+    else
+        error "Error: Invalid index."
 
 -- - Boolean Operations
 -- ParsecT                     ParsecT
@@ -104,13 +104,13 @@ unaryExpression = do
 -- (Scope, [Var], [Statement]) State
 binaryExpression :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 binaryExpression = do
-                    i <- getInput
-                    a <- natToken <|> intToken <|> realToken
-                        <|> parentExpression <|> boolToken <|> textToken
-                        <|> getVar
-                    b <- numberOP <|> booleanOP
-                    c <- expression
-                    return (eval a b c)
+    i <- getInput
+    a <- natToken <|> intToken <|> realToken
+        <|> parentExpression <|> boolToken <|> textToken
+        <|> getVar
+    b <- numberOP <|> booleanOP
+    c <- expression
+    return (eval a b c)
 
 -- - Expression with parentheses
 -- ParsecT                     ParsecT
@@ -118,10 +118,10 @@ binaryExpression = do
 -- (Scope, [Var], [Statement]) State
 parentExpression :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 parentExpression = do
-                    a <- openParenthesesToken <?> "parentheses (."
-                    b <- expression <|> parentExpression
-                    c <- closeParenthesesToken <?> "parentheses )."
-                    return (b)
+    a <- openParenthesesToken <?> "parentheses (."
+    b <- expression <|> parentExpression
+    c <- closeParenthesesToken <?> "parentheses )."
+    return (b)
 
 -- - Evaluation
 -- ParsecT                     ParsecT

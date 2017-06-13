@@ -85,11 +85,30 @@ getArraySize (Array (size, _, _) _) = size
 getArrayValue :: Token -> [Token]
 getArrayValue (Array (_, _, value) _) = value
 
+-- - Get array type
+-- Token  Array
+-- Return Array type
+getArrayType :: Token -> Token
+getArrayType (Array (_, t, _) _) = t
+
 -- - Get array item
 -- Token  Array
 -- Return Array item
 getArrayItem :: Token -> Token -> Token
 getArrayItem (Array (_, _, value) _) (Nat i _) = value!!i
+
+-- - Set array item
+-- Token  Array
+-- Token  New value
+-- Return Updated array
+setArrayItem :: Token -> Token -> Token -> Token
+setArrayItem (Array (s, t, value) p) (Nat i _) nv = (Array (s, t, (replaceNth i nv value) ) p)
+
+-- -
+replaceNth :: Int -> Token -> [Token] -> [Token]
+replaceNth i nv (x:xs)
+     | i == 0 = nv:xs
+     | otherwise = x:replaceNth (i-1) nv xs
 
 -- - Convert a string in token list
 -- Token    Array
@@ -144,8 +163,9 @@ compatible _ _ = False
 cast :: Token -> Token -> Token
 cast (Nat  _ _)  (Nat i p) = if i < 0 then error "Error: Invalid assignment."
                              else Nat i p
-cast (Int  _ _)  (Nat i p) = if i < 0 then Int i p
+cast (Nat  _ _)  (Int i p) = if i < 0 then Int i p
                              else Nat i p
+cast (Int  _ _)  (Nat i p) = Int i p
 cast (Int  _ _)  (Int i p) = Int i p
 cast (Real _ _)  (Nat i p) = let x = integerToFloat(i) in Real x p
 cast (Real _ _)  (Int i p) = let x = integerToFloat(i) in Real x p

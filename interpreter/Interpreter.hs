@@ -175,6 +175,15 @@ remainingStmts = (do a <- stmts
 -- (Scope, [Var], [Statement]) State
 assign :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 assign = do
+    a <- try assignVar <|> assignVarArray
+    return (a)
+
+-- - Assign var
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+assignVar :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+assignVar = do
     a <- idToken <?> "variable name."
     b <- assignToken <?> "assign."
     -- Calculates the expression
@@ -191,6 +200,37 @@ assign = do
             -- s <- getState
             -- liftIO (print s)
             return (a:b:[c])
+
+-- - Assign var
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+assignVarArray :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+assignVarArray = do
+    a <- idToken <?> "variable name."
+    s <- getState
+    -- Check if is an array
+    if (checkArrayType(getVariableType a s) == True) then do
+        b <- openBracketToken
+        c <- expression
+        d <- closeBracketToken
+        e <- assignToken <?> "assign."
+        -- Calculates the expression
+        f <- expression
+        g <- semiColonToken <?> "semicolon."
+        -- Check if the types are compatible
+        if (not (compatible (getDefaultValue(getArrayType(getVariableType a s))) c)) then fail "Type mismatch."
+        else do
+            -- Update variable value
+            liftIO (print (cast (getDefaultValue(getArrayType (getVariableType a s))) f))
+            updateState(updateVariable((a, (setArrayItem (getVariableType a s) c (cast (getDefaultValue(getArrayType (getVariableType a s))) f) )),
+                        "main"))
+            s <- getState
+            -- s <- getState
+            -- liftIO (print s)
+            return (a:b:c:d:e:[f])
+    else
+        return ([a])
 
 
 
