@@ -1,5 +1,5 @@
 -- Types
--- Version: 11/06/2017
+-- Version: 13/06/2017
 module Types where
 
 -- External imports
@@ -67,17 +67,17 @@ getIdName _ = error "Error: Name not found."
 -- Token  Array size
 -- Return Initial array value
 getDefaultArrayValue :: Token -> Token -> Token -> Token
-getDefaultArrayValue (Type "Array" p1) (Type "Nat"  p2) (Nat value p3) = Array ((Nat value p1), (Type "Nat"  p2), []) p1
-getDefaultArrayValue (Type "Array" p1) (Type "Int"  p2) (Nat value p3) = Array ((Nat value p1), (Type "Int"  p2), []) p1
-getDefaultArrayValue (Type "Array" p1) (Type "Real" p2) (Nat value p3) = Array ((Nat value p1), (Type "Real" p2), []) p1
-getDefaultArrayValue (Type "Array" p1) (Type "Bool" p2) (Nat value p3) = Array ((Nat value p1), (Type "Bool" p2), []) p1
-getDefaultArrayValue (Type "Array" p1) (Type "Text" p2) (Nat value p3) = Array ((Nat value p1), (Type "Text" p2), []) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Nat"  p2) (Nat value p3) = Array ((Type "Nat"  p2), (Nat value p1), []) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Int"  p2) (Nat value p3) = Array ((Type "Int"  p2), (Nat value p1), []) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Real" p2) (Nat value p3) = Array ((Type "Real" p2), (Nat value p1), []) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Bool" p2) (Nat value p3) = Array ((Type "Bool" p2), (Nat value p1), []) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Text" p2) (Nat value p3) = Array ((Type "Text" p2), (Nat value p1), []) p1
 
 -- - Get array size
 -- Token  Array
 -- Return Array size
 getArraySize :: Token -> Token
-getArraySize (Array (size, _, _) _) = size
+getArraySize (Array (_, size, _) _) = size
 
 -- - Get array value
 -- Token  Array
@@ -89,7 +89,7 @@ getArrayValue (Array (_, _, value) _) = value
 -- Token  Array
 -- Return Array type
 getArrayType :: Token -> Token
-getArrayType (Array (_, t, _) _) = t
+getArrayType (Array (t, _, _) _) = t
 
 -- - Get array item
 -- Token  Array
@@ -99,16 +99,11 @@ getArrayItem (Array (_, _, value) _) (Nat i _) = value!!i
 
 -- - Set array item
 -- Token  Array
+-- Token  Position
 -- Token  New value
 -- Return Updated array
 setArrayItem :: Token -> Token -> Token -> Token
-setArrayItem (Array (s, t, value) p) (Nat i _) nv = (Array (s, t, (replaceNth i nv value) ) p)
-
--- -
-replaceNth :: Int -> Token -> [Token] -> [Token]
-replaceNth i nv (x:xs)
-     | i == 0 = nv:xs
-     | otherwise = x:replaceNth (i-1) nv xs
+setArrayItem (Array (t, s, value) p) (Nat i _) nv = (Array (t, s, (replaceNth i nv value) ) p)
 
 -- - Convert a string in token list
 -- Token    Array
@@ -117,22 +112,50 @@ replaceNth i nv (x:xs)
 -- Return   Array values
 toToken :: Token -> [String] -> [Token]
 toToken _ [] = []
-toToken (Array (h, (Type "Nat"  p2), v) p1) (sh:st) = (Nat  (stringToInt sh) p1) : toToken (Array (h, (Type "Nat" p2), v) p1) st
-toToken (Array (h, (Type "Int"  p2), v) p1) (sh:st) = (Int  (stringToInt sh) p1) : toToken (Array (h, (Type "Int" p2), v) p1) st
-toToken (Array (h, (Type "Real" p2), v) p1) (sh:st) = (Real (stringToFloat sh) p1) : toToken (Array (h, (Type "Real" p2), v) p1) st
-toToken (Array (h, (Type "Bool" p2), v) p1) (sh:st) = (Bool (stringToBool sh) p1) : toToken (Array (h, (Type "Bool" p2), v) p1) st
-toToken (Array (h, (Type "Text" p2), v) p1) (sh:st) = (Text sh p1) : toToken (Array (h, (Type "Text" p2), v) p1) st
+toToken (Array ((Type "Nat"  p2), s, v) p1) (sh:st) = (Nat  (stringToInt sh) p1) : toToken (Array ((Type "Nat" p2), s, v) p1) st
+toToken (Array ((Type "Int"  p2), s, v) p1) (sh:st) = (Int  (stringToInt sh) p1) : toToken (Array ((Type "Int" p2), s, v) p1) st
+toToken (Array ((Type "Real" p2), s, v) p1) (sh:st) = (Real (stringToFloat sh) p1) : toToken (Array ((Type "Real" p2), s, v) p1) st
+toToken (Array ((Type "Bool" p2), s, v) p1) (sh:st) = (Bool (stringToBool sh) p1) : toToken (Array ((Type "Bool" p2), s, v) p1) st
+toToken (Array ((Type "Text" p2), s, v) p1) (sh:st) = (Text sh p1) : toToken (Array ((Type "Text" p2), s, v) p1) st
 
 -- - Convert an array in a string
 -- Token  Array
 -- Return Array value
 toString :: (Token, Token, [Token]) -> [String]
 toString (_, _, []) = []
-toString ((Nat v1 p1), (Type "Nat"  p2), (Nat  v3 p3):t) = [(show v3)] ++ toString ((Nat v1 p1), (Type "Nat"  p2), t)
-toString ((Nat v1 p1), (Type "Int"  p2), (Int  v3 p3):t) = [(show v3)] ++ toString ((Nat v1 p1), (Type "Int"  p2), t)
-toString ((Nat v1 p1), (Type "Real" p2), (Real v3 p3):t) = [(show v3)] ++ toString ((Nat v1 p1), (Type "Real" p2), t)
-toString ((Nat v1 p1), (Type "Bool" p2), (Bool v3 p3):t) = [(show v3)] ++ toString ((Nat v1 p1), (Type "Bool" p2), t)
-toString ((Nat v1 p1), (Type "Text" p2), (Text v3 p3):t) = [(show v3)] ++ toString ((Nat v1 p1), (Type "Text" p2), t)
+toString ((Type "Nat"  p2), (Nat v1 p1), (Nat  v3 p3):t) = [(show v3)] ++ toString ((Type "Nat"  p2), (Nat v1 p1), t)
+toString ((Type "Int"  p2), (Nat v1 p1), (Int  v3 p3):t) = [(show v3)] ++ toString ((Type "Int"  p2), (Nat v1 p1), t)
+toString ((Type "Real" p2), (Nat v1 p1), (Real v3 p3):t) = [(show v3)] ++ toString ((Type "Real" p2), (Nat v1 p1), t)
+toString ((Type "Bool" p2), (Nat v1 p1), (Bool v3 p3):t) = [(show v3)] ++ toString ((Type "Bool" p2), (Nat v1 p1), t)
+toString ((Type "Text" p2), (Nat v1 p1), (Text v3 p3):t) = [(show v3)] ++ toString ((Type "Text" p2), (Nat v1 p1), t)
+
+-- - Replate nth item
+-- Int Index Position
+-- Token     New value
+-- [Token]   Array
+-- Return    Updated array
+replaceNth :: Int -> Token -> [Token] -> [Token]
+replaceNth i nv (x:xs)
+     | i == 0 = nv:xs
+     | otherwise = x:replaceNth (i-1) nv xs
+
+
+
+ -- --------------------------------------------------------
+ -- Matrix
+ -- --------------------------------------------------------
+
+ -- - Get default matrix value
+ -- Token  Matrix
+ -- Token  Matrix lines
+ -- Token  Matrix columns
+ -- Return Initial matrix value
+ -- getDefaultMatrixValue :: Token -> Token -> Token -> Token
+ -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Nat"  p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Nat"  p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
+ -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Int"  p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Int"  p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
+ -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Real" p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Real" p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
+ -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Bool" p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Bool" p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
+ -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Text" p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Text" p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
 
 
 

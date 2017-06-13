@@ -1,5 +1,5 @@
 -- Interpreter
--- Version: 11/06/2017
+-- Version: 13/06/2017
 module Interpreter where
 
 -- External imports
@@ -92,25 +92,23 @@ arrayDecl = do
     a <- typeToken <?> "variable type."
     b <- openBracketToken
     c <- typeToken <?> "variable type."
-    i <- commaToken
-    d <- expression
-    e <- closeBracketToken
-    f <- colonToken <?> "colon."
-    g <- idToken <?> "variable name."
-    h <- semiColonToken <?> "semicolon."
+    d <- commaToken
+    e <- expression
+    f <- closeBracketToken
+    g <- colonToken <?> "colon."
+    h <- idToken <?> "variable name."
+    i <- semiColonToken <?> "semicolon."
     s <- getState
     -- Check index
-    if ((checkNatType d) == True) then do
+    if ((checkNatType e) == True) then do
         -- Check if the variable already exists
-        if ((variableIsSet g s) == False) then do
+        if ((variableIsSet h s) == False) then do
             -- Add the declared variable
-            updateState(insertVariable((g, getDefaultArrayValue a c d), "main"))
-            -- s <- getState
-            -- liftIO (print s)
-            return (a:b:c:d:e:f:g:[h])
+            updateState(insertVariable((h, getDefaultArrayValue a c e), "main"))
+            return (a:b:c:d:e:f:g:h:[i])
         else
-            error ("Error: The variable " ++ (getTokenName g) ++ " in position "
-                ++ (getTokenPosition g) ++ " already exists.")
+            error ("Error: The variable " ++ (getTokenName h) ++ " in position "
+                ++ (getTokenPosition h) ++ " already exists.")
     else
         error "Error: Invalid size value."
 
@@ -123,25 +121,25 @@ matrixDecl = do
     a <- typeToken <?> "variable type."
     b <- openBracketToken
     c <- typeToken <?> "variable type."
-    i <- commaToken
-    d <- expression
-    e <- closeBracketToken
-    f <- colonToken <?> "colon."
-    g <- idToken <?> "variable name."
-    h <- semiColonToken <?> "semicolon."
+    d <- commaToken
+    e <- expression
+    f <- commaToken
+    g <- expression
+    h <- closeBracketToken
+    i <- colonToken <?> "colon."
+    j <- idToken <?> "variable name."
+    k <- semiColonToken <?> "semicolon."
     s <- getState
     -- Check index
-    if ((checkNatType d) == True) then do
+    if ((checkNatType e) == True && (checkNatType g) == True) then do
         -- Check if the variable already exists
-        if ((variableIsSet g s) == False) then do
+        if ((variableIsSet j s) == False) then do
             -- Add the declared variable
-            updateState(insertVariable((g, getDefaultArrayValue a c d), "main"))
-            -- s <- getState
-            -- liftIO (print s)
-            return (a:b:c:d:e:f:g:[h])
+            -- updateState(insertVariable((j, getDefaultMatrixValue a c e g), "main"))
+            return (a:b:c:d:e:f:g:h:[i])
         else
-            error ("Error: The variable " ++ (getTokenName g) ++ " in position "
-                ++ (getTokenPosition g) ++ " already exists.")
+            error ("Error: The variable " ++ (getTokenName j) ++ " in position "
+                ++ (getTokenPosition j) ++ " already exists.")
     else
         error "Error: Invalid size value."
 
@@ -222,7 +220,6 @@ assignVarArray = do
         if (not (compatible (getDefaultValue(getArrayType(getVariableType a s))) c)) then fail "Type mismatch."
         else do
             -- Update variable value
-            liftIO (print (cast (getDefaultValue(getArrayType (getVariableType a s))) f))
             updateState(updateVariable((a, (setArrayItem (getVariableType a s) c (cast (getDefaultValue(getArrayType (getVariableType a s))) f) )),
                         "main"))
             s <- getState

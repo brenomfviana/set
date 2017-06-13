@@ -2,7 +2,7 @@ program main
 	Array[Int,3] : nums;
 	input(nums);
 	print(nums);
-	nums[2] := 10;
+	nums[1] := 10;
 	print(nums[2]);
 	print(nums);
 end main
