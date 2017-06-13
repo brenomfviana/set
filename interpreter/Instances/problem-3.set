@@ -1,3 +1,50 @@
 program main
+	Nat : m;
+	Nat : n;
+	Nat : mxn;
+	
+	m := 3;
+	n := 3;
+	mxn := m * n;
+
+	Array[Int,mxn] : x;
+
+	Array[Int,mxn] : y;
+
+	Text : textos;
+
+	print("Lendo o vetor x: ");
+	input(x);
+
+	print("Lendo o vetor y: ");
+	input(y);
+
+	
+
+	Nat : index;
+	Nat : i;
+	Nat : j;
+	textos := "";
+	Int : soma;
+	while(i < m)
+		while(j < n)
+
+			index := (i*m)+j;
+			soma := x[index] + y[index];
+			textos := ((textos + " ") + soma);
+
+			j := j + 1;
+
+		endwhile
+
+		print(textos);
+		textos := "";
+
+		j := 0;
+		i := i + 1;
+
+	endwhile
+
+	
 
 end main
