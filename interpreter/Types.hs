@@ -32,7 +32,7 @@ getDefaultValue (Type "Int"   pos) = Int 0 pos
 getDefaultValue (Type "Real"  pos) = Real 0.0 pos
 getDefaultValue (Type "Bool"  pos) = Bool False pos
 getDefaultValue (Type "Text"  pos) = Text "" pos
-getDefaultValue (Type "Array" pos) = Array [] pos
+getDefaultValue (Type "Array" pos) = Array ((Nat 0 pos),(Nat 0 pos),[]) pos
 -- getDefaultValue (Type "Pointer") = Pointer 0.0
 
 -- - Get value
@@ -65,17 +65,23 @@ getIdName _ = error "Error: Name not found."
 -- Token  Array size
 -- Return Initial array value
 getDefaultArrayValue :: Token -> Token -> Token -> Token
-getDefaultArrayValue (Type "Array" p1) (Type "Nat"  p2) (Nat value p3) = Array ((Nat value p1):[(Type "Nat"  p2)]) p1
-getDefaultArrayValue (Type "Array" p1) (Type "Int"  p2) (Nat value p3) = Array ((Nat value p1):[(Type "Int"  p2)]) p1
-getDefaultArrayValue (Type "Array" p1) (Type "Real" p2) (Nat value p3) = Array ((Nat value p1):[(Type "Real" p2)]) p1
-getDefaultArrayValue (Type "Array" p1) (Type "Bool" p2) (Nat value p3) = Array ((Nat value p1):[(Type "Bool" p2)]) p1
-getDefaultArrayValue (Type "Array" p1) (Type "Text" p2) (Nat value p3) = Array ((Nat value p1):[(Type "Text" p2)]) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Nat"  p2) (Nat value p3) = Array ((Nat value p1), (Type "Nat"  p2), []) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Int"  p2) (Nat value p3) = Array ((Nat value p1), (Type "Int"  p2), []) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Real" p2) (Nat value p3) = Array ((Nat value p1), (Type "Real" p2), []) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Bool" p2) (Nat value p3) = Array ((Nat value p1), (Type "Bool" p2), []) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Text" p2) (Nat value p3) = Array ((Nat value p1), (Type "Text" p2), []) p1
+
+-- - Get array size
+-- Token  Array
+-- Return Array size
+getArraySize :: Token -> Token
+getArraySize (Array (size, _, _) _) = size
 
 -- - Get array value
 -- Token  Array
 -- Return Array value
 getArrayValue :: Token -> [Token]
-getArrayValue (Array value _) = value
+getArrayValue (Array (_, _, value) _) = value
 
 -- - Convert a string in token list
 -- Token    Array
@@ -84,23 +90,22 @@ getArrayValue (Array value _) = value
 -- Return   Array values
 toToken :: Token -> [String] -> [Token]
 toToken _ [] = []
-toToken (Array (h:(Type "Nat"  p2):v) p1) (sh:st) = (Nat  (stringToInt sh) p1) : toToken (Array (h:(Type "Nat" p2):v) p1) st
-toToken (Array (h:(Type "Int"  p2):v) p1) (sh:st) = (Int  (stringToInt sh) p1) : toToken (Array (h:(Type "Int" p2):v) p1) st
-toToken (Array (h:(Type "Real" p2):v) p1) (sh:st) = (Real (stringToFloat sh) p1) : toToken (Array (h:(Type "Real" p2):v) p1) st
-toToken (Array (h:(Type "Bool" p2):v) p1) (sh:st) = (Bool (stringToBool sh) p1) : toToken (Array (h:(Type "Bool" p2):v) p1) st
-toToken (Array (h:(Type "Text" p2):v) p1) (sh:st) = (Text sh p1) : toToken (Array (h:(Type "Text" p2):v) p1) st
+toToken (Array (h, (Type "Nat"  p2), v) p1) (sh:st) = (Nat  (stringToInt sh) p1) : toToken (Array (h, (Type "Nat" p2), v) p1) st
+toToken (Array (h, (Type "Int"  p2), v) p1) (sh:st) = (Int  (stringToInt sh) p1) : toToken (Array (h, (Type "Int" p2), v) p1) st
+toToken (Array (h, (Type "Real" p2), v) p1) (sh:st) = (Real (stringToFloat sh) p1) : toToken (Array (h, (Type "Real" p2), v) p1) st
+toToken (Array (h, (Type "Bool" p2), v) p1) (sh:st) = (Bool (stringToBool sh) p1) : toToken (Array (h, (Type "Bool" p2), v) p1) st
+toToken (Array (h, (Type "Text" p2), v) p1) (sh:st) = (Text sh p1) : toToken (Array (h, (Type "Text" p2), v) p1) st
 
 -- - Convert an array in a string
 -- Token  Array
 -- Return Array value
-toString :: [Token] -> [String]
-toString [] = []
-toString ((Nat _ _):(Type _ _):t) = toString t
-toString ((Nat  value _):t) = [(show value)] ++ toString t
-toString ((Int  value _):t) = [(show value)] ++ toString t
-toString ((Real value _):t) = [(show value)] ++ toString t
-toString ((Bool value _):t) = [(show value)] ++ toString t
-toString ((Text value _):t) = [(show value)] ++ toString t
+toString :: (Token, Token, [Token]) -> [String]
+toString (_, _, []) = []
+toString ((Nat v1 p1), (Type "Nat"  p2), (Nat  v3 p3):t) = [(show v3)] ++ toString ((Nat v1 p1), (Type "Nat"  p2), t)
+toString ((Nat v1 p1), (Type "Int"  p2), (Int  v3 p3):t) = [(show v3)] ++ toString ((Nat v1 p1), (Type "Int"  p2), t)
+toString ((Nat v1 p1), (Type "Real" p2), (Real v3 p3):t) = [(show v3)] ++ toString ((Nat v1 p1), (Type "Real" p2), t)
+toString ((Nat v1 p1), (Type "Bool" p2), (Bool v3 p3):t) = [(show v3)] ++ toString ((Nat v1 p1), (Type "Bool" p2), t)
+toString ((Nat v1 p1), (Type "Text" p2), (Text v3 p3):t) = [(show v3)] ++ toString ((Nat v1 p1), (Type "Text" p2), t)
 
 
 

@@ -99,6 +99,7 @@ arrayDecl = do
     g <- idToken <?> "variable name."
     h <- semiColonToken <?> "semicolon."
     s <- getState
+    -- Check index
     if ((checkNatType d) == True) then do
         -- Check if the variable already exists
         if ((variableIsSet g s) == False) then do
@@ -510,13 +511,29 @@ printf :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 printf = do
     a <- printToken
     b <- openParenthesesToken
-    -- Calculates the expression
-    c <- expression <|> idToken
-    d <- closeParenthesesToken
-    e <- semiColonToken
-    -- Prints in terminal
-    liftIO (putStrLn ((getValue c)))
-    return (a:b:c:d:[e])
+    s <- getState
+    f <- ignoreToken
+    af <- getInput
+    -- Add back the last readed statement
+    setInput (f:af)
+    -- Check if is an array
+    if ((checkArrayType(getVariableType f s)) == True) then do
+        -- Calculates the expression
+        c <- idToken
+        d <- closeParenthesesToken
+        e <- semiColonToken
+        liftIO (print (getVariableType c s))
+        -- Prints in terminal
+        liftIO (putStrLn (getValue(getVariableType c s)))
+        return (a:b:c:d:[e])
+    else do
+        -- Calculates the expression
+        c <- expression <|> idToken
+        d <- closeParenthesesToken
+        e <- semiColonToken
+        -- Prints in terminal
+        liftIO (putStrLn ((getValue c)))
+        return (a:b:c:d:[e])
 
 -- - Input
 -- ParsecT                     ParsecT
@@ -537,10 +554,10 @@ inputf = do
         if ((checkArrayType(getVariableType c s)) == True) then do
             -- Update variable value
             -- Check array size
-            if (let (Nat y _):x = getArrayValue(getVariableType c s) in y == length(splitOn "," f)) then do
+            if (let (Nat y _) = getArraySize(getVariableType c s) in y == length(splitOn "," f)) then do
                 -- Update variable value
                 updateState(updateVariable((c,
-                    let (Array _ y) = (getVariableType c s) in (Array (getArrayValue(getVariableType c s) ++ (toToken (getVariableType c s) (splitOn "," f))) y)), "main"))
+                    let (Array (si, t, _) y) = (getVariableType c s) in (Array (si, t, (getArrayValue(getVariableType c s) ++ (toToken (getVariableType c s) (splitOn "," f)))) y)), "main"))
                 return (a:b:[c])
             else
                 error "Error: The entry does not match the size of the array."
