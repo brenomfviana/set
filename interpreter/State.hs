@@ -99,7 +99,7 @@ getVariable (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
 -- State  State
 -- Return Variable
 getVariableType :: Token -> State -> Token
-getVariableType _ (_, [], _) = error "Error: Variable not found."
+getVariableType _ (_, [], _) = (Id "_" (0,0))
 getVariableType (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
     if id1 == id2 then value
     else getVariableType (Id id1 p1) (sc, m, st)

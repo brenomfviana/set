@@ -22,20 +22,45 @@ import Keywords
 -- (Scope, [Var], [Statement]) State
 getVar :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 getVar = do
-            a <- idToken <?> "variable name."
+            a <- ignoreToken <?> "variable name."
+            af <- getInput
+            -- Add back the last readed statement
+            setInput (a:af)
             s <- getState
             -- Check if is an array
             if ((checkArrayType(getVariableType a s)) == True) then do
+                b <- try  getVarArrayValue <|> getVarArray
+                return (b)
+            else do
+                a <- idToken
+                return (getVariableType a s)
+
+-- - Array var
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+getVarArray :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+getVarArray = do
+                a <- idToken
+                s <- getState
+                return (getVariableType a s)
+
+-- - Array value
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+getVarArrayValue :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+getVarArrayValue = do
+                a <- idToken
                 b <- openBracketToken
                 c <- expression
                 d <- closeBracketToken
+                s <- getState
                 -- Check index
                 if ((checkNatType c) == True) then do
                     return (getArrayItem(getVariableType a s) c)
                 else
                     error "Error: Invalid index."
-            else
-                return (getVariableType a s)
 
 -- - Boolean Operations
 -- ParsecT                     ParsecT

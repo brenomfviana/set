@@ -83,18 +83,49 @@ varDecl = do
         error ("The variable " ++ (getTokenName c) ++ " in position "
             ++ (getTokenPosition c) ++ " already exists.")
 
--- - Variable declaration
+-- - Array declaration
 -- ParsecT                     ParsecT
 -- [Token]                     Token list
 -- (Scope, [Var], [Statement]) State
 arrayDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 arrayDecl = do
     a <- typeToken <?> "variable type."
-    b <- smallerToken
+    b <- openBracketToken
     c <- typeToken <?> "variable type."
     i <- commaToken
     d <- expression
-    e <- greaterToken
+    e <- closeBracketToken
+    f <- colonToken <?> "colon."
+    g <- idToken <?> "variable name."
+    h <- semiColonToken <?> "semicolon."
+    s <- getState
+    -- Check index
+    if ((checkNatType d) == True) then do
+        -- Check if the variable already exists
+        if ((variableIsSet g s) == False) then do
+            -- Add the declared variable
+            updateState(insertVariable((g, getDefaultArrayValue a c d), "main"))
+            -- s <- getState
+            -- liftIO (print s)
+            return (a:b:c:d:e:f:g:[h])
+        else
+            error ("Error: The variable " ++ (getTokenName g) ++ " in position "
+                ++ (getTokenPosition g) ++ " already exists.")
+    else
+        error "Error: Invalid size value."
+
+-- - Matrix declaration
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+matrixDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+matrixDecl = do
+    a <- typeToken <?> "variable type."
+    b <- openBracketToken
+    c <- typeToken <?> "variable type."
+    i <- commaToken
+    d <- expression
+    e <- closeBracketToken
     f <- colonToken <?> "colon."
     g <- idToken <?> "variable name."
     h <- semiColonToken <?> "semicolon."
@@ -156,7 +187,7 @@ assign = do
         do
             -- Update variable value
             updateState(updateVariable(((a, (cast (getVariableType a s) c)),
-                        "m")))
+                        "main")))
             -- s <- getState
             -- liftIO (print s)
             return (a:b:[c])
@@ -511,45 +542,13 @@ printf :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 printf = do
     a <- printToken <?> "print."
     b <- openParenthesesToken <?> "parentheses (."
-    s <- getState
-    f <- ignoreToken
-    af <- getInput
-    -- Add back the last readed statement
-    setInput (f:af)
-    -- Check if is an array
-    if ((checkArrayType(getVariableType f s)) == True) then do
-        f <- ignoreToken
-        g <- ignoreToken
-        af <- getInput
-        -- Add back the lasts readed statements
-        setInput (f:g:af)
-        -- Check if is just one element of array
-        if ((checkOpenBracket g) == True) then do
-            c <- idToken
-            d <- openBracketToken
-            e <- expression
-            f <- closeBracketToken
-            g <- closeParenthesesToken
-            h <- semiColonToken
-            -- Prints in terminal
-            liftIO (putStrLn (getValue (getArrayItem (getVariableType c s) e)))
-            return (a:b:c:d:e:f:g:[h])
-        else do
-            -- Calculates the expression
-            c <- idToken
-            d <- closeParenthesesToken
-            e <- semiColonToken
-            -- Prints in terminal
-            liftIO (putStrLn (getValue(getVariableType c s)))
-            return (a:b:c:d:[e])
-    else do
-        -- Calculates the expression
-        c <- expression <|> idToken
-        d <- closeParenthesesToken
-        e <- semiColonToken
-        -- Prints in terminal
-        liftIO (putStrLn ((getValue c)))
-        return (a:b:c:d:[e])
+    -- Calculates the expression
+    c <- expression
+    d <- closeParenthesesToken
+    e <- semiColonToken
+    -- Prints in terminal
+    liftIO (putStrLn ((getValue c)))
+    return (a:b:c:d:[e])
 
 -- - Input
 -- ParsecT                     ParsecT
@@ -568,7 +567,6 @@ inputf = do
     if (variableIsSet c s) then
         -- Check if is an array
         if ((checkArrayType(getVariableType c s)) == True) then do
-            -- Update variable value
             -- Check array size
             if (let (Nat y _) = getArraySize(getVariableType c s) in y == length(splitOn "," f)) then do
                 -- Update variable value
@@ -584,7 +582,7 @@ inputf = do
                     (Text (show f) (let (Id _ y) = c in y)))), "main"))
             return (a:b:[c])
     else
-        error "Error: variable don't exists."
+        error "Error: variable not found."
 
 
 

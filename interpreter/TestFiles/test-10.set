@@ -1,8 +1,9 @@
 program main
-	Array<Int,3> : nums;
+	Array[Int,3] : nums;
 	input(nums);
 	print(nums);
 	Int : n;
+	print(n);
 	print(nums[0]);
 	n := nums[2];
 	print(n);
