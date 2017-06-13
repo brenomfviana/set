@@ -49,8 +49,8 @@ program = do
 -- (Scope, [Var], [Statement]) State
 varDecls :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 varDecls = do
-    first <- try varDecl <|> arrayDecl
-    next  <- remainingVarDecls
+    first <- try varDecl <|> arrayDecl <?> "variable declaration."
+    next  <- remainingVarDecls <?> "remaining variable declaration."
     return (first ++ next)
 
 -- - Variable declaration remaining
@@ -174,17 +174,17 @@ assign = do
 ifStmt :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 ifStmt = do
     s <- getState
-    a <- ifToken
-    b <- openParenthesesToken
+    a <- ifToken <?> "if."
+    b <- openParenthesesToken <?> "parentheses (."
     -- Calculates the expression
     c <- expression
-    d <- closeParenthesesToken
+    d <- closeParenthesesToken <?> "parentheses )."
     -- Update scope
     updateState(insertScope(("if" ++ (show (getScopeLength s)))))
     -- Check if the expression is true
     if ((getValue c) == "True") then do
         -- Get the next statement
-        e <- ignoreToken
+        e <- ignoreToken <?> "get the ignored statement."
         af <- getInput
         -- Add back the last readed statement
         setInput (e:af)
@@ -201,7 +201,7 @@ ifStmt = do
                 -- Ignore statements
                 bf <- getInput
                 let loop = do
-                    f <- ignoreToken
+                    f <- ignoreToken <?> "get the ignored statement."
                     when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnIfStmt a))) loop
                 loop
@@ -215,7 +215,7 @@ ifStmt = do
                 -- Ignore other statements
                 bf <- getInput
                 let loop = do
-                    f <- ignoreToken
+                    f <- ignoreToken <?> "get the ignored statement."
                     when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnIfStmt a))) loop
                 loop
@@ -229,7 +229,7 @@ ifStmt = do
             -- Update scope
             updateState(removeScope(("if" ++ (show (getScopeLength s)))))
             -- Get the next statement
-            e <- ignoreToken
+            e <- ignoreToken <?> "get the ignored statement."
             af <- getInput
             -- Add back the last readed statement
             setInput (e:af)
@@ -243,7 +243,7 @@ ifStmt = do
                 -- Ignore other statements
                 bf <- getInput
                 let loop = do
-                    f <- ignoreToken
+                    f <- ignoreToken <?> "get the ignored statement."
                     when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnElseStmt f) /= (columnIfStmt a))
                         && ((columnElseIfStmt f) /= (columnIfStmt a))
@@ -254,21 +254,21 @@ ifStmt = do
                 setInput (let y:x = reverse (bf \\ af) in y:af)
                 bf1 <- getInput
                 -- Get the next statement
-                e <- ignoreToken
+                e <- ignoreToken <?> "get the ignored statement."
                 -- Check if the token is a ELSE
                 if ((checkElseStmt e) == True) then do
                     -- Get the next statement
-                    e <- ignoreToken
+                    e <- ignoreToken <?> "get the ignored statement."
                     af1 <- getInput
                     -- Add back the last readed statement
                     setInput (e:af1)
                     -- Check if the token is a END_IF
                     if (((checkEndIfStmt e) == True)) then do
-                        e <- endIfToken
+                        e <- endIfToken <?> "endif."
                         return (a:b:c:[d] ++ (bf \\ af) ++ [e])
                     else do
                         e <- stmts
-                        f <- endIfToken
+                        f <- endIfToken <?> "endif."
                         -- Update scope
                         updateState(removeScope(("if" ++ (show (getScopeLength s)))))
                         return (a:b:c:[d] ++ e ++ [f])
@@ -298,23 +298,23 @@ ifStmt = do
 elseIfStmt :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 elseIfStmt = do
     s <- getState
-    a <- elseIfToken
-    b <- openParenthesesToken
+    a <- elseIfToken <?> "elseif."
+    b <- openParenthesesToken <?> "parentheses (."
     -- Calculates the expression
     c <- expression
-    d <- closeParenthesesToken
+    d <- closeParenthesesToken <?> "parentheses )."
     -- Update scope
     updateState(insertScope(("if" ++ (show (getScopeLength s)))))
     -- Check if the expression is true
     if ((getValue c) == "True") then do
         -- Get the next statement
-        e <- ignoreToken
-        af <- getInput
+        e <- ignoreToken <?> "get the ignored statement."
+        af <- getInput 
         -- Add back the last readed statement
         setInput (e:af)
         -- Check if the token is a END_IF
         if (((checkEndIfStmt e) == True)) then do
-            e <- endIfToken
+            e <- endIfToken <?> "endif."
             -- Update scope
             updateState(removeScope(("if" ++ (show (getScopeLength s)))))
             return (a:b:c:d:[e])
@@ -325,7 +325,7 @@ elseIfStmt = do
                     -- Ignore other statements
                 bf <- getInput
                 let loop = do
-                    f <- ignoreToken
+                    f <- ignoreToken <?> "get the ignored statement."
                     when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnElseIfStmt a))) loop
                 loop
@@ -339,7 +339,7 @@ elseIfStmt = do
                 -- Ignore other statements
                 bf <- getInput
                 let loop = do
-                    f <- ignoreToken
+                    f <- ignoreToken <?> "get the ignored statement."
                     when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnElseIfStmt a))) loop
                 loop
@@ -353,7 +353,7 @@ elseIfStmt = do
             -- Update scope
             updateState(removeScope(("if" ++ (show (getScopeLength s)))))
             -- Get the next statement
-            e <- ignoreToken
+            e <- ignoreToken <?> "get the ignored statement."
             af <- getInput
             -- Add back the last readed statement
             setInput (e:af)
@@ -367,7 +367,7 @@ elseIfStmt = do
                 -- Ignore other statements
                 bf <- getInput
                 let loop = do
-                    f <- ignoreToken
+                    f <- ignoreToken <?> "get the ignored statement."
                     when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnElseStmt f) /= (columnElseIfStmt a))
                         && ((columnElseIfStmt f) /= (columnElseIfStmt a))
@@ -378,21 +378,21 @@ elseIfStmt = do
                 setInput (let y:x = reverse (bf \\ af) in y:af)
                 bf1 <- getInput
                 -- Get the next statement
-                e <- ignoreToken
+                e <- ignoreToken <?> "get the ignored statement."
                 -- Check if the token is a ELSE
                 if ((checkElseStmt e) == True) then do
                     -- Get the next statement
-                    e <- ignoreToken
+                    e <- ignoreToken <?> "get the ignored statement."
                     af1 <- getInput
                     -- Add back the last readed statement
                     setInput (e:af1)
                     -- Check if the token is a END_IF
                     if (((checkEndIfStmt e) == True)) then do
-                        e <- endIfToken
+                        e <- endIfToken <?> "endif."
                         return (a:b:c:d:[e])
                     else do
                         e <- stmts
-                        f <- endIfToken
+                        f <- endIfToken <?> "endif."
                         -- Update scope
                         updateState(removeScope(("if" ++ (show (getScopeLength s)))))
                         return (a:b:c:[d])
@@ -402,7 +402,7 @@ elseIfStmt = do
                         af1 <- getInput
                         -- Add back the last readed statement
                         setInput (let y:x = reverse (bf1 \\ af1) in y:af)
-                        f <- elseIfStmt
+                        f <- elseIfStmt <?> "elseif."
                         -- Update scope
                         updateState(removeScope(("if" ++ (show (getScopeLength s)))))
                         return (a:b:c:[d])
@@ -429,10 +429,10 @@ whileStmt :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 whileStmt = do
     -- Get Input
     wb <- getInput
-    a <- whileToken
+    a <- whileToken <?> "while."
     -- Check while block
     let loop = do
-        f <- ignoreToken
+        f <- ignoreToken <?> "get the ignored statement."
         when ((checkEndStmt f) == True) (error "endwhile statement not found.")
         when (((columnEndWhileStmt f) /= (columnWhileStmt a))) loop
     loop
@@ -440,8 +440,8 @@ whileStmt = do
     -- Executes while
     let loopwhile = do
         setInput (wb \\ we)
-        f <- ignoreToken
-        f <- ignoreToken
+        f <- ignoreToken <?> "get the ignored statement."
+        f <- ignoreToken <?> "get the ignored statement."
         c <- expression
         setInput (wb \\ we)
         w <- runWhile
@@ -457,23 +457,23 @@ whileStmt = do
 runWhile :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 runWhile = do
     s <- getState
-    a <- whileToken
-    b <- openParenthesesToken
+    a <- whileToken <?> "while."
+    b <- openParenthesesToken <?> "parentheses (."
     -- Calculates the expression
     c <- expression
-    d <- closeParenthesesToken
+    d <- closeParenthesesToken <?> "parentheses )."
     -- Update scope
     updateState(insertScope(("while" ++ (show (getScopeLength s)))))
     -- Check if the expression is true
     if ((getValue c) == "True") then do
         -- Get the next statement
-        e <- ignoreToken
+        e <- ignoreToken <?> "get the ignored statement."
         af <- getInput
         -- Add back the last readed statement
         setInput (e:af)
         -- Check if the token is a END_WHILE
         if (((checkEndWhileStmt e) == True)) then do
-            e <- endWhileToken
+            e <- endWhileToken <?> "endWhile."
             -- Update scope
             updateState(removeScope(("while" ++ (show (getScopeLength s)))))
             return (a:b:c:d:[e])
@@ -483,7 +483,7 @@ runWhile = do
             -- Ignore other statements
             bf <- getInput
             let loop = do
-                f <- ignoreToken
+                f <- ignoreToken <?> "get the ignored statement."
                 when (((columnEndWhileStmt f) /= (columnWhileStmt a))) loop
             loop
             af <- getInput
@@ -509,8 +509,8 @@ runWhile = do
 -- (Scope, [Var], [Statement]) State
 printf :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 printf = do
-    a <- printToken
-    b <- openParenthesesToken
+    a <- printToken <?> "print."
+    b <- openParenthesesToken <?> "parentheses (."
     s <- getState
     f <- ignoreToken
     af <- getInput
@@ -520,8 +520,8 @@ printf = do
     if ((checkArrayType(getVariableType f s)) == True) then do
         -- Calculates the expression
         c <- idToken
-        d <- closeParenthesesToken
-        e <- semiColonToken
+        d <- closeParenthesesToken <?> "parentheses )."
+        e <- semiColonToken <?> "semicolon ;."
         liftIO (print (getVariableType c s))
         -- Prints in terminal
         liftIO (putStrLn (getValue(getVariableType c s)))
@@ -529,8 +529,8 @@ printf = do
     else do
         -- Calculates the expression
         c <- expression <|> idToken
-        d <- closeParenthesesToken
-        e <- semiColonToken
+        d <- closeParenthesesToken <?> "parentheses )."
+        e <- semiColonToken <?> "semicolon ;."
         -- Prints in terminal
         liftIO (putStrLn ((getValue c)))
         return (a:b:c:d:[e])
@@ -541,11 +541,11 @@ printf = do
 -- (Scope, [Var], [Statement]) State
 inputf :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 inputf = do
-    a <- inputToken
-    b <- openParenthesesToken
-    c <- idToken
-    d <- closeParenthesesToken
-    e <- semiColonToken
+    a <- inputToken <?> "input."
+    b <- openParenthesesToken <?> "parentheses (."
+    c <- idToken <?> "Variable name."
+    d <- closeParenthesesToken <?> "parentheses )."
+    e <- semiColonToken <?> "semicolon ;."
     f <- liftIO $ getLine
     s <- getState
     -- Check if variable exists

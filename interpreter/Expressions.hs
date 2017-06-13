@@ -21,7 +21,7 @@ import State
 -- (Scope, [Var], [Statement]) State
 getVar :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 getVar = do
-            a <- idToken
+            a <- idToken <?> "variable name."
             s <- getState
             return (getVariableType a s)
 
@@ -81,9 +81,9 @@ binaryExpression = do
 -- (Scope, [Var], [Statement]) State
 parentExpression :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 parentExpression = do
-                    a <- openParenthesesToken
+                    a <- openParenthesesToken <?> "parentheses (."
                     b <- expression <|> parentExpression
-                    c <- closeParenthesesToken
+                    c <- closeParenthesesToken <?> "parentheses )."
                     return (b)
 
 -- - Evaluation
