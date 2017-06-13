@@ -27,11 +27,11 @@ getTokenPosition _ = error "Invalid token format."
 -- Token  Variable type
 -- Return Initial variable value
 getDefaultValue :: Token -> Token
-getDefaultValue (Type "Nat"  pos) = Nat 0 pos
-getDefaultValue (Type "Int"  pos) = Int 0 pos
-getDefaultValue (Type "Real" pos) = Real 0.0 pos
-getDefaultValue (Type "Bool" pos) = Bool False pos
-getDefaultValue (Type "Text" pos) = Text "" pos
+getDefaultValue (Type "Nat"   pos) = Nat 0 pos
+getDefaultValue (Type "Int"   pos) = Int 0 pos
+getDefaultValue (Type "Real"  pos) = Real 0.0 pos
+getDefaultValue (Type "Bool"  pos) = Bool False pos
+getDefaultValue (Type "Text"  pos) = Text "" pos
 getDefaultValue (Type "Array" pos) = Array [] pos
 -- getDefaultValue (Type "Pointer") = Pointer 0.0
 
@@ -39,11 +39,11 @@ getDefaultValue (Type "Array" pos) = Array [] pos
 -- Token  Literal token
 -- String Value
 getValue :: Token -> String
-getValue (Text value _) = removeQuote(show value)
-getValue (Nat  value _) = show value
-getValue (Int  value _) = show value
-getValue (Real value _) = show value
-getValue (Bool value _) = show value
+getValue (Nat   value _) = show value
+getValue (Int   value _) = show value
+getValue (Real  value _) = show value
+getValue (Bool  value _) = show value
+getValue (Text  value _) = removeQuote(show value)
 getValue (Array value _) = show (toString value)
 getValue _ = error "Error: Value not found."
 
@@ -64,22 +64,44 @@ getIdName _ = error "Error: Name not found."
 -- Token  Array
 -- Token  Array size
 -- Return Initial array value
-getDefaultArrayValue :: Token -> Token -> Token
-getDefaultArrayValue (Type "Array" p1) (Nat value p2) = Array [(Nat value p2)] p1
+getDefaultArrayValue :: Token -> Token -> Token -> Token
+getDefaultArrayValue (Type "Array" p1) (Type "Nat"  p2) (Nat value p3) = Array ((Nat value p1):[(Type "Nat"  p2)]) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Int"  p2) (Nat value p3) = Array ((Nat value p1):[(Type "Int"  p2)]) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Real" p2) (Nat value p3) = Array ((Nat value p1):[(Type "Real" p2)]) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Bool" p2) (Nat value p3) = Array ((Nat value p1):[(Type "Bool" p2)]) p1
+getDefaultArrayValue (Type "Array" p1) (Type "Text" p2) (Nat value p3) = Array ((Nat value p1):[(Type "Text" p2)]) p1
 
--- -
+-- - Get array value
+-- Token  Array
+-- Return Array value
 getArrayValue :: Token -> [Token]
 getArrayValue (Array value _) = value
 
--- -
+-- - Convert a string in token list
+-- Token    Array
+-- Token    Array type
+-- [String] Values
+-- Return   Array values
 toToken :: Token -> [String] -> [Token]
 toToken _ [] = []
-toToken (Array v p) (sh:st) = (Real (stringToFloat sh) p) : toToken (Array v p) st
+toToken (Array (h:(Type "Nat"  p2):v) p1) (sh:st) = (Nat  (stringToInt sh) p1) : toToken (Array (h:(Type "Nat" p2):v) p1) st
+toToken (Array (h:(Type "Int"  p2):v) p1) (sh:st) = (Int  (stringToInt sh) p1) : toToken (Array (h:(Type "Int" p2):v) p1) st
+toToken (Array (h:(Type "Real" p2):v) p1) (sh:st) = (Real (stringToFloat sh) p1) : toToken (Array (h:(Type "Real" p2):v) p1) st
+toToken (Array (h:(Type "Bool" p2):v) p1) (sh:st) = (Bool (stringToBool sh) p1) : toToken (Array (h:(Type "Bool" p2):v) p1) st
+toToken (Array (h:(Type "Text" p2):v) p1) (sh:st) = (Text sh p1) : toToken (Array (h:(Type "Text" p2):v) p1) st
 
+-- - Convert an array in a string
+-- Token  Array
+-- Return Array value
 toString :: [Token] -> [String]
 toString [] = []
-toString ((Nat value _):t) = toString t
+toString ((Nat _ _):(Type _ _):t) = toString t
+toString ((Nat  value _):t) = [(show value)] ++ toString t
+toString ((Int  value _):t) = [(show value)] ++ toString t
 toString ((Real value _):t) = [(show value)] ++ toString t
+toString ((Bool value _):t) = [(show value)] ++ toString t
+toString ((Text value _):t) = [(show value)] ++ toString t
+
 
 
 -- -----------------------------------------------------------------------------

@@ -1,7 +1,10 @@
 program main
 	Nat : n;
 	input(n);
-	Array[3] : nums;
+	Array<Int,3> : nums;
 	input(nums);
 	print(nums);
+	Array<Real,3> : n2;
+	input(n2);
+	print(n2);
 end main

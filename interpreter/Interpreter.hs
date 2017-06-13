@@ -90,24 +90,26 @@ varDecl = do
 arrayDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 arrayDecl = do
     a <- typeToken <?> "variable type."
-    b <- openBracketToken
-    c <- expression
-    d <- closeBracketToken
-    e <- colonToken <?> "colon."
-    f <- idToken <?> "variable name."
-    g <- semiColonToken <?> "semicolon."
+    b <- smallerToken
+    c <- typeToken <?> "variable type."
+    i <- commaToken
+    d <- expression
+    e <- greaterToken
+    f <- colonToken <?> "colon."
+    g <- idToken <?> "variable name."
+    h <- semiColonToken <?> "semicolon."
     s <- getState
-    if ((checkNatType c) == True) then do
+    if ((checkNatType d) == True) then do
         -- Check if the variable already exists
-        if ((variableIsSet f s) == False) then do
+        if ((variableIsSet g s) == False) then do
             -- Add the declared variable
-            updateState(insertVariable((f, getDefaultArrayValue a c), "main"))
+            updateState(insertVariable((g, getDefaultArrayValue a c d), "main"))
             -- s <- getState
             -- liftIO (print s)
-            return (a:b:c:d:e:f:[g])
+            return (a:b:c:d:e:f:g:[h])
         else
-            error ("Error: The variable " ++ (getTokenName c) ++ " in position "
-                ++ (getTokenPosition c) ++ " already exists.")
+            error ("Error: The variable " ++ (getTokenName g) ++ " in position "
+                ++ (getTokenPosition g) ++ " already exists.")
     else
         error "Error: Invalid size value."
 

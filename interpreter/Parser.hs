@@ -38,6 +38,12 @@ colonToken = tokenPrim show updatePositon getToken where
     getToken (Colon pos) = Just (Colon pos)
     getToken _           = Nothing
 
+-- - Comma Token
+commaToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+commaToken = tokenPrim show updatePositon getToken where
+    getToken (Comma pos) = Just (Comma pos)
+    getToken _           = Nothing
+
 -- - Semicolon Token
 semiColonToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 semiColonToken = tokenPrim show updatePositon getToken where
@@ -90,11 +96,6 @@ boolToken = tokenPrim show updatePositon getToken where
     getToken (Bool x pos) = Just (Bool x pos)
     getToken _            = Nothing
 
--- - Univ Token
--- univToken = tokenPrim show updatePositon getToken where
---     getToken (Univ x pos) = Just (Univ x pos)
---     getToken _        = Nothing
-
 -- - Text Token
 textToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 textToken = tokenPrim show updatePositon getToken where
@@ -106,19 +107,6 @@ arrayToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 arrayToken = tokenPrim show updatePositon getToken where
     getToken (Array x pos) = Just (Array x pos)
     getToken _             = Nothing
-
--- - Vector of nat
--- vectorOfNatToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
--- vectorOfNatToken = tokenPrim show updatePositon getToken where
---     getToken (VectorOfNat x p) = Just (VectorOfNat x p)
---     getToken _                 = Nothing
-
--- - Vector of nat
--- vectorOfIntToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
--- vectorOfIntToken = tokenPrim show updatePositon getToken where
---     getToken (VectorOfInt x p) = Just (VectorOfInt x p)
---     getToken _                 = Nothing
-
 
 -- - MatrixOfReal Token
 matrixOfRealToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
@@ -263,6 +251,8 @@ endWhileToken = tokenPrim show updatePositon getToken where
     getToken (End_While p) = Just (End_While p)
     getToken _             = Nothing
 
+
+
 -- --------------------------------------------------------
 -- Other tokens
 -- --------------------------------------------------------
@@ -290,8 +280,6 @@ closeBracketToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 closeBracketToken = tokenPrim show updatePositon getToken where
     getToken (Close_Bracket p) = Just (Close_Bracket p)
     getToken _                     = Nothing
-
-
 
 
 
