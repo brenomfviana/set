@@ -104,8 +104,6 @@ getVariableType (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
     if id1 == id2 then value
     else getVariableType (Id id1 p1) (sc, m, st)
 
--- getVariableValue :: Token -> State -> Var
-
 
 
 -- -----------------------------------------------------------------------------
@@ -142,7 +140,6 @@ removeScope s1 (s2 : sc1, m1, st1) =
 -- Int   Scope length
 getScopeLength :: State -> Int
 getScopeLength (sc, _, _) = length(sc)
-getScopeLength _ = error "Error: The state doesn't exits."
 
 -- getScope ::
 

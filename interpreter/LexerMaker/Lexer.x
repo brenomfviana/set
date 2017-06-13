@@ -45,7 +45,7 @@ tokens :-
   Text                            { \p s -> Type s (getLC p) }
   Pointer                         { \p s -> Type s (getLC p) }
   "Set"                           { \p s -> Set_of (getLC p) }
-  "Array"                         { \p s -> Array_of s (getLC p) }
+  "Array"                         { \p s -> Type s (getLC p) }
   @vectorOfNat                    { \p s -> Type s (getLC p) }
   @vectorOfInt                    { \p s -> Type s (getLC p) }
   @vectorOfReal                   { \p s -> Type s (getLC p) }
@@ -126,7 +126,7 @@ data Token =
   Text          String     (Int, Int)   |
 -- Pointer       Pointer    (Int, Int)   |
   Set_of                   (Int, Int)   |
-  Array_of      String     (Int, Int)   |
+  Array         [Token]    (Int, Int)   |
   End_Set_of               (Int, Int)   |
   VectorOfNat   [Int]      (Int, Int)   |
   VectorOfInt   [Int]      (Int, Int)   |

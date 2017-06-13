@@ -24,7 +24,7 @@ getTokenPosition (Id _ pos) = show pos
 getTokenPosition _ = error "Invalid token format."
 
 -- - Get default value of different types
--- Type   Variable type
+-- Token  Variable type
 -- Return Initial variable value
 getDefaultValue :: Token -> Token
 getDefaultValue (Type "Nat"  pos) = Nat 0 pos
@@ -32,9 +32,7 @@ getDefaultValue (Type "Int"  pos) = Int 0 pos
 getDefaultValue (Type "Real" pos) = Real 0.0 pos
 getDefaultValue (Type "Bool" pos) = Bool False pos
 getDefaultValue (Type "Text" pos) = Text "" pos
-getDefaultValue (Type "Vector<Nat>" pos)  = VectorOfNat [] pos
-getDefaultValue (Type "Vector<Int>" pos)  = VectorOfInt [] pos
-getDefaultValue (Type "Vector<Real>" pos) = VectorOfReal [] pos
+getDefaultValue (Type "Array" pos) = Array [] pos
 -- getDefaultValue (Type "Pointer") = Pointer 0.0
 
 -- - Get value
@@ -46,6 +44,7 @@ getValue (Nat  value _) = show value
 getValue (Int  value _) = show value
 getValue (Real value _) = show value
 getValue (Bool value _) = show value
+getValue (Array value _) = show (toString value)
 getValue _ = error "Error: Value not found."
 
 -- - Get ID name
@@ -55,6 +54,32 @@ getIdName :: Token -> String
 getIdName (Id name _) = name
 getIdName _ = error "Error: Name not found."
 
+
+
+-- --------------------------------------------------------
+-- Array
+-- --------------------------------------------------------
+
+-- - Get default array value
+-- Token  Array
+-- Token  Array size
+-- Return Initial array value
+getDefaultArrayValue :: Token -> Token -> Token
+getDefaultArrayValue (Type "Array" p1) (Nat value p2) = Array [(Nat value p2)] p1
+
+-- -
+getArrayValue :: Token -> [Token]
+getArrayValue (Array value _) = value
+
+-- -
+toToken :: Token -> [String] -> [Token]
+toToken _ [] = []
+toToken (Array v p) (sh:st) = (Real (stringToFloat sh) p) : toToken (Array v p) st
+
+toString :: [Token] -> [String]
+toString [] = []
+toString ((Nat value _):t) = toString t
+toString ((Real value _):t) = [(show value)] ++ toString t
 
 
 -- -----------------------------------------------------------------------------

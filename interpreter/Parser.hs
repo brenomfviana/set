@@ -101,6 +101,24 @@ textToken = tokenPrim show updatePositon getToken where
     getToken (Text x pos) = let y = removeQuote x in Just (Text y pos)
     getToken _            = Nothing
 
+-- - Array Token
+arrayToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+arrayToken = tokenPrim show updatePositon getToken where
+    getToken (Array x pos) = Just (Array x pos)
+    getToken _             = Nothing
+
+-- - Vector of nat
+-- vectorOfNatToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+-- vectorOfNatToken = tokenPrim show updatePositon getToken where
+--     getToken (VectorOfNat x p) = Just (VectorOfNat x p)
+--     getToken _                 = Nothing
+
+-- - Vector of nat
+-- vectorOfIntToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+-- vectorOfIntToken = tokenPrim show updatePositon getToken where
+--     getToken (VectorOfInt x p) = Just (VectorOfInt x p)
+--     getToken _                 = Nothing
+
 
 -- - MatrixOfReal Token
 matrixOfRealToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
@@ -261,24 +279,19 @@ closeParenthesesToken = tokenPrim show updatePositon getToken where
     getToken (Close_Parentheses p) = Just (Close_Parentheses p)
     getToken _                     = Nothing
 
+-- - OpenParentheses Token
+openBracketToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+openBracketToken = tokenPrim show updatePositon getToken where
+    getToken (Open_Bracket p) = Just (Open_Bracket p)
+    getToken _                    = Nothing
 
--- - Array Token
--- arrayToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
--- arrayToken = tokenPrim show updatePositon getToken where
---     getToken (Array_of x pos) = Just (Array_of x pos)
---     getToken _                = Nothing
+-- - CloseBracket Token
+closeBracketToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+closeBracketToken = tokenPrim show updatePositon getToken where
+    getToken (Close_Bracket p) = Just (Close_Bracket p)
+    getToken _                     = Nothing
 
--- - Vector of nat
-vectorOfNatToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-vectorOfNatToken = tokenPrim show updatePositon getToken where
-    getToken (VectorOfNat x p) = Just (VectorOfNat x p)
-    getToken _                 = Nothing
 
--- - Vector of nat
-vectorOfIntToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-vectorOfIntToken = tokenPrim show updatePositon getToken where
-    getToken (VectorOfInt x p) = Just (VectorOfInt x p)
-    getToken _                 = Nothing
 
 
 
@@ -289,8 +302,7 @@ vectorOfIntToken = tokenPrim show updatePositon getToken where
 -- - Ignore Token
 ignoreToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 ignoreToken = tokenPrim show updatePositon getToken where
-getToken t = Just t
-getToken _ = Nothing
+    getToken t = Just t
 
 -- - Update position
 -- SourcePos Position

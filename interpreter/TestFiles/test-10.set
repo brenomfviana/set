@@ -1,5 +1,7 @@
 program main
-	Vector<Int> : nums;
+	Nat : n;
+	input(n);
+	Array[3] : nums;
 	input(nums);
 	print(nums);
 end main

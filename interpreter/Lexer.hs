@@ -273,7 +273,7 @@ data Token =
   Text          String     (Int, Int)   |
 -- Pointer       Pointer    (Int, Int)   |
   Set_of                   (Int, Int)   |
-  Array_of      String     (Int, Int)   |
+  Array         [Token]    (Int, Int)   |
   End_Set_of               (Int, Int)   |
   VectorOfNat   [Int]      (Int, Int)   |
   VectorOfInt   [Int]      (Int, Int)   |
@@ -346,7 +346,7 @@ alex_action_11 =  \p s -> Type s (getLC p)
 alex_action_12 =  \p s -> Type s (getLC p) 
 alex_action_13 =  \p s -> Type s (getLC p) 
 alex_action_14 =  \p s -> Set_of (getLC p) 
-alex_action_15 =  \p s -> Array_of s (getLC p) 
+alex_action_15 =  \p s -> Type s (getLC p) 
 alex_action_16 =  \p s -> Type s (getLC p) 
 alex_action_17 =  \p s -> Type s (getLC p) 
 alex_action_18 =  \p s -> Type s (getLC p) 

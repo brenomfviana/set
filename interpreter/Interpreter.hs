@@ -4,6 +4,7 @@ module Interpreter where
 
 -- External imports
 import Data.List
+import Data.List.Split
 import Text.Parsec
 import Control.Monad
 import System.IO.Unsafe
@@ -38,13 +39,17 @@ program = do
     eof
     return (a:[b] ++ c ++ [e])
 
+-- --------------------------------------------------------
+-- Variable declarations
+-- --------------------------------------------------------
+
 -- - Variable declarations
 -- ParsecT                     ParsecT
 -- [Token]                     Token list
 -- (Scope, [Var], [Statement]) State
 varDecls :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 varDecls = do
-    first <- varDecl
+    first <- try varDecl <|> arrayDecl
     next  <- remainingVarDecls
     return (first ++ next)
 
@@ -70,13 +75,47 @@ varDecl = do
     -- Check if the variable already exists
     if ((variableIsSet c s) == False) then do
         -- Add the declared variable
-        updateState(insertVariable((c, getDefaultValue(a)), "m"))
-        s <- getState
-        liftIO (print s)
-        return (a:b:[c])
+        updateState(insertVariable((c, getDefaultValue(a)), "main"))
+        -- s <- getState
+        -- liftIO (print s)
+        return (a:b:c:[d])
     else
         error ("The variable " ++ (getTokenName c) ++ " in position "
             ++ (getTokenPosition c) ++ " already exists.")
+
+-- - Variable declaration
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+arrayDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+arrayDecl = do
+    a <- typeToken <?> "variable type."
+    b <- openBracketToken
+    c <- expression
+    d <- closeBracketToken
+    e <- colonToken <?> "colon."
+    f <- idToken <?> "variable name."
+    g <- semiColonToken <?> "semicolon."
+    s <- getState
+    if ((checkNatType c) == True) then do
+        -- Check if the variable already exists
+        if ((variableIsSet f s) == False) then do
+            -- Add the declared variable
+            updateState(insertVariable((f, getDefaultArrayValue a c), "main"))
+            -- s <- getState
+            -- liftIO (print s)
+            return (a:b:c:d:e:f:[g])
+        else
+            error ("Error: The variable " ++ (getTokenName c) ++ " in position "
+                ++ (getTokenPosition c) ++ " already exists.")
+    else
+        error "Error: Invalid size value."
+
+
+
+-- --------------------------------------------------------
+-- Other statements
+-- --------------------------------------------------------
 
 -- - Statements
 -- ParsecT                     ParsecT
@@ -147,20 +186,20 @@ ifStmt = do
         -- Add back the last readed statement
         setInput (e:af)
         -- Check if the token is a END_IF
-        if (((checkEndIfStmt e) == "True")) then do
+        if (((checkEndIfStmt e) == True)) then do
             e <- endIfToken
             -- Update scope
             updateState(removeScope(("if" ++ (show (getScopeLength s)))))
             return (a:b:c:d:[e])
         else
             -- Check if the token is a ELSE or ELSE_IF
-            if (((checkElseIfStmt e) == "True")
-                    || ((checkElseStmt e) == "True")) then do
+            if (((checkElseIfStmt e) == True)
+                    || ((checkElseStmt e) == True)) then do
                 -- Ignore statements
                 bf <- getInput
                 let loop = do
                     f <- ignoreToken
-                    when ((checkEndStmt f) == "True") (error "endif statement not found.")
+                    when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnIfStmt a))) loop
                 loop
                 af <- getInput
@@ -174,7 +213,7 @@ ifStmt = do
                 bf <- getInput
                 let loop = do
                     f <- ignoreToken
-                    when ((checkEndStmt f) == "True") (error "endif statement not found.")
+                    when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnIfStmt a))) loop
                 loop
                 af <- getInput
@@ -192,7 +231,7 @@ ifStmt = do
             -- Add back the last readed statement
             setInput (e:af)
             -- Check if the token is a END_IF
-            if (((checkEndIfStmt e) == "True")) then do
+            if (((checkEndIfStmt e) == True)) then do
                 e <- endIfToken
                 return (a:b:c:d:[e])
             else do
@@ -202,7 +241,7 @@ ifStmt = do
                 bf <- getInput
                 let loop = do
                     f <- ignoreToken
-                    when ((checkEndStmt f) == "True") (error "endif statement not found.")
+                    when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnElseStmt f) /= (columnIfStmt a))
                         && ((columnElseIfStmt f) /= (columnIfStmt a))
                         && ((columnEndIfStmt f) /= (columnIfStmt a))) loop
@@ -214,14 +253,14 @@ ifStmt = do
                 -- Get the next statement
                 e <- ignoreToken
                 -- Check if the token is a ELSE
-                if ((checkElseStmt e) == "True") then do
+                if ((checkElseStmt e) == True) then do
                     -- Get the next statement
                     e <- ignoreToken
                     af1 <- getInput
                     -- Add back the last readed statement
                     setInput (e:af1)
                     -- Check if the token is a END_IF
-                    if (((checkEndIfStmt e) == "True")) then do
+                    if (((checkEndIfStmt e) == True)) then do
                         e <- endIfToken
                         return (a:b:c:[d] ++ (bf \\ af) ++ [e])
                     else do
@@ -232,7 +271,7 @@ ifStmt = do
                         return (a:b:c:[d] ++ e ++ [f])
                 else
                     -- Check if the token is a ELSE_IF
-                    if ((checkElseIfStmt e) == "True") then do
+                    if ((checkElseIfStmt e) == True) then do
                         af1 <- getInput
                         -- Add back the last readed statement
                         setInput (let y:x = reverse (bf1 \\ af1) in y:af)
@@ -271,20 +310,20 @@ elseIfStmt = do
         -- Add back the last readed statement
         setInput (e:af)
         -- Check if the token is a END_IF
-        if (((checkEndIfStmt e) == "True")) then do
+        if (((checkEndIfStmt e) == True)) then do
             e <- endIfToken
             -- Update scope
             updateState(removeScope(("if" ++ (show (getScopeLength s)))))
             return (a:b:c:d:[e])
         else
             -- Check if the token is a ELSE or ELSE_IF
-            if (((checkElseIfStmt e) == "True")
-                    || ((checkElseStmt e) == "True")) then do
+            if (((checkElseIfStmt e) == True)
+                    || ((checkElseStmt e) == True)) then do
                     -- Ignore other statements
                 bf <- getInput
                 let loop = do
                     f <- ignoreToken
-                    when ((checkEndStmt f) == "True") (error "endif statement not found.")
+                    when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnElseIfStmt a))) loop
                 loop
                 af <- getInput
@@ -298,7 +337,7 @@ elseIfStmt = do
                 bf <- getInput
                 let loop = do
                     f <- ignoreToken
-                    when ((checkEndStmt f) == "True") (error "endif statement not found.")
+                    when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnElseIfStmt a))) loop
                 loop
                 af <- getInput
@@ -316,7 +355,7 @@ elseIfStmt = do
             -- Add back the last readed statement
             setInput (e:af)
             -- Check if the token is a END_IF
-            if (((checkEndIfStmt e) == "True")) then do
+            if (((checkEndIfStmt e) == True)) then do
                 e <- endIfToken
                 return (a:b:c:d:[e])
             else do
@@ -326,7 +365,7 @@ elseIfStmt = do
                 bf <- getInput
                 let loop = do
                     f <- ignoreToken
-                    when ((checkEndStmt f) == "True") (error "endif statement not found.")
+                    when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnElseStmt f) /= (columnElseIfStmt a))
                         && ((columnElseIfStmt f) /= (columnElseIfStmt a))
                         && ((columnEndIfStmt f) /= (columnElseIfStmt a))) loop
@@ -338,14 +377,14 @@ elseIfStmt = do
                 -- Get the next statement
                 e <- ignoreToken
                 -- Check if the token is a ELSE
-                if ((checkElseStmt e) == "True") then do
+                if ((checkElseStmt e) == True) then do
                     -- Get the next statement
                     e <- ignoreToken
                     af1 <- getInput
                     -- Add back the last readed statement
                     setInput (e:af1)
                     -- Check if the token is a END_IF
-                    if (((checkEndIfStmt e) == "True")) then do
+                    if (((checkEndIfStmt e) == True)) then do
                         e <- endIfToken
                         return (a:b:c:d:[e])
                     else do
@@ -356,7 +395,7 @@ elseIfStmt = do
                         return (a:b:c:[d])
                 else
                     -- Check if the token is a ELSE_IF
-                    if ((checkElseIfStmt e) == "True") then do
+                    if ((checkElseIfStmt e) == True) then do
                         af1 <- getInput
                         -- Add back the last readed statement
                         setInput (let y:x = reverse (bf1 \\ af1) in y:af)
@@ -391,7 +430,7 @@ whileStmt = do
     -- Check while block
     let loop = do
         f <- ignoreToken
-        when ((checkEndStmt f) == "True") (error "endwhile statement not found.")
+        when ((checkEndStmt f) == True) (error "endwhile statement not found.")
         when (((columnEndWhileStmt f) /= (columnWhileStmt a))) loop
     loop
     we <- getInput
@@ -430,7 +469,7 @@ runWhile = do
         -- Add back the last readed statement
         setInput (e:af)
         -- Check if the token is a END_WHILE
-        if (((checkEndWhileStmt e) == "True")) then do
+        if (((checkEndWhileStmt e) == True)) then do
             e <- endWhileToken
             -- Update scope
             updateState(removeScope(("while" ++ (show (getScopeLength s)))))
@@ -470,7 +509,7 @@ printf = do
     a <- printToken
     b <- openParenthesesToken
     -- Calculates the expression
-    c <- expression
+    c <- expression <|> idToken
     d <- closeParenthesesToken
     e <- semiColonToken
     -- Prints in terminal
@@ -490,11 +529,27 @@ inputf = do
     e <- semiColonToken
     f <- liftIO $ getLine
     s <- getState
-    -- Update variable value
-    updateState(updateVariable((c,
-        (inputCast (getVariableType c s)
-            (Text (show f) (let (Id _ y) = c in y)))), "m"))
-    return (a:b:[c])
+    -- Check if variable exists
+    if (variableIsSet c s) then
+        -- Check if is an array
+        if ((checkArrayType(getVariableType c s)) == True) then do
+            -- Update variable value
+            -- Check array size
+            if (let (Nat y _):x = getArrayValue(getVariableType c s) in y == length(splitOn "," f)) then do
+                -- Update variable value
+                updateState(updateVariable((c,
+                    let (Array _ y) = (getVariableType c s) in (Array (getArrayValue(getVariableType c s) ++ (toToken (getVariableType c s) (splitOn "," f))) y)), "main"))
+                return (a:b:[c])
+            else
+                error "Error: The entry does not match the size of the array."
+        else do
+            -- Update variable value
+            updateState(updateVariable((c,
+                (inputCast (getVariableType c s)
+                    (Text (show f) (let (Id _ y) = c in y)))), "main"))
+            return (a:b:[c])
+    else
+        error "Error: variable don't exists."
 
 
 
