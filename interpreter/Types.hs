@@ -2,6 +2,8 @@
 -- Version: 11/06/2017
 module Types where
 
+-- External imports
+import Data.List
 -- Internal imports
 import Lexer
 
@@ -82,6 +84,12 @@ getArraySize (Array (size, _, _) _) = size
 -- Return Array value
 getArrayValue :: Token -> [Token]
 getArrayValue (Array (_, _, value) _) = value
+
+-- - Get array item
+-- Token  Array
+-- Return Array item
+getArrayItem :: Token -> Token -> Token
+getArrayItem (Array (_, _, value) _) (Nat i _) = value!!i
 
 -- - Convert a string in token list
 -- Token    Array

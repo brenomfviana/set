@@ -309,7 +309,7 @@ elseIfStmt = do
     if ((getValue c) == "True") then do
         -- Get the next statement
         e <- ignoreToken <?> "get the ignored statement."
-        af <- getInput 
+        af <- getInput
         -- Add back the last readed statement
         setInput (e:af)
         -- Check if the token is a END_IF
@@ -518,19 +518,35 @@ printf = do
     setInput (f:af)
     -- Check if is an array
     if ((checkArrayType(getVariableType f s)) == True) then do
-        -- Calculates the expression
-        c <- idToken
-        d <- closeParenthesesToken <?> "parentheses )."
-        e <- semiColonToken <?> "semicolon ;."
-        liftIO (print (getVariableType c s))
-        -- Prints in terminal
-        liftIO (putStrLn (getValue(getVariableType c s)))
-        return (a:b:c:d:[e])
+        f <- ignoreToken
+        g <- ignoreToken
+        af <- getInput
+        -- Add back the lasts readed statements
+        setInput (f:g:af)
+        -- Check if is just one element of array
+        if ((checkOpenBracket g) == True) then do
+            c <- idToken
+            d <- openBracketToken
+            e <- expression
+            f <- closeBracketToken
+            g <- closeParenthesesToken
+            h <- semiColonToken
+            -- Prints in terminal
+            liftIO (putStrLn (getValue (getArrayItem (getVariableType c s) e)))
+            return (a:b:c:d:e:f:g:[h])
+        else do
+            -- Calculates the expression
+            c <- idToken
+            d <- closeParenthesesToken
+            e <- semiColonToken
+            -- Prints in terminal
+            liftIO (putStrLn (getValue(getVariableType c s)))
+            return (a:b:c:d:[e])
     else do
         -- Calculates the expression
         c <- expression <|> idToken
-        d <- closeParenthesesToken <?> "parentheses )."
-        e <- semiColonToken <?> "semicolon ;."
+        d <- closeParenthesesToken
+        e <- semiColonToken
         -- Prints in terminal
         liftIO (putStrLn ((getValue c)))
         return (a:b:c:d:[e])

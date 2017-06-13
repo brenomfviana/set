@@ -10,6 +10,7 @@ import Lexer
 import Parser
 import Types
 import State
+import Keywords
 
 -- -----------------------------------------------------------------------------
 -- Expression evaluator
@@ -23,7 +24,18 @@ getVar :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 getVar = do
             a <- idToken <?> "variable name."
             s <- getState
-            return (getVariableType a s)
+            -- Check if is an array
+            if ((checkArrayType(getVariableType a s)) == True) then do
+                b <- openBracketToken
+                c <- expression
+                d <- closeBracketToken
+                -- Check index
+                if ((checkNatType c) == True) then do
+                    return (getArrayItem(getVariableType a s) c)
+                else
+                    error "Error: Invalid index."
+            else
+                return (getVariableType a s)
 
 -- - Boolean Operations
 -- ParsecT                     ParsecT
