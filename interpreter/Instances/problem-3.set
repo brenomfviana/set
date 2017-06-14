@@ -46,7 +46,7 @@ program main
 		while(i < m1)
 			while(j < n1)
 
-				index := (i*m1)+j;
+				index := (i*n1)+j;
 				soma := x[index] + y[index];
 				texto := texto + soma + " ";
 
