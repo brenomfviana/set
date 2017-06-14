@@ -1,2 +1,6 @@
 program main
+    typedef pessoa :
+        Text : nome;
+        Int : idade;
+    endtypedef
 end main

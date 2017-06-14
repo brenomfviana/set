@@ -1,31 +1,27 @@
 program main
-	
-	print("----- Testing Nat expressions -----");
+
 	Nat : n1;
 	Nat : expected_value;
 	n1 := 3 + 6;
 	expected_value := 9;
-	
-	print("Expected value [" + expected_value + "], value [" + n1 + "]");
-	#print("Expected value [" + expected_value + "]");
+
+	print("Expected value [" + expected_value + "], result [" + n1 + "]");
 
 	Nat : n2;
 	n2 := n1 / 3;
 	expected_value := 3;
-	
-	#print("Expected value ["+expected_value+"], value ["+n2+"]");
+
+	print("Expected value [" + expected_value + "], result [" + n2 + "]");
 
 	Nat : n3;
 	n3 := n2 * 2;
 	expected_value := 6;
-	
-	#print("Expected value ["+expected_value+"], value ["+n3+"]");
+
+	print("Expected value [" + expected_value + "], result [" + n3 + "]");
 
 	Nat : n4;
 	n4 := n1 - 4;
 	expected_value := 5;
-	
-	#print("Expected value ["+expected_value+"], value ["+n4+"]");
-	
-	#print("----- FIM TESTE -----");
+
+	print("Expected value [" + expected_value + "], result [" + n4 + "]");
 end main
