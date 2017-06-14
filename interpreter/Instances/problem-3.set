@@ -1,10 +1,7 @@
 program main
 
-
 	Nat : m1;
 	Nat : n1;
-
-	
 
 	print("-- Matriz 1 ---");
 	print("Informe o numero de linhas: ");
@@ -16,11 +13,8 @@ program main
 	input(x);
 	print("---------------");
 
-
 	Nat : m2;
 	Nat : n2;
-
-
 
 	print("-- Matriz 2 ---");
 	print("Informe o numero de linhas: ");
@@ -30,18 +24,20 @@ program main
 	print("Informe os valores (ex: 1,2,3,4 para uma matriz 2x2): ");
 	Array[Real,m2*n2] : y;
 	input(y);
-	print("---------------");
+	print("---- Soma -----");
+
+
+	Nat : index;
+	Nat : i;
+	Nat : j;
+	
+	Real : soma;
+
+	Text : texto;
 
 	if((m1 == m2) && (n1 == n2))
 
-		Nat : index;
-		Nat : i;
-		Nat : j;
 		
-		Real : soma;
-
-		Text : texto;
-
 		print("-- Resultado --");
 		while(i < m1)
 			while(j < n1)
@@ -61,10 +57,67 @@ program main
 			i := i + 1;
 
 		endwhile
-		print("---------------");
+		
 
 	else
-		print("Matrizes incompativeis!");
+		print("Matrizes incompativeis para soma!");
+	endif
+	print("---- Produto ----");
+	
+	
+	if(n1 == m2)
+
+		Nat : index1;
+		Nat : index2;
+		Nat : index3;
+		i := 0;
+		j := 0;
+		Nat : k;	
+		texto := "";
+
+		Real : produto;
+		Array[Real,n1*m2] : z;
+
+		Real : temp;
+
+		print("-- Resultado --");
+		while(i < m1)
+			while(j < n1)
+				while(k < n1)
+
+					index1 := (i*n1)+j;
+					index2 := (i*n1)+k;
+					index3 := (k*n1)+j;
+					#print(index1 +" "+  index2 +" "+ index3 + " ");
+
+					#z[index1] := z[index1] + (x[index2] * y[index3]);
+					produto := produto + (x[index2] * y[index3]);
+
+					#Z[i][j] += X[i][k] * Y[k][j];
+
+					k := k + 1;
+
+				endwhile
+				k := 0;
+				j := j + 1;
+
+				texto := texto + produto + " ";
+				produto := 0;
+
+				#produto := temp;
+				#texto := texto + soma + " ";
+
+			endwhile
+			j := 0;
+			i := i + 1;
+
+			print(texto);
+			texto := "";
+
+		endwhile
+
+	else
+		print("Matrizes incompativeis para Produto!");
 	endif
 
 end main
