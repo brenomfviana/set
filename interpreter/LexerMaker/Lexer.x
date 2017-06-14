@@ -25,6 +25,7 @@ tokens :-
   :                               { \p s -> Colon (getLC p) }
   ";"                             { \p s -> SemiColon (getLC p) }
   ","                             { \p s -> Comma (getLC p) }
+  "."                             { \p s -> Dot (getLC p) }
   Nat                             { \p s -> Type s (getLC p) }
   Int                             { \p s -> Type s (getLC p) }
   Real                            { \p s -> Type s (getLC p) }
@@ -97,6 +98,7 @@ data Token =
   Colon                                          (Int, Int)   |
   SemiColon                                      (Int, Int)   |
   Comma                                          (Int, Int)   |
+  Dot                                            (Int, Int)   |
   Id            String                           (Int, Int)   |
   Type          String                           (Int, Int)   |
   Nat           Int                              (Int, Int)   |
