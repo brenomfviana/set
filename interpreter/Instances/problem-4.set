@@ -1,0 +1,30 @@
+program main
+
+	typedef racionalt :
+		Int : numerador;
+		Nat : denominador;
+	endtypedef
+
+	define racionalt : r1;
+	put r1.numerador := 2;
+	put r1.denominador := 4;
+
+	print(r1.numerador + "/" + r1.denominador);
+
+	define racionalt : r2;
+	put r2.numerador := 2;
+	put r2.denominador := 4;
+
+	# Verifica a igualdade dos números
+	Bool : b := (r1.numerador == r2.numerador) && (r1.denominador == r2.denominador);
+
+	# Imprime mensagem correspondente
+	if (b)
+		print("Os numeros sao iguais.");
+	else
+		print("Os numeros sao diferentes.");
+	endif
+
+	
+
+end main
