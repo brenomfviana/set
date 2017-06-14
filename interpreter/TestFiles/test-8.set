@@ -4,5 +4,5 @@ program main
         Int : idade;
     endtypedef
     pessoa : p;
-    print(p);
+    print(p.idade);
 end main

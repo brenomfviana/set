@@ -210,6 +210,12 @@ denialToken = tokenPrim show updatePositon getToken where
     getToken (Denial p) = Just (Denial p)
     getToken _                  = Nothing
 
+-- - Dot Token
+dotToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+dotToken = tokenPrim show updatePositon getToken where
+    getToken (Dot p) = Just (Dot p)
+    getToken _       = Nothing
+
 -- - And Token
 andToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 andToken = tokenPrim show updatePositon getToken where

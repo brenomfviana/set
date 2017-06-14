@@ -196,13 +196,33 @@ getDefaultFieldValues [] = []
 getDefaultFieldValues (v:f:t) = (f, (getDefaultValue v)) : getDefaultFieldValues t
 
 -- - Convert a user type in a string
+--
+--
 usertypeToString :: (Token, [(Token, Token)]) -> [String]
 usertypeToString (n, fs) = fieldToString fs
 
 -- - Convert each field to string
+--
+--
 fieldToString :: [(Token, Token)] -> [String]
 fieldToString [] = []
 fieldToString ((v,f):t) = (getValue f) : fieldToString t
+
+-- -
+--
+--
+getValueByField :: Token -> Token -> Token
+getValueByField (Id id1 p1) (UserType (i, fs) p) = getFieldValue (Id id1 p) fs
+
+-- -
+--
+--
+getFieldValue :: Token -> [(Token, Token)] -> Token
+getFieldValue _ [] = error "Error: Invalid field."
+getFieldValue (Id id1 p1) (((Id id2 p2),v):t) =
+    if (id1 == id2) then v
+    else getFieldValue (Id id1 p1) t
+
 
 
 -- -----------------------------------------------------------------------------

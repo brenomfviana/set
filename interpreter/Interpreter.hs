@@ -194,12 +194,8 @@ typedefDecl = do
         -- Check if the variable already exists
         if ((variableIsSet c s) == False) then do
             s <- getState
-            liftIO (print a)
-            liftIO (print (getStatementBody a s))
             -- Add the declared variable
             updateState(insertVariable((c, (getDefaultUserTypeValue a (getStatementBody a s))), "main"))
-            s <- getState
-            liftIO (print s)
             return (a:b:c:[d])
         else
             error ("The variable " ++ (getTokenName c) ++ " in position "

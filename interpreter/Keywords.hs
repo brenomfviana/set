@@ -23,6 +23,11 @@ checkArrayType :: Token -> Bool
 checkArrayType (Array _ _) = True
 checkArrayType _ = False
 
+-- - Check user type statement
+checkUserType :: Token -> Bool
+checkUserType (UserType _ _) = True
+checkUserType _ = False
+
 -- - Check end typedef statement
 checkEndTypedef :: Token -> Bool
 checkEndTypedef (End_Typedef _) = True
