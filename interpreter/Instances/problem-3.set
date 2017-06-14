@@ -1,50 +1,70 @@
 program main
-	Nat : m;
-	Nat : n;
-	Nat : mxn;
+
+
+	Nat : m1;
+	Nat : n1;
+
 	
-	m := 3;
-	n := 3;
-	mxn := m * n;
 
-	Array[Int,mxn] : x;
-
-	Array[Int,mxn] : y;
-
-	Text : textos;
-
-	print("Lendo o vetor x: ");
+	print("-- Matriz 1 ---");
+	print("Informe o numero de linhas: ");
+	input(m1);
+	print("Informe o numero de colunas: ");
+	input(n1);
+	print("Informe os valores (ex: 1,2,3,4 para uma matriz 2x2): ");
+	Array[Real,m1*n1] : x;
 	input(x);
+	print("---------------");
 
-	print("Lendo o vetor y: ");
+
+	Nat : m2;
+	Nat : n2;
+
+
+
+	print("-- Matriz 2 ---");
+	print("Informe o numero de linhas: ");
+	input(m2);
+	print("Informe o numero de colunas: ");
+	input(n2);
+	print("Informe os valores (ex: 1,2,3,4 para uma matriz 2x2): ");
+	Array[Real,m2*n2] : y;
 	input(y);
+	print("---------------");
 
-	
+	if((m1 == m2) && (n1 == n2))
 
-	Nat : index;
-	Nat : i;
-	Nat : j;
-	textos := "";
-	Int : soma;
-	while(i < m)
-		while(j < n)
+		Nat : index;
+		Nat : i;
+		Nat : j;
+		
+		Real : soma;
 
-			index := (i*m)+j;
-			soma := x[index] + y[index];
-			textos := ((textos + " ") + soma);
+		Text : texto;
 
-			j := j + 1;
+		print("-- Resultado --");
+		while(i < m1)
+			while(j < n1)
+
+				index := (i*m1)+j;
+				soma := x[index] + y[index];
+				texto := texto + soma + " ";
+
+				j := j + 1;
+
+			endwhile
+
+			print(texto);
+			texto := "";
+
+			j := 0;
+			i := i + 1;
 
 		endwhile
+		print("---------------");
 
-		print(textos);
-		textos := "";
-
-		j := 0;
-		i := i + 1;
-
-	endwhile
-
-	
+	else
+		print("Matrizes incompativeis!");
+	endif
 
 end main
