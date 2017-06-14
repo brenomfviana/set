@@ -1,5 +1,5 @@
 -- Interpreter
--- Version: 13/06/2017
+-- Version: 14/06/2017
 module Interpreter where
 
 -- External imports
@@ -725,6 +725,14 @@ functionDecl = do
     s <- getState
     liftIO (print s)
     return (a:b:c:d:[e])
+
+-- - Run function
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+-- runFuntion :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+-- runFuntion = do
+--     func
 
 
 

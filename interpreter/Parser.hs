@@ -1,5 +1,5 @@
 -- Parser (Syntax Analyzer)
--- Version: 13/06/2017
+-- Version: 14/06/2017
 module Parser where
 
 -- External imports
