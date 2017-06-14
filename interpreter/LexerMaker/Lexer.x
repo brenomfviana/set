@@ -29,7 +29,6 @@ tokens :-
   Int                             { \p s -> Type s (getLC p) }
   Real                            { \p s -> Type s (getLC p) }
   Bool                            { \p s -> Type s (getLC p) }
-  Univ                            { \p s -> Type s (getLC p) }
   Text                            { \p s -> Type s (getLC p) }
   Pointer                         { \p s -> Type s (getLC p) }
   "Set"                           { \p s -> Type s (getLC p) }
@@ -78,6 +77,8 @@ tokens :-
   "\subset"                       { \p s -> Subset (getLC p) }
   "\stcomp"                       { \p s -> Complement (getLC p) }
   "\emptyset"                     { \p s -> Empty_Set (getLC p) }
+  "\p"                            { \p s -> Set_Pointer (getLC p) }
+  "\c"                            { \p s -> Get_Content (getLC p) }
   "["                             { \p s -> Open_Bracket (getLC p) }
   "]"                             { \p s -> Close_Bracket (getLC p) }
   "("                             { \p s -> Open_Parentheses (getLC p) }
@@ -103,7 +104,7 @@ data Token =
   Bool          Bool                             (Int, Int)   |
   Text          String                           (Int, Int)   |
   Pointer       (Token, Token)                   (Int, Int)   |
-  Set                                            (Int, Int)   |
+  Set           [Token]                          (Int, Int)   |
   Array         (Token, Token, [Token])          (Int, Int)   |
   Matrix        (Token, Token, Token, [[Token]]) (Int, Int)   |
   If                                             (Int, Int)   |
@@ -145,6 +146,8 @@ data Token =
   Close_Bracket                                  (Int, Int)   |
   Open_Parentheses                               (Int, Int)   |
   Close_Parentheses                              (Int, Int)   |
+  Set_Pointer                                    (Int, Int)   |
+  Get_Content                                    (Int, Int)   |
   String        String                           (Int, Int)
   deriving (Eq,Show)
 
