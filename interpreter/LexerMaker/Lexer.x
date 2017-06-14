@@ -45,6 +45,8 @@ tokens :-
   endproc                         { \p s -> End_Proc(getLC p) }
   while                           { \p s -> While (getLC p) }
   endwhile                        { \p s -> End_While (getLC p) }
+  dect                            { \p s -> Dect (getLC p) }
+  asg                             { \p s -> Asg (getLC p) }
   typedef                         { \p s -> Typedef (getLC p) }
   endtypedef                      { \p s -> End_Typedef (getLC p) }
   print                           { \p s -> Print (getLC p) }
@@ -121,6 +123,8 @@ data Token =
   End_Proc                                       (Int, Int)   |
   While                                          (Int, Int)   |
   End_While                                      (Int, Int)   |
+  Dect                                           (Int, Int)   |
+  Asg                                            (Int, Int)   |
   Typedef                                        (Int, Int)   |
   End_Typedef                                    (Int, Int)   |
   Print                                          (Int, Int)   |
