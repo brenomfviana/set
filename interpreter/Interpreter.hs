@@ -67,6 +67,15 @@ remainingVarDecls = (do a <- varDecls
 -- (Scope, [Var], [Statement]) State
 varDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 varDecl = do
+    a <- try varDeclN <|> varDeclA
+    return (a)
+
+-- - Variable declaration
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+varDeclN :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+varDeclN = do
     a <- typeToken <?> "variable type."
     b <- colonToken <?> "colon."
     c <- idToken <?> "variable name."
@@ -79,6 +88,30 @@ varDecl = do
         -- s <- getState
         -- liftIO (print s)
         return (a:b:c:[d])
+    else
+        error ("The variable " ++ (getTokenName c) ++ " in position "
+            ++ (getTokenPosition c) ++ " already exists.")
+
+-- - Variable declaration and assignment
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+varDeclA :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+varDeclA = do
+    a <- typeToken <?> "variable type."
+    b <- colonToken <?> "colon."
+    c <- idToken <?> "variable name."
+    d <- assignToken
+    e <- expression
+    f <- semiColonToken <?> "semicolon."
+    s <- getState
+    -- Check if the variable already exists
+    if ((variableIsSet c s) == False) then do
+        -- Add the declared variable
+        updateState(insertVariable((c, (cast (getDefaultValue a) e)), "main"))
+        -- s <- getState
+        -- liftIO (print s)
+        return (a:b:c:d:e:[f])
     else
         error ("The variable " ++ (getTokenName c) ++ " in position "
             ++ (getTokenPosition c) ++ " already exists.")

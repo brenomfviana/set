@@ -1,11 +1,4 @@
 program main
-    if (0 > 1)
-        print("1");
-        print("1");
-        print("1");
-    elseif (6 > 7)
-        print("2");
-    else
-        print("3");
-    endif
+    Int : v := 2;
+    print(v);
 end main
