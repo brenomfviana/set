@@ -45,6 +45,7 @@ tokens :-
   while                           { \p s -> While (getLC p) }
   endwhile                        { \p s -> End_While (getLC p) }
   typedef                         { \p s -> Typedef (getLC p) }
+  endtypedef                      { \p s -> End_Typedef (getLC p) }
   print                           { \p s -> Print (getLC p) }
   input                           { \p s -> Input (getLC p) }
   exit                            { \p s -> Exit (getLC p) }
@@ -118,6 +119,7 @@ data Token =
   While                                          (Int, Int)   |
   End_While                                      (Int, Int)   |
   Typedef                                        (Int, Int)   |
+  End_Typedef                                    (Int, Int)   |
   Print                                          (Int, Int)   |
   Input                                          (Int, Int)   |
   Exit                                           (Int, Int)   |
