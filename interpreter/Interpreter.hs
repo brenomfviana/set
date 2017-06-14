@@ -182,7 +182,7 @@ matrixDecl = do
 -- (Scope, [Var], [Statement]) State
 typedefDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 typedefDecl = do
-    e <- dectToken
+    e <- defineToken
     a <- idToken <?> "variable type."
     b <- colonToken <?> "colon."
     c <- idToken <?> "variable name."
@@ -326,7 +326,7 @@ assignVarArray = do
 -- (Scope, [Var], [Statement]) State
 assignUserTypeVar :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 assignUserTypeVar = do
-    e <- asgToken
+    e <- putToken
     a <- idToken <?> "variable name."
     s <- getState
     -- Check if is an array
