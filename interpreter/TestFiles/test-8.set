@@ -3,6 +3,7 @@ program main
         Text : nome;
         Int : idade;
     endtypedef
-    pessoa : p;
+    dect pessoa : p;
+    asg p.idade := 4;
     print(p.idade);
 end main

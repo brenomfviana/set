@@ -49,8 +49,8 @@ program = do
 -- (Scope, [Var], [Statement]) State
 varDecls :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 varDecls = do
-    first <- try varDecl <|> arrayDecl <|> typedefDecl <?> "variable declaration."
-    next  <- remainingVarDecls <?> "remaining variable declaration."
+    first <- try varDecl <|> arrayDecl <|> typedefDecl
+    next  <- remainingVarDecls
     return (first ++ next)
 
 -- - Variable declaration remaining
@@ -182,18 +182,16 @@ matrixDecl = do
 -- (Scope, [Var], [Statement]) State
 typedefDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 typedefDecl = do
-    s <- getInput
+    e <- dectToken
     a <- idToken <?> "variable type."
+    b <- colonToken <?> "colon."
+    c <- idToken <?> "variable name."
+    d <- semiColonToken <?> "semicolon."
     s <- getState
     -- Check if the type has been set
     if ((statementIsSet a s) == True) then do
-        b <- colonToken <?> "colon."
-        c <- idToken <?> "variable name."
-        d <- semiColonToken <?> "semicolon."
-        s <- getState
         -- Check if the variable already exists
         if ((variableIsSet c s) == False) then do
-            s <- getState
             -- Add the declared variable
             updateState(insertVariable((c, (getDefaultUserTypeValue a (getStatementBody a s))), "main"))
             return (a:b:c:[d])
@@ -254,7 +252,7 @@ remainingStmts = (do a <- stmts
 -- (Scope, [Var], [Statement]) State
 assign :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 assign = do
-    a <- try assignVar <|> assignVarArray
+    a <- try assignVar <|> assignVarArray <|> assignUserTypeVar
     return (a)
 
 -- - Assign var
@@ -280,16 +278,19 @@ assignVar = do
             -- liftIO (print s)
             return (a:b:[c])
 
--- - Assign var
+-- - Assign array
 -- ParsecT                     ParsecT
 -- [Token]                     Token list
 -- (Scope, [Var], [Statement]) State
 assignVarArray :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 assignVarArray = do
     a <- idToken <?> "variable name."
+    bf <- getInput
+    setInput (a:bf)
     s <- getState
     -- Check if is an array
     if (checkArrayType(getVariableType a s) == True) then do
+        a <- idToken <?> "variable name."
         b <- openBracketToken
         c <- expression
         d <- closeBracketToken
@@ -304,6 +305,35 @@ assignVarArray = do
             updateState(updateVariable((a, (setArrayItem (getVariableType a s) c (cast (getDefaultValue(getArrayType (getVariableType a s))) f) )),
                         "main"))
             s <- getState
+            -- s <- getState
+            -- liftIO (print s)
+            return (a:b:c:d:e:[f])
+    else
+        return ([a])
+
+-- - Assign user type var
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+assignUserTypeVar :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+assignUserTypeVar = do
+    e <- asgToken
+    a <- idToken <?> "variable name."
+    s <- getState
+    -- Check if is an array
+    if ((checkUserType(getVariableType a s)) == True) then do
+        b <- dotToken
+        c <- idToken
+        d <- assignToken <?> "assign."
+        -- Calculates the expression
+        e <- expression
+        f <- semiColonToken <?> "semicolon."
+        liftIO (print (setUserType (getVariableType a s) c e))
+        -- Check if the types are compatible
+        if (not (compatible (getValueByField c (getVariableType a s)) e)) then fail "Type mismatch."
+        else do
+            -- Update variable value
+            updateState(updateVariable((a, (setUserType (getVariableType a s) c e)), "main"))
             -- s <- getState
             -- liftIO (print s)
             return (a:b:c:d:e:[f])

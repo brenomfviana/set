@@ -168,7 +168,7 @@ replaceNth i nv (x:xs)
 -- Typedef
 -- --------------------------------------------------------
 
--- - Get typedef fields
+-- - Get typedef fields, remove others useless tokens
 -- [Token] Typedef body
 -- Return  Fields
 getFields :: [Token] -> [Token]
@@ -188,7 +188,7 @@ getFields (x:t) = getFields t
 getDefaultUserTypeValue :: Token -> [Token] -> Token
 getDefaultUserTypeValue (Id td p1) fs = (UserType ((Id td p1), (getDefaultFieldValues fs)) p1)
 
--- - Get defaut values of each field
+-- - Get default values of each field
 -- [Token] Fields
 -- Return  Values
 getDefaultFieldValues :: [Token] -> [(Token, Token)]
@@ -196,32 +196,53 @@ getDefaultFieldValues [] = []
 getDefaultFieldValues (v:f:t) = (f, (getDefaultValue v)) : getDefaultFieldValues t
 
 -- - Convert a user type in a string
---
---
+-- (Token, [(Token, Token)]) User type
+-- Return                    User type values
 usertypeToString :: (Token, [(Token, Token)]) -> [String]
 usertypeToString (n, fs) = fieldToString fs
 
 -- - Convert each field to string
---
---
+-- [(Token, Token)] User types fields
+-- Return           User type values
 fieldToString :: [(Token, Token)] -> [String]
 fieldToString [] = []
 fieldToString ((v,f):t) = (getValue f) : fieldToString t
 
--- -
---
---
+-- - Get value by field
+-- Token  Field
+-- Token  User type
+-- Return Value of the selected field
 getValueByField :: Token -> Token -> Token
-getValueByField (Id id1 p1) (UserType (i, fs) p) = getFieldValue (Id id1 p) fs
+getValueByField (Id id1 p1) (UserType (i, fs) p) = getFieldType (Id id1 p) fs
 
--- -
---
---
-getFieldValue :: Token -> [(Token, Token)] -> Token
-getFieldValue _ [] = error "Error: Invalid field."
-getFieldValue (Id id1 p1) (((Id id2 p2),v):t) =
+-- - Get field type
+-- Token            Field
+-- [(Token, Token)] Fields
+-- Return           Type of the selected field
+getFieldType :: Token -> [(Token, Token)] -> Token
+getFieldType _ [] = error "Error: Invalid field."
+getFieldType (Id id1 p1) (((Id id2 p2),v) : t) =
     if (id1 == id2) then v
-    else getFieldValue (Id id1 p1) t
+    else getFieldType (Id id1 p1) t
+
+-- - Set user type
+-- Token  User type
+-- Token  Field
+-- Token  New value
+-- Return Updated user type
+setUserType :: Token -> Token -> Token -> Token
+setUserType (UserType (i, fs) p) f value = (UserType (i, (setFieldType f value fs)) p)
+
+-- - Set field value
+-- Token            Field
+-- Token            New value
+-- [(Token, Token)] Fields
+-- Return           Updated field
+setFieldType :: Token -> Token -> [(Token, Token)] -> [(Token, Token)]
+setFieldType _ _ [] = []
+setFieldType (Id id1 p1) value (((Id id2 p2),v) : t) =
+    if (id1 == id2) then ((Id id2 p2),value):t
+    else ((Id id2 p2),v) : setFieldType (Id id1 p1) value t
 
 
 

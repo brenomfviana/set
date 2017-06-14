@@ -132,6 +132,18 @@ usertypeToken = tokenPrim show updatePositon getToken where
     getToken (UserType x p) = Just (UserType x p)
     getToken _             = Nothing
 
+-- - Dect Token
+dectToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+dectToken = tokenPrim show updatePositon getToken where
+    getToken (Dect p) = Just (Dect p)
+    getToken _             = Nothing
+
+-- - Asg Token
+asgToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+asgToken = tokenPrim show updatePositon getToken where
+    getToken (Asg p) = Just (Asg p)
+    getToken _             = Nothing
+
 -- - Typedef Token
 typedefToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 typedefToken = tokenPrim show updatePositon getToken where
