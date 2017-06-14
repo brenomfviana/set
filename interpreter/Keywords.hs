@@ -41,56 +41,56 @@ checkEndTypedef _ = False
 
 -- - Check if statement
 -- Token  If token
--- String Value
+-- Return True if is the token, false otherwise
 checkIfStmt :: Token -> Bool
 checkIfStmt (If _) = True
 checkIfStmt _ = False
 
 -- - Get column if token
 -- Token  If token
--- String Value
+-- Return True if is the token, false otherwise
 columnIfStmt :: Token -> Int
 columnIfStmt (If (_, c)) = c
 columnIfStmt _ = -1
 
 -- - Check else statement
 -- Token  Else token
--- String Value
+-- Return True if is the token, false otherwise
 checkElseStmt :: Token -> Bool
 checkElseStmt (Else _) = True
 checkElseStmt _ = False
 
 -- - Get column else token
 -- Token  Else token
--- String Value
+-- Return True if is the token, false otherwise
 columnElseStmt :: Token -> Int
 columnElseStmt (Else (_, c)) = c
 columnElseStmt _ = -1
 
 -- - Check elseif statement
 -- Token  ElseIf token
--- String Value
+-- Return True if is the token, false otherwise
 checkElseIfStmt :: Token -> Bool
 checkElseIfStmt (Else_If _) = True
 checkElseIfStmt _ = False
 
 -- - Get column else token
 -- Token  Else token
--- String Value
+-- Return True if is the token, false otherwise
 columnElseIfStmt :: Token -> Int
 columnElseIfStmt (Else_If (_, c)) = c
 columnElseIfStmt _ = -1
 
 -- - Check endif statement
 -- Token  End if token
--- String Value
+-- Return True if is the token, false otherwise
 checkEndIfStmt :: Token -> Bool
 checkEndIfStmt (End_If _) = True
 checkEndIfStmt _ = False
 
 -- - Get column end token
 -- Token  End if token
--- String Value
+-- Return True if is the token, false otherwise
 columnEndIfStmt :: Token -> Int
 columnEndIfStmt (End_If (_, c)) = c
 columnEndIfStmt _ = -1
@@ -103,28 +103,28 @@ columnEndIfStmt _ = -1
 
 -- - Check while statement
 -- Token  End token
--- String Value
+-- Return True if is the token, false otherwise
 checkWhileStmt :: Token -> Bool
 checkWhileStmt (While _) = True
 checkWhileStmt _ = False
 
 -- - Get column while token
 -- Token  While token
--- String Value
+-- Return True if is the token, false otherwise
 columnWhileStmt :: Token -> Int
 columnWhileStmt (While (_, c)) = c
 columnWhileStmt _ = -1
 
 -- - Check endwhile statement
 -- Token  End while token
--- String Value
+-- Return True if is the token, false otherwise
 checkEndWhileStmt :: Token -> Bool
 checkEndWhileStmt (End_While _) = True
 checkEndWhileStmt _ = False
 
 -- - Get column end token
 -- Token  End while token
--- String Value
+-- Return True if is the token, false otherwise
 columnEndWhileStmt :: Token -> Int
 columnEndWhileStmt (End_While (_, c)) = c
 columnEndWhileStmt _ = -1
@@ -137,17 +137,30 @@ columnEndWhileStmt _ = -1
 
 -- - Check close parentheses
 -- Token  Close parentheses token
--- String Value
+-- Return True if is the token, false otherwise
 checkCloseParentheses :: Token -> Bool
 checkCloseParentheses (Close_Parentheses _) = True
 checkCloseParentheses _ = False
 
 -- - Check open bracket
 -- Token  Open bracket token
--- String Value
+-- Return True if is the token, false otherwise
 checkOpenBracket :: Token -> Bool
 checkOpenBracket (Open_Bracket _) = True
 checkOpenBracket _ = False
+
+
+
+-- --------------------------------------------------------
+-- FUNCTION
+-- --------------------------------------------------------
+
+-- - Check end function
+-- Token  End function token
+-- Return True if is the token, false otherwise
+checkEndFunction :: Token -> Bool
+checkEndFunction (End_Function _) = True
+checkEndFunction _ = False
 
 
 
@@ -157,7 +170,7 @@ checkOpenBracket _ = False
 
 -- - Check end
 -- Token  End token
--- String Value
+-- Return True if is the token, false otherwise
 checkEndStmt :: Token -> Bool
 checkEndStmt (End _) = True
 checkEndStmt _ = False

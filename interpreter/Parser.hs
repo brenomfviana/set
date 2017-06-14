@@ -309,6 +309,24 @@ endWhileToken = tokenPrim show updatePositon getToken where
 
 
 -- --------------------------------------------------------
+-- Function
+-- --------------------------------------------------------
+
+-- Function token
+functionToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+functionToken = tokenPrim show updatePositon getToken where
+    getToken (Function p) = Just (Function p)
+    getToken _            = Nothing
+
+-- End function token
+endFunctionToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+endFunctionToken = tokenPrim show updatePositon getToken where
+    getToken (End_Function p) = Just (End_Function p)
+    getToken _                = Nothing
+
+
+
+-- --------------------------------------------------------
 -- Other tokens
 -- --------------------------------------------------------
 

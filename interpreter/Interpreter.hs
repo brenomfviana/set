@@ -213,13 +213,22 @@ typedef = do
     tb <- getInput
     -- Check typedef block
     let loop = do
-        f <- ignoreToken
-        when ((checkEndStmt f) == True) (error "endtypedef statement not found.")
-        when ((checkEndTypedef f) /= True) loop
+        d <- typeToken <?> "variable type in typedef."
+        e <- colonToken <?> "colon in typedef."
+        f <- idToken <?> "variable name in typedef."
+        g <- semiColonToken <?> "semicolon in typedef."
+        -- Check next value
+        n <- ignoreToken
+        bf <- getInput
+        setInput (n:bf)
+        when ((checkEndStmt n) == True) (error "endtypedef statement not found.")
+        when ((checkEndTypedef n) == False) loop
     loop
     ta <- getInput
+    d <- endTypedefToken
+    -- Add user type
     updateState(insertStatement(a, b, tokenNull, [], getFields(tb \\ ta)))
-    return (a:b:[c])
+    return (a:b:c:[d])
 
 
 
@@ -234,7 +243,7 @@ typedef = do
 stmts :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 stmts = do
     first <- typedef <|> varDecls <|> assign <|> printf <|> inputf
-            <|> ifStmt <|> whileStmt
+            <|> ifStmt <|> whileStmt <|> functionDecl
     next  <- remainingStmts
     return (first ++ next)
 
@@ -328,7 +337,6 @@ assignUserTypeVar = do
         -- Calculates the expression
         e <- expression
         f <- semiColonToken <?> "semicolon."
-        liftIO (print (setUserType (getVariableType a s) c e))
         -- Check if the types are compatible
         if (not (compatible (getValueByField c (getVariableType a s)) e)) then fail "Type mismatch."
         else do
@@ -675,6 +683,48 @@ runWhile = do
             return (a:b:c:[d])
         else do
             error "Error: it's not a boolean expresion."
+
+
+
+-- -----------------------------------------------------------------------------
+-- FUNCTION
+-- -----------------------------------------------------------------------------
+
+-- - Function
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+functionDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+functionDecl = do
+    a <- functionToken
+    b <- idToken
+    c <- typeToken
+    d <- colonToken
+    e <- openParenthesesToken
+    fpb <- getInput
+    -- Check parameters block
+    let loop = do
+        d <- typeToken <?> "variable type in function declaration."
+        e <- colonToken <?> "colon in function declaration."
+        f <- idToken <?> "variable name in function declaration."
+        g <- commaToken <|> closeParenthesesToken <?> "comma in function declaration."
+        when ((checkEndStmt g) == True) (error "close parentheses not found.")
+        when ((checkCloseParentheses g) == False) loop
+    loop
+    fpa <- getInput
+    fbb <- getInput
+    -- Check body block
+    let loop = do
+        f <- ignoreToken
+        when ((checkEndStmt f) == True) (error "close parentheses not found.")
+        when ((checkEndFunction f) == False) loop
+    loop
+    fba <- getInput
+    -- Add the function to statements list
+    updateState(insertStatement(a, b, c, getDefaultFieldValues(getFields(fpb \\ fpa)), (fbb \\ fba)))
+    s <- getState
+    liftIO (print s)
+    return (a:b:c:d:[e])
 
 
 
