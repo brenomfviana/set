@@ -76,7 +76,7 @@ removeVariable ((Id id1 p1, v1), s1) (sc1, ((Id id2 p2, v2), s2) : m1, st1) =
 -- - Get true if the variable is in symbol table, false otherwise
 -- Token  Variable ID
 -- State  State
--- Return Variable
+-- Return True if the variable is in symbol table, false otherwise
 variableIsSet :: Token -> State -> Bool
 variableIsSet _ (_, [], _) = False
 variableIsSet (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
@@ -117,7 +117,7 @@ type Scope = [String]
 
 -- - Insert scope
 -- String Current scope
--- State  State
+-- State  Current state
 -- Return Updated state
 insertScope :: String -> State -> State
 insertScope s  ([], m, st) = ([s], m, st)
@@ -125,7 +125,7 @@ insertScope s (sc, m, st) = (s:sc, m, st)
 
 -- - Remove scope
 -- String Current scope
--- State  State
+-- State  Current state
 -- Return Updated state
 removeScope :: String -> State -> State
 removeScope _  ([], _, _) = error "Error: The scope doesn't exits."
@@ -161,11 +161,39 @@ type Statement = (Token, Token, Token, [(Token, Token)], [Token])
 -- --------------------------------------
 
 -- - Insert statement
--- Usertype Statement
--- State    Current state
--- Return   Updated state
+-- Statement Statement
+-- State     Current state
+-- Return    Updated state
 insertStatement :: Statement -> State -> State
 insertStatement stmt (sc, m, []) = (sc, m, [stmt])
 insertStatement stmt (sc, m, st) = (sc, m, st ++ [stmt])
 
 -- - Get statement
+-- Token  Token
+-- State  Current state
+-- Return Statement
+getStatement :: Token -> State -> Statement
+getStatement _ (_, _, []) = error "Error: Statement not found."
+getStatement (Id id1 p1) (sc, m, (t, (Id id2 p2), r, p, b):st) =
+    if id1 == id2 then (t, (Id id2 p2), r, p, b)
+    else getStatement (Id id1 p1) (sc, m, st)
+
+-- - Get statement body
+-- Token  Token
+-- State  Current state
+-- Return Statement
+getStatementBody :: Token -> State -> [Token]
+getStatementBody _ (_, _, []) = error "Error: Statement not found."
+getStatementBody (Id id1 p1) (sc, m, (t, (Id id2 p2), r, p, b):st) =
+    if id1 == id2 then b
+    else getStatementBody (Id id1 p1) (sc, m, st)
+
+-- - Get true if the token is a statement
+-- Token  Statement
+-- State  State
+-- Return True if the token is a statement, false otherwise
+statementIsSet :: Token -> State -> Bool
+statementIsSet _ (_, _, []) = False
+statementIsSet (Id id1 p1) (sc, m, (t, (Id id2 p2), r, p, b):st) =
+    if id1 == id2 then True
+    else statementIsSet (Id id1 p1) (sc, m, st)

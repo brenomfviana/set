@@ -1,6 +1,11 @@
 program main
+    print("criando tipo");
     typedef pessoa :
         Text : nome;
         Int : idade;
     endtypedef
+    print("tipo criado");
+    print("declarando um tipo do usuario");
+    pessoa : p;
+    print("tipo declarado");
 end main

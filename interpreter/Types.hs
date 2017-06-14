@@ -51,6 +51,7 @@ getValue (Real  value _) = show value
 getValue (Bool  value _) = show value
 getValue (Text  value _) = removeQuote(show value)
 getValue (Array value _) = show (toString value)
+-- getValue (UserType value _) = show (toString value)
 getValue _ = error "Error: Value not found."
 
 -- - Get ID name
@@ -179,6 +180,18 @@ getFields ((Type "Real" p):t) = (Type "Real" p) : getFields t
 getFields ((Type "Bool" p):t) = (Type "Bool" p) : getFields t
 getFields ((Type "Text" p):t) = (Type "Text" p) : getFields t
 getFields (x:t) = getFields t
+
+-- - Get defaul user type value
+-- Token   -
+-- [Token] -
+-- Token   -
+getDefaultUserTypeValue :: Token -> [Token] -> Token
+getDefaultUserTypeValue (Id td p1) fs = (UserType ((Id td p1), (getDefaultFieldValues fs)) p1)
+
+-- -
+getDefaultFieldValues :: [Token] -> [(Token, Token)]
+getDefaultFieldValues [] = []
+getDefaultFieldValues (v:f:t) = (f, (getDefaultValue v)) : getDefaultFieldValues t
 
 
 

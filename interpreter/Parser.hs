@@ -126,6 +126,12 @@ setToken = tokenPrim show updatePositon getToken where
     getToken (Set x pos) = Just (Set x pos)
     getToken _           = Nothing
 
+-- - User type Token
+usertypeToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+usertypeToken = tokenPrim show updatePositon getToken where
+    getToken (UserType x p) = Just (UserType x p)
+    getToken _             = Nothing
+
 -- - Typedef Token
 typedefToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 typedefToken = tokenPrim show updatePositon getToken where

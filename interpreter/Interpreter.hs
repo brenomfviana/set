@@ -49,7 +49,7 @@ program = do
 -- (Scope, [Var], [Statement]) State
 varDecls :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 varDecls = do
-    first <- try varDecl <|> arrayDecl <?> "variable declaration."
+    first <- try varDecl <|> arrayDecl <|> typedefDecl <?> "variable declaration."
     next  <- remainingVarDecls <?> "remaining variable declaration."
     return (first ++ next)
 
@@ -124,7 +124,7 @@ arrayDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 arrayDecl = do
     a <- typeToken <?> "variable type."
     b <- openBracketToken
-    c <- typeToken <?> "variable type."
+    c <- typeToken <?> "array type."
     d <- commaToken
     e <- expression
     f <- closeBracketToken
@@ -176,12 +176,43 @@ matrixDecl = do
     else
         error "Error: Invalid size value."-}
 
--- - Typedef declaration
+-- - Variable declaration
 -- ParsecT                     ParsecT
 -- [Token]                     Token list
 -- (Scope, [Var], [Statement]) State
 typedefDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 typedefDecl = do
+    s <- getInput
+    a <- idToken <?> "variable type."
+    s <- getState
+    -- Check if the type has been set
+    if ((statementIsSet a s) == True) then do
+        b <- colonToken <?> "colon."
+        c <- idToken <?> "variable name."
+        d <- semiColonToken <?> "semicolon."
+        s <- getState
+        -- Check if the variable already exists
+        if ((variableIsSet c s) == False) then do
+            s <- getState
+            liftIO (print a)
+            liftIO (print (getStatementBody a s))
+            -- Add the declared variable
+            updateState(insertVariable((c, (getDefaultUserTypeValue a (getStatementBody a s))), "main"))
+            s <- getState
+            liftIO (print s)
+            return (a:b:c:[d])
+        else
+            error ("The variable " ++ (getTokenName c) ++ " in position "
+                ++ (getTokenPosition c) ++ " already exists.")
+    else
+        return ([a])
+
+-- - Typedef declaration
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+typedef :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+typedef = do
     a <- typedefToken
     b <- idToken
     c <- colonToken
@@ -208,7 +239,7 @@ typedefDecl = do
 -- (Scope, [Var], [Statement]) State
 stmts :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 stmts = do
-    first <- assign <|> varDecls <|> typedefDecl <|> printf <|> inputf
+    first <- typedef <|> varDecls <|> assign <|> printf <|> inputf
             <|> ifStmt <|> whileStmt
     next  <- remainingStmts
     return (first ++ next)
