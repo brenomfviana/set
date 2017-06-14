@@ -1,12 +1,8 @@
 program main
     Real : result;
-    Real : x;
-    Real : y;
-    Int : c;
-    
-    x := 20 / 10;
-    y := 30 / 10;
-    c := 1;
+    Real : x := 20 / 10;
+    Real : y := 30 / 10;
+    Int : c := 1;
     
     print ("x = 20/10");
     print ("y = 30/10" ); 
