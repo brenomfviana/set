@@ -50,8 +50,8 @@ getValue (Int   value _) = show value
 getValue (Real  value _) = show value
 getValue (Bool  value _) = show value
 getValue (Text  value _) = removeQuote(show value)
-getValue (Array value _) = show (toString value)
--- getValue (UserType value _) = show (toString value)
+getValue (Array value _) = show (arrayToString value)
+getValue (UserType value _) = show (usertypeToString value)
 getValue _ = error "Error: Value not found."
 
 -- - Get ID name
@@ -126,13 +126,13 @@ toToken (Array ((Type "Text" p2), s, v) p1) (sh:st) = (Text sh p1) : toToken (Ar
 -- - Convert an array in a string
 -- Token  Array
 -- Return Array value
-toString :: (Token, Token, [Token]) -> [String]
-toString (_, _, []) = []
-toString ((Type "Nat"  p2), (Nat v1 p1), (Nat  v3 p3):t) = [(show v3)] ++ toString ((Type "Nat"  p2), (Nat v1 p1), t)
-toString ((Type "Int"  p2), (Nat v1 p1), (Int  v3 p3):t) = [(show v3)] ++ toString ((Type "Int"  p2), (Nat v1 p1), t)
-toString ((Type "Real" p2), (Nat v1 p1), (Real v3 p3):t) = [(show v3)] ++ toString ((Type "Real" p2), (Nat v1 p1), t)
-toString ((Type "Bool" p2), (Nat v1 p1), (Bool v3 p3):t) = [(show v3)] ++ toString ((Type "Bool" p2), (Nat v1 p1), t)
-toString ((Type "Text" p2), (Nat v1 p1), (Text v3 p3):t) = [(show v3)] ++ toString ((Type "Text" p2), (Nat v1 p1), t)
+arrayToString :: (Token, Token, [Token]) -> [String]
+arrayToString (_, _, []) = []
+arrayToString ((Type "Nat"  p2), (Nat v1 p1), (Nat  v3 p3):t) = [(show v3)] ++ arrayToString ((Type "Nat"  p2), (Nat v1 p1), t)
+arrayToString ((Type "Int"  p2), (Nat v1 p1), (Int  v3 p3):t) = [(show v3)] ++ arrayToString ((Type "Int"  p2), (Nat v1 p1), t)
+arrayToString ((Type "Real" p2), (Nat v1 p1), (Real v3 p3):t) = [(show v3)] ++ arrayToString ((Type "Real" p2), (Nat v1 p1), t)
+arrayToString ((Type "Bool" p2), (Nat v1 p1), (Bool v3 p3):t) = [(show v3)] ++ arrayToString ((Type "Bool" p2), (Nat v1 p1), t)
+arrayToString ((Type "Text" p2), (Nat v1 p1), (Text v3 p3):t) = [(show v3)] ++ arrayToString ((Type "Text" p2), (Nat v1 p1), t)
 
 -- - Replate nth item
 -- Int Index Position
@@ -181,18 +181,28 @@ getFields ((Type "Bool" p):t) = (Type "Bool" p) : getFields t
 getFields ((Type "Text" p):t) = (Type "Text" p) : getFields t
 getFields (x:t) = getFields t
 
--- - Get defaul user type value
--- Token   -
--- [Token] -
--- Token   -
+-- - Get default user type value
+-- Token   User type
+-- [Token] Fields
+-- Token   Get default value of each type
 getDefaultUserTypeValue :: Token -> [Token] -> Token
 getDefaultUserTypeValue (Id td p1) fs = (UserType ((Id td p1), (getDefaultFieldValues fs)) p1)
 
--- -
+-- - Get defaut values of each field
+-- [Token] Fields
+-- Return  Values
 getDefaultFieldValues :: [Token] -> [(Token, Token)]
 getDefaultFieldValues [] = []
 getDefaultFieldValues (v:f:t) = (f, (getDefaultValue v)) : getDefaultFieldValues t
 
+-- - Convert a user type in a string
+usertypeToString :: (Token, [(Token, Token)]) -> [String]
+usertypeToString (n, fs) = fieldToString fs
+
+-- - Convert each field to string
+fieldToString :: [(Token, Token)] -> [String]
+fieldToString [] = []
+fieldToString ((v,f):t) = (getValue f) : fieldToString t
 
 
 -- -----------------------------------------------------------------------------
