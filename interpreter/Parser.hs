@@ -132,6 +132,12 @@ typedefToken = tokenPrim show updatePositon getToken where
     getToken (Typedef p) = Just (Typedef p)
     getToken _             = Nothing
 
+-- - End typedef Token
+endTypedefToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
+endTypedefToken = tokenPrim show updatePositon getToken where
+    getToken (End_Typedef p) = Just (End_Typedef p)
+    getToken _             = Nothing
+
 
 
 -- --------------------------------------------------------

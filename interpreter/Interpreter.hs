@@ -149,7 +149,7 @@ arrayDecl = do
 -- ParsecT                     ParsecT
 -- [Token]                     Token list
 -- (Scope, [Var], [Statement]) State
-matrixDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+{-matrixDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 matrixDecl = do
     a <- typeToken <?> "variable type."
     b <- openBracketToken
@@ -174,7 +174,27 @@ matrixDecl = do
             error ("Error: The variable " ++ (getTokenName j) ++ " in position "
                 ++ (getTokenPosition j) ++ " already exists.")
     else
-        error "Error: Invalid size value."
+        error "Error: Invalid size value."-}
+
+-- - Typedef declaration
+-- ParsecT                     ParsecT
+-- [Token]                     Token list
+-- (Scope, [Var], [Statement]) State
+typedefDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
+typedefDecl = do
+    a <- typedefToken
+    b <- idToken
+    c <- colonToken
+    tb <- getInput
+    -- Check typedef block
+    let loop = do
+        f <- ignoreToken
+        when ((checkEndStmt f) == True) (error "endtypedef statement not found.")
+        when ((checkEndTypedef f) /= True) loop
+    loop
+    ta <- getInput
+    updateState(insertStatement(a, b, tokenNull, [], getFields(tb \\ ta)))
+    return (a:b:[c])
 
 
 
@@ -188,7 +208,8 @@ matrixDecl = do
 -- (Scope, [Var], [Statement]) State
 stmts :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 stmts = do
-    first <- assign <|> varDecls <|> printf <|> inputf <|> ifStmt <|> whileStmt
+    first <- assign <|> varDecls <|> typedefDecl <|> printf <|> inputf
+            <|> ifStmt <|> whileStmt
     next  <- remainingStmts
     return (first ++ next)
 
@@ -285,7 +306,7 @@ ifStmt = do
     -- Check if the expression is true
     if ((getValue c) == "True") then do
         -- Get the next statement
-        e <- ignoreToken <?> "get the ignored statement."
+        e <- ignoreToken
         af <- getInput
         -- Add back the last readed statement
         setInput (e:af)
@@ -302,7 +323,7 @@ ifStmt = do
                 -- Ignore statements
                 bf <- getInput
                 let loop = do
-                    f <- ignoreToken <?> "get the ignored statement."
+                    f <- ignoreToken
                     when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnIfStmt a))) loop
                 loop
@@ -316,7 +337,7 @@ ifStmt = do
                 -- Ignore other statements
                 bf <- getInput
                 let loop = do
-                    f <- ignoreToken <?> "get the ignored statement."
+                    f <- ignoreToken
                     when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnIfStmt a))) loop
                 loop
@@ -330,7 +351,7 @@ ifStmt = do
             -- Update scope
             updateState(removeScope(("if" ++ (show (getScopeLength s)))))
             -- Get the next statement
-            e <- ignoreToken <?> "get the ignored statement."
+            e <- ignoreToken
             af <- getInput
             -- Add back the last readed statement
             setInput (e:af)
@@ -344,7 +365,7 @@ ifStmt = do
                 -- Ignore other statements
                 bf <- getInput
                 let loop = do
-                    f <- ignoreToken <?> "get the ignored statement."
+                    f <- ignoreToken
                     when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnElseStmt f) /= (columnIfStmt a))
                         && ((columnElseIfStmt f) /= (columnIfStmt a))
@@ -355,11 +376,11 @@ ifStmt = do
                 setInput (let y:x = reverse (bf \\ af) in y:af)
                 bf1 <- getInput
                 -- Get the next statement
-                e <- ignoreToken <?> "get the ignored statement."
+                e <- ignoreToken
                 -- Check if the token is a ELSE
                 if ((checkElseStmt e) == True) then do
                     -- Get the next statement
-                    e <- ignoreToken <?> "get the ignored statement."
+                    e <- ignoreToken
                     af1 <- getInput
                     -- Add back the last readed statement
                     setInput (e:af1)
@@ -409,7 +430,7 @@ elseIfStmt = do
     -- Check if the expression is true
     if ((getValue c) == "True") then do
         -- Get the next statement
-        e <- ignoreToken <?> "get the ignored statement."
+        e <- ignoreToken
         af <- getInput
         -- Add back the last readed statement
         setInput (e:af)
@@ -426,7 +447,7 @@ elseIfStmt = do
                     -- Ignore other statements
                 bf <- getInput
                 let loop = do
-                    f <- ignoreToken <?> "get the ignored statement."
+                    f <- ignoreToken
                     when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnElseIfStmt a))) loop
                 loop
@@ -440,7 +461,7 @@ elseIfStmt = do
                 -- Ignore other statements
                 bf <- getInput
                 let loop = do
-                    f <- ignoreToken <?> "get the ignored statement."
+                    f <- ignoreToken
                     when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnEndIfStmt f) /= (columnElseIfStmt a))) loop
                 loop
@@ -454,7 +475,7 @@ elseIfStmt = do
             -- Update scope
             updateState(removeScope(("if" ++ (show (getScopeLength s)))))
             -- Get the next statement
-            e <- ignoreToken <?> "get the ignored statement."
+            e <- ignoreToken
             af <- getInput
             -- Add back the last readed statement
             setInput (e:af)
@@ -468,7 +489,7 @@ elseIfStmt = do
                 -- Ignore other statements
                 bf <- getInput
                 let loop = do
-                    f <- ignoreToken <?> "get the ignored statement."
+                    f <- ignoreToken
                     when ((checkEndStmt f) == True) (error "endif statement not found.")
                     when (((columnElseStmt f) /= (columnElseIfStmt a))
                         && ((columnElseIfStmt f) /= (columnElseIfStmt a))
@@ -479,11 +500,11 @@ elseIfStmt = do
                 setInput (let y:x = reverse (bf \\ af) in y:af)
                 bf1 <- getInput
                 -- Get the next statement
-                e <- ignoreToken <?> "get the ignored statement."
+                e <- ignoreToken
                 -- Check if the token is a ELSE
                 if ((checkElseStmt e) == True) then do
                     -- Get the next statement
-                    e <- ignoreToken <?> "get the ignored statement."
+                    e <- ignoreToken
                     af1 <- getInput
                     -- Add back the last readed statement
                     setInput (e:af1)
@@ -533,7 +554,7 @@ whileStmt = do
     a <- whileToken <?> "while."
     -- Check while block
     let loop = do
-        f <- ignoreToken <?> "get the ignored statement."
+        f <- ignoreToken
         when ((checkEndStmt f) == True) (error "endwhile statement not found.")
         when (((columnEndWhileStmt f) /= (columnWhileStmt a))) loop
     loop
@@ -541,8 +562,8 @@ whileStmt = do
     -- Executes while
     let loopwhile = do
         setInput (wb \\ we)
-        f <- ignoreToken <?> "get the ignored statement."
-        f <- ignoreToken <?> "get the ignored statement."
+        f <- ignoreToken
+        f <- ignoreToken
         c <- expression
         setInput (wb \\ we)
         w <- runWhile
@@ -568,7 +589,7 @@ runWhile = do
     -- Check if the expression is true
     if ((getValue c) == "True") then do
         -- Get the next statement
-        e <- ignoreToken <?> "get the ignored statement."
+        e <- ignoreToken
         af <- getInput
         -- Add back the last readed statement
         setInput (e:af)
@@ -584,7 +605,7 @@ runWhile = do
             -- Ignore other statements
             bf <- getInput
             let loop = do
-                f <- ignoreToken <?> "get the ignored statement."
+                f <- ignoreToken
                 when (((columnEndWhileStmt f) /= (columnWhileStmt a))) loop
             loop
             af <- getInput

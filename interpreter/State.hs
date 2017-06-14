@@ -46,9 +46,8 @@ type Var = ((Token, Token), String)
 -- State  Current state
 -- Return Updated state
 insertVariable :: Var -> State -> State
-insertVariable ((vid, vv), vs) (sc, [], st) = (sc, [((vid, vv), vs)], st)
-insertVariable ((vid, vv), vs) (sc, m, st) =
-    let nv = ((vid, vv), vs) in (sc, m ++ [nv], st)
+insertVariable var (sc, [], st) = (sc, [var], st)
+insertVariable var (sc,  m, st) = (sc, m ++ [var], st)
 
 -- - Update variable
 -- Var    Variable
@@ -74,7 +73,7 @@ removeVariable ((Id id1 p1, v1), s1) (sc1, ((Id id2 p2, v2), s2) : m1, st1) =
         let (sc2, m2, st2) = removeVariable ((Id id1 p1, v1), s1) (sc1, m1, st1)
         in (sc2, ((Id id2 p2, v2), s2) : m2, st2)
 
--- - Get variable
+-- - Get true if the variable is in symbol table, false otherwise
 -- Token  Variable ID
 -- State  State
 -- Return Variable
@@ -99,7 +98,7 @@ getVariable (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
 -- State  State
 -- Return Variable
 getVariableType :: Token -> State -> Token
-getVariableType _ (_, [], _) = (Id "_" (0,0))
+getVariableType _ (_, [], _) = error "Error: Variable not found."
 getVariableType (Id id1 p1) (sc, (((Id id2 p2), value), s2) : m, st) =
     if id1 == id2 then value
     else getVariableType (Id id1 p1) (sc, m, st)
@@ -149,73 +148,24 @@ getScopeLength (sc, _, _) = length(sc)
 -- Statements
 -- -----------------------------------------------------------------------------
 
-type Statement = Var
-
--- --------------------------------------------------------
--- Procedure
--- --------------------------------------------------------
-
-{-
--- - Procedure declaration
--- String    Procedure name
--- Integer   Procedure scope ID
--- [VarDecl] Parameters
-type ProcDecl = (String, Integer, [VarDecl])
-
--- - Procedure
--- String    Procedure name
--- Integer   Procedure scope ID
--- [VarDecl] Parameters
--- [Token]   Statements
-type Procedure = (String, Integer, [VarDecl], [Token])
+-- - Statement
+-- Token            Type
+-- Token            Name
+-- Token            Return type
+-- [(Token, Token)] Parameters
+-- [Token]          Body
+type Statement = (Token, Token, Token, [(Token, Token)], [Token])
 
 -- --------------------------------------
--- Procedure handler
+-- User type handler
 -- --------------------------------------
 
--- - Insert procedure
--- - Get procedure
--- - Update procedure
+-- - Insert statement
+-- Usertype Statement
+-- State    Current state
+-- Return   Updated state
+insertStatement :: Statement -> State -> State
+insertStatement stmt (sc, m, []) = (sc, m, [stmt])
+insertStatement stmt (sc, m, st) = (sc, m, st ++ [stmt])
 
--- --------------------------------------------------------
--- Function
--- --------------------------------------------------------
-
--- - Function declaration
--- String    Function name
--- Integer   Function scope ID
--- [VarDecl] Parameters
--- Type      Return type
-type FuncDec = (String, Integer, [VarDecl], Type)
-
--- - Function
--- String    Function name
--- Integer   Function scope ID
--- [VarDecl] Parameters
--- [Token]   Statements
--- Type      Return type
-type Function = (String, Integer, [VarDecl], Type, [Token])
-
--- --------------------------------------
--- Function handler
--- --------------------------------------
-
--- - Insert function
--- - Get function
--- - Get function return type
--- - Update function
-
--- --------------------------------------------------------
--- User types
--- --------------------------------------------------------
-
--- - Field
--- String Variable name
--- Type   Variable type
-type Field = (String, Type)
-
--- - User type
--- String  Type name
--- [Field] Fields
-type UserType = (String, [Field])
--}
+-- - Get statement

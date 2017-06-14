@@ -11,6 +11,10 @@ import Lexer
 -- Values
 -- -----------------------------------------------------------------------------
 
+-- - Token null
+tokenNull :: Token
+tokenNull = (Id "_" (-1,-1))
+
 -- - Get default value of different types
 -- Type   Variable type
 -- Return Initial variable value
@@ -156,6 +160,25 @@ replaceNth i nv (x:xs)
  -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Real" p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Real" p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
  -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Bool" p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Bool" p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
  -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Text" p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Text" p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
+
+
+
+-- --------------------------------------------------------
+-- Typedef
+-- --------------------------------------------------------
+
+-- - Get typedef fields
+-- [Token] Typedef body
+-- Return  Fields
+getFields :: [Token] -> [Token]
+getFields [] = []
+getFields ((Id n p):t) = (Id n p) : getFields t
+getFields ((Type "Nat"  p):t) = (Type "Nat"  p) : getFields t
+getFields ((Type "Int"  p):t) = (Type "Int"  p) : getFields t
+getFields ((Type "Real" p):t) = (Type "Real" p) : getFields t
+getFields ((Type "Bool" p):t) = (Type "Bool" p) : getFields t
+getFields ((Type "Text" p):t) = (Type "Text" p) : getFields t
+getFields (x:t) = getFields t
 
 
 
