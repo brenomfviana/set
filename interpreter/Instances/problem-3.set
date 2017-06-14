@@ -37,8 +37,6 @@ program main
 
 	if((m1 == m2) && (n1 == n2))
 
-		
-		print("-- Resultado --");
 		while(i < m1)
 			while(j < n1)
 
@@ -67,7 +65,6 @@ program main
 	
 	if(n1 == m2)
 
-		Nat : index1;
 		Nat : index2;
 		Nat : index3;
 		i := 0;
@@ -76,24 +73,15 @@ program main
 		texto := "";
 
 		Real : produto;
-		Array[Real,n1*m2] : z;
 
-		Real : temp;
-
-		print("-- Resultado --");
 		while(i < m1)
-			while(j < n1)
+			while(j < n2)
 				while(k < n1)
 
-					index1 := (i*n1)+j;
 					index2 := (i*n1)+k;
-					index3 := (k*n1)+j;
-					#print(index1 +" "+  index2 +" "+ index3 + " ");
+					index3 := (k*n2)+j;
 
-					#z[index1] := z[index1] + (x[index2] * y[index3]);
 					produto := produto + (x[index2] * y[index3]);
-
-					#Z[i][j] += X[i][k] * Y[k][j];
 
 					k := k + 1;
 
@@ -104,18 +92,13 @@ program main
 				texto := texto + produto + " ";
 				produto := 0;
 
-				#produto := temp;
-				#texto := texto + soma + " ";
-
 			endwhile
 			j := 0;
 			i := i + 1;
 
 			print(texto);
 			texto := "";
-
 		endwhile
-
 	else
 		print("Matrizes incompativeis para Produto!");
 	endif
