@@ -275,6 +275,7 @@ data Token =
   Set           [Token]                          (Int, Int)   |
   Array         (Token, Token, [Token])          (Int, Int)   |
   Matrix        (Token, Token, Token, [[Token]]) (Int, Int)   |
+  UserType      (Token, [(Token, Token)])        (Int, Int)   |
   If                                             (Int, Int)   |
   Else                                           (Int, Int)   |
   Else_If                                        (Int, Int)   |
