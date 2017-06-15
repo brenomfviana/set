@@ -6,13 +6,11 @@
 
 Set is an imperative programming language with a focus on mathematics teaching, therefore, is aimed at teachers and students. The language handles sets as one of the primitive types.
 
-[comment]: <> (## Start Guide)
+This interpreter for this language is a project of the discipline of Programming Language, Concepts and Paradigms of the Information Technology course of the Federal University of Rio Grande do Norte (UFRN).
 
-[comment]: <> (Here is Described how to configure the Haskell environment, and then an Interpreter startup guide)
+### About the interpreter
 
-[comment]: <> (### Instalation)
-
-[comment]: <> (More information in https://www.haskell.org/platform/)
+The interpreter was developed using the Haskell language.
 
 ## Team
 
