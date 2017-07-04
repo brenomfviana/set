@@ -10,7 +10,7 @@ This interpreter for this language is a project of the discipline of Programming
 
 ### About the interpreter
 
-The interpreter was developed using the Haskell language.
+The interpreter of the set programming language was a work of the Concepts and Paradigms Programming Language course of the Federal University of Rio Grande do Norte (UFRN). The interpreter was developed using the Haskell language.
 
 ## Team
 
@@ -18,4 +18,4 @@ The interpreter was developed using the Haskell language.
 - Felipe Barbalho Rocha ([GitHub](https://github.com/Barbalho12))
 - Jackson Rauup Silvestre Santos ([GitHub](https://github.com/jacksonrauupti))
 - Patrícia Pontes Cruz ([GitHub](https://github.com/Pekorishia))
-- Raul S. Silva ([GitHub](https://github.com/RaulMacintosh))
+- Raul Silveira Silva ([GitHub](https://github.com/RaulMacintosh))
