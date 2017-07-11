@@ -203,7 +203,7 @@ The only condition structure is the ```if-elseif-else```:
 
 #### Repetition structure
 
-The only condition structure is the ```while```:
+The only repetition structure is the ```while```:
 
     program repetitionstructure
         Nat : count := 0;
