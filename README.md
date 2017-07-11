@@ -88,7 +88,7 @@ Hello World in set:
             Nat : x := 1;
             Int : y;
             y := 1;
-            Int sum := x + y; // Result: 2
+            Int sum := x + y; % Result: 2
             print(sum);
         end sum
 
@@ -97,7 +97,7 @@ Hello World in set:
         program subtraction
             Nat : x := 1;
             Int : y := 1;
-            print(x - y); // Result: 0
+            print(x - y); % Result: 0
         end subtraction
 
 3. Multiplication:
@@ -105,7 +105,7 @@ Hello World in set:
         program multiplication
             Real : x := 5.0;
             Int : y := 2;
-            print(x * y); // Result: 10.0
+            print(x * y); % Result: 10.0
         end multiplication
 
 4. Division:
@@ -113,7 +113,7 @@ Hello World in set:
         program division
             Real : x := 10.0;
             Int : y := 2;
-            print(x / y); // Result: 5.0
+            print(x / y); % Result: 5.0
         end division
 
 ##### Boolean operations
@@ -121,58 +121,58 @@ Hello World in set:
 5. Equality
 
         program equality
-            print(2 == 2); // Result: True
-            print(2 == 1); // Result: False
+            print(2 == 2); % Result: True
+            print(2 == 1); % Result: False
         end equality
 
 6. Conjunction
 
         program conjunction
-            print((1 == 1) && (2 == 2)); // Result: True
-            print((1 == 1) && (2 == 1)); // Result: False
-            print((2 == 1) && (1 == 1)); // Result: False
-            print((2 == 1) && (2 == 1)); // Result: False
+            print((1 == 1) && (2 == 2)); % Result: True
+            print((1 == 1) && (2 == 1)); % Result: False
+            print((2 == 1) && (1 == 1)); % Result: False
+            print((2 == 1) && (2 == 1)); % Result: False
         end conjunction
 
 7. Disjunction
 
         program disjunction
-            print((1 == 1) || (2 == 2)); // Result: True
-            print((1 == 1) || (2 == 1)); // Result: True
-            print((2 == 1) || (1 == 1)); // Result: True
-            print((2 == 1) || (2 == 1)); // Result: False
+            print((1 == 1) || (2 == 2)); % Result: True
+            print((1 == 1) || (2 == 1)); % Result: True
+            print((2 == 1) || (1 == 1)); % Result: True
+            print((2 == 1) || (2 == 1)); % Result: False
         end disjunction
 
 8. Greater than
 
         program greaterthan
-            print(2 > 1); // Result: True
-            print(1 > 2); // Result: False
-            print(1 > 1); // Result: False
+            print(2 > 1); % Result: True
+            print(1 > 2); % Result: False
+            print(1 > 1); % Result: False
         end greaterthan
 
 9. Smaller than
 
         program smallerthan
-            print(2 < 1); // Result: False
-            print(1 < 2); // Result: True
-            print(1 < 1); // Result: False
+            print(2 < 1); % Result: False
+            print(1 < 2); % Result: True
+            print(1 < 1); % Result: False
         end smallerthan
 
 10. Greater than or equal to
 
         program greaterthanorequal
-            print(2 >= 1); // Result: True
-            print(1 >= 2); // Result: False
-            print(1 >= 1); // Result: True
+            print(2 >= 1); % Result: True
+            print(1 >= 2); % Result: False
+            print(1 >= 1); % Result: True
         end greaterthanorequal
 
 11. Smaller than or equal to
 
         program smallerthanorequal
-            print(2 <= 1); // Result: False
-            print(1 <= 2); // Result: True
-            print(1 <= 1); // Result: True
+            print(2 <= 1); % Result: False
+            print(1 <= 2); % Result: True
+            print(1 <= 1); % Result: True
         end smallerthanorequal
 
 
@@ -184,7 +184,7 @@ Hello World in set:
             Real : x := 2.0;
             Real : y := 2.0;
             Text : s := "of the sum:";
-            print("Result " + s + (x + y));
+            print("Result " + s + (x + y)); % Result: "Result of the sum: 4.0"
         end concat
 
 #### Condition structure
@@ -217,8 +217,8 @@ The only condition structure is the ```while```:
 
     program inputoutput
         Text : t;
-        input(t); // User input
-        print(t);
+        input(t); % Get user input
+        print(t); % Print user input
     program inputoutput
 
 ### What was planned to implement but not done
