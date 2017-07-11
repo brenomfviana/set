@@ -10,9 +10,19 @@ This interpreter for this language is a project of the discipline of Programming
 
 ### About the interpreter
 
-The interpreter of the set programming language was a work of the Concepts and Paradigms Programming Language course of the Federal University of Rio Grande do Norte (UFRN). The interpreter was developed using the Haskell language.
+The interpreter of the set programming language was a homework of the Concepts and Paradigms Programming Language course of the Federal University of Rio Grande do Norte (UFRN). The interpreter was developed using the Haskell language. We used Alex to generate the Haskell lexical analyzer for our language and we used the Parsec library to implement the parser and the interpreter.
 
-### Learning
+#### Compiling
+
+To compile the interpreter use the ```make.sh``` file.
+
+#### Running a program
+
+To run a set program use the following command:
+
+	./set <file-name>
+
+## Learning
 
 A set program has the following structure:
 
@@ -65,7 +75,7 @@ Hello World in set:
     x[0] := 1;
     x[1] := 2;
     x[2] := 3;
-    print("x[0]" + x[0] + ",x[1]" + x[1] + ",x[2]" + x[2]);
+    print("{x[0]=" + x[0] + ",x[1]=" + x[1] + ",x[2]=" + x[2] + "}");
 
 ##### Coercion
 
