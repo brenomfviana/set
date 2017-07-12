@@ -245,6 +245,6 @@ The only repetition structure is the ```while```:
 
 ## Team
 
-[![Breno Viana](https://avatars2.githubusercontent.com/u/17532418?v=3&u=46e9d47c495080fd08dc336d0767f76a57a7644b&s=400)](https://github.com/brenov) | [![Felipe Barbalho](https://avatars2.githubusercontent.com/u/8813353?v=3&s=400)](https://github.com/Barbalho12) | [![Patrícia Cruz](https://avatars2.githubusercontent.com/u/17392686?v=3&s=400)](https://github.com/Pekorishia) | [![Raul Silveira](https://avatars3.githubusercontent.com/u/12190094?v=3&s=400)](https://github.com/RaulMacintosh) | [![Jackson Rauup](https://avatars0.githubusercontent.com/u/17713381?v=3&s=400)](https://github.com/jacksonrauupti)
+[<img src="https://avatars2.githubusercontent.com/u/17532418?v=3&s=400" width="100"/>](https://github.com/brenov) | [<img src="https://avatars2.githubusercontent.com/u/8813353?v=3&s=400" width="100"/>](https://github.com/Barbalho12) | [<img src="https://avatars2.githubusercontent.com/u/17392686?v=3&s=400" width="100"/>](https://github.com/Pekorishia) | [<img src="https://avatars3.githubusercontent.com/u/12190094?v=3&s=400" width="100"/>](https://github.com/RaulMacintosh) | [<img src="https://avatars0.githubusercontent.com/u/17713381?v=3&s=400" width="100"/>](https://github.com/jacksonrauupti)
 ---|---|---|---|---
 [Breno Viana](https://github.com/brenov) | [Felipe Barbalho](https://github.com/Barbalho12) | [Patrícia Cruz](https://github.com/Pekorishia) | [Raul Silveira](https://github.com/RaulMacintosh) | [Jackson Rauup](https://github.com/jacksonrauupti)
