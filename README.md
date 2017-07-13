@@ -16,11 +16,17 @@ The interpreter of the set programming language was a homework of the Concepts a
 
 To compile the interpreter use the ```make.sh``` file.
 
+```bash
+./make
+```
+
 #### Running a program
 
 To run a set program use the following command:
 
-	./set <file-name>
+```bash
+./set <file-name>
+```
 
 ## Learning
 
