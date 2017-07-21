@@ -28,6 +28,24 @@ To run a set program use the following command:
 ./set <file-name>
 ```
 
+#### Requirements implemented
+
+- [x] Primitive types
+- [x] Array type
+- [x] If statement
+- [x] While statement
+- [x] Print
+- [x] User input
+- [ ] Set type
+- [ ] Matrix type
+- [ ] Pointer type
+- [ ] User types
+- [ ] Function
+- [ ] Procedure
+- [ ] Exit statement
+- [ ] Break statement
+- [ ] Continue statement
+
 ## Learning
 
 A set program has the following structure:
@@ -236,18 +254,6 @@ The only repetition structure is the ```while```:
         input(t); % Get user input
         print(t); % Print user input
     program inputoutput
-
-### What was planned to implement but not done
-
-- Set type
-- Matrix type
-- Pointer type
-- User types
-- Function
-- Procedure
-- Exit
-- Break
-- Continue
 
 ## Team
 
