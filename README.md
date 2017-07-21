@@ -34,6 +34,8 @@ To run a set program use the following command:
 - [x] Array type
 - [x] If statement
 - [x] While statement
+- [ ] Break statement
+- [ ] Continue statement
 - [x] Print
 - [x] User input
 - [ ] Set type
@@ -41,10 +43,7 @@ To run a set program use the following command:
 - [ ] Pointer type
 - [ ] User types
 - [ ] Function
-- [ ] Procedure
-- [ ] Exit statement
-- [ ] Break statement
-- [ ] Continue statement
+- [ ] Procedure	
 
 ## Learning
 
