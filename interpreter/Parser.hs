@@ -108,54 +108,6 @@ arrayToken = tokenPrim show updatePositon getToken where
     getToken (Array x pos) = Just (Array x pos)
     getToken _             = Nothing
 
--- - Matrix Token
-matrixToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-matrixToken = tokenPrim show updatePositon getToken where
-    getToken (Matrix x pos) = Just (Matrix x pos)
-    getToken _              = Nothing
-
--- - Pointer Token
-pointerToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-pointerToken = tokenPrim show updatePositon getToken where
-    getToken (Pointer x pos) = Just (Pointer x pos)
-    getToken _               = Nothing
-
--- - Set Token
-setToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-setToken = tokenPrim show updatePositon getToken where
-    getToken (Set x pos) = Just (Set x pos)
-    getToken _           = Nothing
-
--- - User type Token
-usertypeToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-usertypeToken = tokenPrim show updatePositon getToken where
-    getToken (UserType x p) = Just (UserType x p)
-    getToken _             = Nothing
-
--- - Define Token
-defineToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-defineToken = tokenPrim show updatePositon getToken where
-    getToken (Define p) = Just (Define p)
-    getToken _             = Nothing
-
--- - Put Token
-putToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-putToken = tokenPrim show updatePositon getToken where
-    getToken (Put p) = Just (Put p)
-    getToken _             = Nothing
-
--- - Typedef Token
-typedefToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-typedefToken = tokenPrim show updatePositon getToken where
-    getToken (Typedef p) = Just (Typedef p)
-    getToken _             = Nothing
-
--- - End typedef Token
-endTypedefToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-endTypedefToken = tokenPrim show updatePositon getToken where
-    getToken (End_Typedef p) = Just (End_Typedef p)
-    getToken _             = Nothing
-
 
 
 -- --------------------------------------------------------
@@ -240,18 +192,6 @@ orToken = tokenPrim show updatePositon getToken where
     getToken (Or p) = Just (Or p)
     getToken _      = Nothing
 
--- - Set pointer Token
-setPointerToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-setPointerToken = tokenPrim show updatePositon getToken where
-    getToken (Set_Pointer p) = Just (Set_Pointer p)
-    getToken _      = Nothing
-
--- - Get content Token
-getContentToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-getContentToken = tokenPrim show updatePositon getToken where
-    getToken (Get_Content p) = Just (Get_Content p)
-    getToken _      = Nothing
-
 
 
 -- --------------------------------------------------------
@@ -305,24 +245,6 @@ endWhileToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
 endWhileToken = tokenPrim show updatePositon getToken where
     getToken (End_While p) = Just (End_While p)
     getToken _             = Nothing
-
-
-
--- --------------------------------------------------------
--- Function
--- --------------------------------------------------------
-
--- Function token
-functionToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-functionToken = tokenPrim show updatePositon getToken where
-    getToken (Function p) = Just (Function p)
-    getToken _            = Nothing
-
--- End function token
-endFunctionToken :: ParsecT [Token] (Scope, [Var], [Statement]) IO(Token)
-endFunctionToken = tokenPrim show updatePositon getToken where
-    getToken (End_Function p) = Just (End_Function p)
-    getToken _                = Nothing
 
 
 

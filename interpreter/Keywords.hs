@@ -23,16 +23,6 @@ checkArrayType :: Token -> Bool
 checkArrayType (Array _ _) = True
 checkArrayType _ = False
 
--- - Check user type statement
-checkUserType :: Token -> Bool
-checkUserType (UserType _ _) = True
-checkUserType _ = False
-
--- - Check end typedef statement
-checkEndTypedef :: Token -> Bool
-checkEndTypedef (End_Typedef _) = True
-checkEndTypedef _ = False
-
 
 
 -- --------------------------------------------------------
@@ -148,19 +138,6 @@ checkCloseParentheses _ = False
 checkOpenBracket :: Token -> Bool
 checkOpenBracket (Open_Bracket _) = True
 checkOpenBracket _ = False
-
-
-
--- --------------------------------------------------------
--- FUNCTION
--- --------------------------------------------------------
-
--- - Check end function
--- Token  End function token
--- Return True if is the token, false otherwise
-checkEndFunction :: Token -> Bool
-checkEndFunction (End_Function _) = True
-checkEndFunction _ = False
 
 
 

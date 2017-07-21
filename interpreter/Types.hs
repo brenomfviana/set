@@ -51,7 +51,6 @@ getValue (Real  value _) = show value
 getValue (Bool  value _) = show value
 getValue (Text  value _) = removeQuote(show value)
 getValue (Array value _) = show (arrayToString value)
-getValue (UserType value _) = show (usertypeToString value)
 getValue _ = error "Error: Value not found."
 
 -- - Get ID name
@@ -143,106 +142,6 @@ replaceNth :: Int -> Token -> [Token] -> [Token]
 replaceNth i nv (x:xs)
      | i == 0 = nv:xs
      | otherwise = x:replaceNth (i-1) nv xs
-
-
-
- -- --------------------------------------------------------
- -- Matrix
- -- --------------------------------------------------------
-
- -- - Get default matrix value
- -- Token  Matrix
- -- Token  Matrix lines
- -- Token  Matrix columns
- -- Return Initial matrix value
- -- getDefaultMatrixValue :: Token -> Token -> Token -> Token
- -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Nat"  p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Nat"  p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
- -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Int"  p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Int"  p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
- -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Real" p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Real" p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
- -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Bool" p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Bool" p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
- -- getDefaultMatrixValue (Type "Matrix" p1) (Type "Text" p2) (Nat v1 p3) (Nat v2 p4) = Matrix ((Type "Text" p2), (Nat v1 p3), (Nat v2 p4), [[]]) p1
-
-
-
--- --------------------------------------------------------
--- Typedef
--- --------------------------------------------------------
-
--- - Get typedef fields, remove others useless tokens
--- [Token] Typedef body
--- Return  Fields
-getFields :: [Token] -> [Token]
-getFields [] = []
-getFields ((Id n p):t) = (Id n p) : getFields t
-getFields ((Type "Nat"  p):t) = (Type "Nat"  p) : getFields t
-getFields ((Type "Int"  p):t) = (Type "Int"  p) : getFields t
-getFields ((Type "Real" p):t) = (Type "Real" p) : getFields t
-getFields ((Type "Bool" p):t) = (Type "Bool" p) : getFields t
-getFields ((Type "Text" p):t) = (Type "Text" p) : getFields t
-getFields (x:t) = getFields t
-
--- - Get default user type value
--- Token   User type
--- [Token] Fields
--- Token   Get default value of each type
-getDefaultUserTypeValue :: Token -> [Token] -> Token
-getDefaultUserTypeValue (Id td p1) fs = (UserType ((Id td p1), (getDefaultFieldValues fs)) p1)
-
--- - Get default values of each field
--- [Token] Fields
--- Return  Values
-getDefaultFieldValues :: [Token] -> [(Token, Token)]
-getDefaultFieldValues [] = []
-getDefaultFieldValues (v:f:t) = (f, (getDefaultValue v)) : getDefaultFieldValues t
-
--- - Convert a user type in a string
--- (Token, [(Token, Token)]) User type
--- Return                    User type values
-usertypeToString :: (Token, [(Token, Token)]) -> [String]
-usertypeToString (n, fs) = fieldToString fs
-
--- - Convert each field to string
--- [(Token, Token)] User types fields
--- Return           User type values
-fieldToString :: [(Token, Token)] -> [String]
-fieldToString [] = []
-fieldToString ((v,f):t) = (getValue f) : fieldToString t
-
--- - Get value by field
--- Token  Field
--- Token  User type
--- Return Value of the selected field
-getValueByField :: Token -> Token -> Token
-getValueByField (Id id1 p1) (UserType (i, fs) p) = getFieldType (Id id1 p) fs
-
--- - Get field type
--- Token            Field
--- [(Token, Token)] Fields
--- Return           Type of the selected field
-getFieldType :: Token -> [(Token, Token)] -> Token
-getFieldType _ [] = error "Error: Invalid field."
-getFieldType (Id id1 p1) (((Id id2 p2),v) : t) =
-    if (id1 == id2) then v
-    else getFieldType (Id id1 p1) t
-
--- - Set user type
--- Token  User type
--- Token  Field
--- Token  New value
--- Return Updated user type
-setUserType :: Token -> Token -> Token -> Token
-setUserType (UserType (i, fs) p) f value = (UserType (i, (setFieldType f value fs)) p)
-
--- - Set field value
--- Token            Field
--- Token            New value
--- [(Token, Token)] Fields
--- Return           Updated field
-setFieldType :: Token -> Token -> [(Token, Token)] -> [(Token, Token)]
-setFieldType _ _ [] = []
-setFieldType (Id id1 p1) value (((Id id2 p2),v) : t) =
-    if (id1 == id2) then ((Id id2 p2),value):t
-    else ((Id id2 p2),v) : setFieldType (Id id1 p1) value t
 
 
 

@@ -31,29 +31,15 @@ tokens :-
   Real                            { \p s -> Type s (getLC p) }
   Bool                            { \p s -> Type s (getLC p) }
   Text                            { \p s -> Type s (getLC p) }
-  Pointer                         { \p s -> Type s (getLC p) }
-  "Set"                           { \p s -> Type s (getLC p) }
   "Array"                         { \p s -> Type s (getLC p) }
-  "Matrix"                        { \p s -> Type s (getLC p) }
   if                              { \p s -> If (getLC p) }
   else                            { \p s -> Else (getLC p) }
   elseif                          { \p s -> Else_If (getLC p) }
   endif                           { \p s -> End_If (getLC p) }
-  func                            { \p s -> Function (getLC p) }
-  endfunc                         { \p s -> End_Function(getLC p) }
-  proc                            { \p s -> Proc (getLC p) }
-  endproc                         { \p s -> End_Proc(getLC p) }
   while                           { \p s -> While (getLC p) }
   endwhile                        { \p s -> End_While (getLC p) }
-  define                          { \p s -> Define (getLC p) }
-  put                             { \p s -> Put (getLC p) }
-  typedef                         { \p s -> Typedef (getLC p) }
-  endtypedef                      { \p s -> End_Typedef (getLC p) }
   print                           { \p s -> Print (getLC p) }
   input                           { \p s -> Input (getLC p) }
-  exit                            { \p s -> Exit (getLC p) }
-  break                           { \p s -> Break (getLC p) }
-  continue                        { \p s -> Continue (getLC p) }
   @natural                        { \p s -> Nat (read s) (getLC p) }
   @integer                        { \p s -> Int (read s) (getLC p) }
   @real                           { \p s -> Real (read s) (getLC p) }
@@ -75,14 +61,6 @@ tokens :-
   ==                              { \p s -> Equality (getLC p) }
   "&&"                            { \p s -> And (getLC p) }
   "||"                            { \p s -> Or (getLC p) }
-  "\in"                           { \p s -> Belongs (getLC p) }
-  "\cap"                          { \p s -> Intersection (getLC p) }
-  "\cup"                          { \p s -> Union (getLC p) }
-  "\subset"                       { \p s -> Subset (getLC p) }
-  "\stcomp"                       { \p s -> Complement (getLC p) }
-  "\emptyset"                     { \p s -> Empty_Set (getLC p) }
-  "\p"                            { \p s -> Set_Pointer (getLC p) }
-  "\c"                            { \p s -> Get_Content (getLC p) }
   "["                             { \p s -> Open_Bracket (getLC p) }
   "]"                             { \p s -> Close_Bracket (getLC p) }
   "("                             { \p s -> Open_Parentheses (getLC p) }
@@ -111,27 +89,14 @@ data Token =
   Pointer       (Token, Token)                   (Int, Int)   |
   Set           [Token]                          (Int, Int)   |
   Array         (Token, Token, [Token])          (Int, Int)   |
-  Matrix        (Token, Token, Token, [[Token]]) (Int, Int)   |
-  UserType      (Token, [(Token, Token)])        (Int, Int)   |
   If                                             (Int, Int)   |
   Else                                           (Int, Int)   |
   Else_If                                        (Int, Int)   |
   End_If                                         (Int, Int)   |
-  Function                                       (Int, Int)   |
-  End_Function                                   (Int, Int)   |
-  Proc                                           (Int, Int)   |
-  End_Proc                                       (Int, Int)   |
   While                                          (Int, Int)   |
   End_While                                      (Int, Int)   |
-  Define                                         (Int, Int)   |
-  Put                                            (Int, Int)   |
-  Typedef                                        (Int, Int)   |
-  End_Typedef                                    (Int, Int)   |
   Print                                          (Int, Int)   |
   Input                                          (Int, Int)   |
-  Exit                                           (Int, Int)   |
-  Break                                          (Int, Int)   |
-  Continue                                       (Int, Int)   |
   Assign                                         (Int, Int)   |
   Addition                                       (Int, Int)   |
   Subtraction                                    (Int, Int)   |
@@ -145,18 +110,10 @@ data Token =
   Equality                                       (Int, Int)   |
   And                                            (Int, Int)   |
   Or                                             (Int, Int)   |
-  Belongs                                        (Int, Int)   |
-  Intersection                                   (Int, Int)   |
-  Union                                          (Int, Int)   |
-  Subset                                         (Int, Int)   |
-  Complement                                     (Int, Int)   |
-  Empty_Set                                      (Int, Int)   |
   Open_Bracket                                   (Int, Int)   |
   Close_Bracket                                  (Int, Int)   |
   Open_Parentheses                               (Int, Int)   |
   Close_Parentheses                              (Int, Int)   |
-  Set_Pointer                                    (Int, Int)   |
-  Get_Content                                    (Int, Int)   |
   String        String                           (Int, Int)
   deriving (Eq,Show)
 

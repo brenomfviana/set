@@ -32,15 +32,8 @@ getVar = do
         a <- try  getVarArrayValue <|> getVarArray
         return (a)
     else do
-        -- Check if is an user tyoe
-        if ((checkUserType(getVariableType a s)) == True) then do
-            a <- idToken
-            b <- dotToken
-            c <- idToken
-            return (getValueByField c (getVariableType a s))
-        else do
-            a <- idToken
-            return (getVariableType a s)
+        a <- idToken
+        return (getVariableType a s)
 
 -- - Array var
 -- ParsecT                     ParsecT

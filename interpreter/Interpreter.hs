@@ -49,7 +49,7 @@ program = do
 -- (Scope, [Var], [Statement]) State
 varDecls :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 varDecls = do
-    first <- try varDecl <|> arrayDecl <|> typedefDecl
+    first <- try varDecl <|> arrayDecl
     next  <- remainingVarDecls
     return (first ++ next)
 
@@ -145,91 +145,6 @@ arrayDecl = do
     else
         error "Error: Invalid size value."
 
--- - Matrix declaration
--- ParsecT                     ParsecT
--- [Token]                     Token list
--- (Scope, [Var], [Statement]) State
-{-matrixDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
-matrixDecl = do
-    a <- typeToken <?> "variable type."
-    b <- openBracketToken
-    c <- typeToken <?> "variable type."
-    d <- commaToken
-    e <- expression
-    f <- commaToken
-    g <- expression
-    h <- closeBracketToken
-    i <- colonToken <?> "colon."
-    j <- idToken <?> "variable name."
-    k <- semiColonToken <?> "semicolon."
-    s <- getState
-    -- Check index
-    if ((checkNatType e) == True && (checkNatType g) == True) then do
-        -- Check if the variable already exists
-        if ((variableIsSet j s) == False) then do
-            -- Add the declared variable
-            -- updateState(insertVariable((j, getDefaultMatrixValue a c e g), "main"))
-            return (a:b:c:d:e:f:g:h:[i])
-        else
-            error ("Error: The variable " ++ (getTokenName j) ++ " in position "
-                ++ (getTokenPosition j) ++ " already exists.")
-    else
-        error "Error: Invalid size value."-}
-
--- - Variable declaration
--- ParsecT                     ParsecT
--- [Token]                     Token list
--- (Scope, [Var], [Statement]) State
-typedefDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
-typedefDecl = do
-    e <- defineToken
-    a <- idToken <?> "variable type."
-    b <- colonToken <?> "colon."
-    c <- idToken <?> "variable name."
-    d <- semiColonToken <?> "semicolon."
-    s <- getState
-    -- Check if the type has been set
-    if ((statementIsSet a s) == True) then do
-        -- Check if the variable already exists
-        if ((variableIsSet c s) == False) then do
-            -- Add the declared variable
-            updateState(insertVariable((c, (getDefaultUserTypeValue a (getStatementBody a s))), "main"))
-            return (a:b:c:[d])
-        else
-            error ("The variable " ++ (getTokenName c) ++ " in position "
-                ++ (getTokenPosition c) ++ " already exists.")
-    else
-        return ([a])
-
--- - Typedef declaration
--- ParsecT                     ParsecT
--- [Token]                     Token list
--- (Scope, [Var], [Statement]) State
-typedef :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
-typedef = do
-    a <- typedefToken
-    b <- idToken
-    c <- colonToken
-    tb <- getInput
-    -- Check typedef block
-    let loop = do
-        d <- typeToken <?> "variable type in typedef."
-        e <- colonToken <?> "colon in typedef."
-        f <- idToken <?> "variable name in typedef."
-        g <- semiColonToken <?> "semicolon in typedef."
-        -- Check next value
-        n <- ignoreToken
-        bf <- getInput
-        setInput (n:bf)
-        when ((checkEndStmt n) == True) (error "endtypedef statement not found.")
-        when ((checkEndTypedef n) == False) loop
-    loop
-    ta <- getInput
-    d <- endTypedefToken
-    -- Add user type
-    updateState(insertStatement(a, b, tokenNull, [], getFields(tb \\ ta)))
-    return (a:b:c:[d])
-
 
 
 -- --------------------------------------------------------
@@ -242,8 +157,7 @@ typedef = do
 -- (Scope, [Var], [Statement]) State
 stmts :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 stmts = do
-    first <- typedef <|> varDecls <|> assign <|> printf <|> inputf
-            <|> ifStmt <|> whileStmt <|> functionDecl
+    first <- varDecls <|> assign <|> printf <|> inputf <|> ifStmt <|> whileStmt
     next  <- remainingStmts
     return (first ++ next)
 
@@ -261,7 +175,7 @@ remainingStmts = (do a <- stmts
 -- (Scope, [Var], [Statement]) State
 assign :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
 assign = do
-    a <- try assignVar <|> assignVarArray <|> assignUserTypeVar
+    a <- try assignVar <|> assignVarArray
     return (a)
 
 -- - Assign var
@@ -283,8 +197,6 @@ assignVar = do
             -- Update variable value
             updateState(updateVariable(((a, (cast (getVariableType a s) c)),
                         "main")))
-            -- s <- getState
-            -- liftIO (print s)
             return (a:b:[c])
 
 -- - Assign array
@@ -314,34 +226,6 @@ assignVarArray = do
             updateState(updateVariable((a, (setArrayItem (getVariableType a s) c (cast (getDefaultValue(getArrayType (getVariableType a s))) f) )),
                         "main"))
             s <- getState
-            -- s <- getState
-            -- liftIO (print s)
-            return (a:b:c:d:e:[f])
-    else
-        return ([a])
-
--- - Assign user type var
--- ParsecT                     ParsecT
--- [Token]                     Token list
--- (Scope, [Var], [Statement]) State
-assignUserTypeVar :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
-assignUserTypeVar = do
-    e <- putToken
-    a <- idToken <?> "variable name."
-    s <- getState
-    -- Check if is an array
-    if ((checkUserType(getVariableType a s)) == True) then do
-        b <- dotToken
-        c <- idToken
-        d <- assignToken <?> "assign."
-        -- Calculates the expression
-        e <- expression
-        f <- semiColonToken <?> "semicolon."
-        -- Check if the types are compatible
-        if (not (compatible (getValueByField c (getVariableType a s)) e)) then fail "Type mismatch."
-        else do
-            -- Update variable value
-            updateState(updateVariable((a, (setUserType (getVariableType a s) c e)), "main"))
             -- s <- getState
             -- liftIO (print s)
             return (a:b:c:d:e:[f])
@@ -683,56 +567,6 @@ runWhile = do
             return (a:b:c:[d])
         else do
             error "Error: it's not a boolean expresion."
-
-
-
--- -----------------------------------------------------------------------------
--- FUNCTION
--- -----------------------------------------------------------------------------
-
--- - Function
--- ParsecT                     ParsecT
--- [Token]                     Token list
--- (Scope, [Var], [Statement]) State
-functionDecl :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
-functionDecl = do
-    a <- functionToken
-    b <- idToken
-    c <- typeToken
-    d <- colonToken
-    e <- openParenthesesToken
-    fpb <- getInput
-    -- Check parameters block
-    let loop = do
-        d <- typeToken <?> "variable type in function declaration."
-        e <- colonToken <?> "colon in function declaration."
-        f <- idToken <?> "variable name in function declaration."
-        g <- commaToken <|> closeParenthesesToken <?> "comma in function declaration."
-        when ((checkEndStmt g) == True) (error "close parentheses not found.")
-        when ((checkCloseParentheses g) == False) loop
-    loop
-    fpa <- getInput
-    fbb <- getInput
-    -- Check body block
-    let loop = do
-        f <- ignoreToken
-        when ((checkEndStmt f) == True) (error "close parentheses not found.")
-        when ((checkEndFunction f) == False) loop
-    loop
-    fba <- getInput
-    -- Add the function to statements list
-    updateState(insertStatement(a, b, c, getDefaultFieldValues(getFields(fpb \\ fpa)), (fbb \\ fba)))
-    s <- getState
-    liftIO (print s)
-    return (a:b:c:d:[e])
-
--- - Run function
--- ParsecT                     ParsecT
--- [Token]                     Token list
--- (Scope, [Var], [Statement]) State
--- runFuntion :: ParsecT [Token] (Scope, [Var], [Statement]) IO([Token])
--- runFuntion = do
---     func
 
 
 
