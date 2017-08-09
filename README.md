@@ -4,13 +4,13 @@
 
 ## Description
 
-Set is an imperative programming language with a focus on mathematics teaching, therefore, is aimed at teachers and students. The language handles sets as one of the primitive types.
-
-This interpreter for this language is a project of the discipline of Programming Language, Concepts and Paradigms of the Information Technology course of the Federal University of Rio Grande do Norte (UFRN).
+Set is an imperative programming language with focus on teaching mathematics, therefore, it is aimed at teachers and students. The language handles sets as one of the primitive types.
 
 ### About the interpreter
 
 The interpreter of the set programming language was a homework of the Concepts and Paradigms Programming Language course of the Federal University of Rio Grande do Norte (UFRN). The interpreter was developed using the Haskell language. We used Alex to generate the Haskell lexical analyzer for our language and we used the Parsec library to implement the parser and the interpreter.
+
+**Note**: One of the language's basic primitive type was not implemented due to time issues.
 
 #### Compiling
 
@@ -62,7 +62,7 @@ Hello World in set:
 #### Comments:
 
     program helloworld
-        % Comments
+        # Comments
         print("Hello World!");
     end helloworld
 
@@ -93,7 +93,7 @@ Hello World in set:
 
 ##### Array
 
-    % Array[Type,Size] : x;
+    # Array[Type,Size] : x;
     Array[Nat,3] : x;
     x[0] := 1;
     x[1] := 2;
@@ -121,7 +121,7 @@ Hello World in set:
             Nat : x := 1;
             Int : y;
             y := 1;
-            Int sum := x + y; % Result: 2
+            Int sum := x + y; # Result: 2
             print(sum);
         end sum
 
@@ -130,7 +130,7 @@ Hello World in set:
         program subtraction
             Nat : x := 1;
             Int : y := 1;
-            print(x - y); % Result: 0
+            print(x - y); # Result: 0
         end subtraction
 
 3. Multiplication:
@@ -138,7 +138,7 @@ Hello World in set:
         program multiplication
             Real : x := 5.0;
             Int : y := 2;
-            print(x * y); % Result: 10.0
+            print(x * y); # Result: 10.0
         end multiplication
 
 4. Division:
@@ -146,7 +146,7 @@ Hello World in set:
         program division
             Real : x := 10.0;
             Int : y := 2;
-            print(x / y); % Result: 5.0
+            print(x / y); # Result: 5.0
         end division
 
 ##### Boolean operations
@@ -154,58 +154,58 @@ Hello World in set:
 5. Equality
 
         program equality
-            print(2 == 2); % Result: True
-            print(2 == 1); % Result: False
+            print(2 == 2); # Result: True
+            print(2 == 1); # Result: False
         end equality
 
 6. Conjunction
 
         program conjunction
-            print((1 == 1) && (2 == 2)); % Result: True
-            print((1 == 1) && (2 == 1)); % Result: False
-            print((2 == 1) && (1 == 1)); % Result: False
-            print((2 == 1) && (2 == 1)); % Result: False
+            print((1 == 1) && (2 == 2)); # Result: True
+            print((1 == 1) && (2 == 1)); # Result: False
+            print((2 == 1) && (1 == 1)); # Result: False
+            print((2 == 1) && (2 == 1)); # Result: False
         end conjunction
 
 7. Disjunction
 
         program disjunction
-            print((1 == 1) || (2 == 2)); % Result: True
-            print((1 == 1) || (2 == 1)); % Result: True
-            print((2 == 1) || (1 == 1)); % Result: True
-            print((2 == 1) || (2 == 1)); % Result: False
+            print((1 == 1) || (2 == 2)); # Result: True
+            print((1 == 1) || (2 == 1)); # Result: True
+            print((2 == 1) || (1 == 1)); # Result: True
+            print((2 == 1) || (2 == 1)); # Result: False
         end disjunction
 
 8. Greater than
 
         program greaterthan
-            print(2 > 1); % Result: True
-            print(1 > 2); % Result: False
-            print(1 > 1); % Result: False
+            print(2 > 1); # Result: True
+            print(1 > 2); # Result: False
+            print(1 > 1); # Result: False
         end greaterthan
 
 9. Smaller than
 
         program smallerthan
-            print(2 < 1); % Result: False
-            print(1 < 2); % Result: True
-            print(1 < 1); % Result: False
+            print(2 < 1); # Result: False
+            print(1 < 2); # Result: True
+            print(1 < 1); # Result: False
         end smallerthan
 
 10. Greater than or equal to
 
         program greaterthanorequal
-            print(2 >= 1); % Result: True
-            print(1 >= 2); % Result: False
-            print(1 >= 1); % Result: True
+            print(2 >= 1); # Result: True
+            print(1 >= 2); # Result: False
+            print(1 >= 1); # Result: True
         end greaterthanorequal
 
 11. Smaller than or equal to
 
         program smallerthanorequal
-            print(2 <= 1); % Result: False
-            print(1 <= 2); % Result: True
-            print(1 <= 1); % Result: True
+            print(2 <= 1); # Result: False
+            print(1 <= 2); # Result: True
+            print(1 <= 1); # Result: True
         end smallerthanorequal
 
 
@@ -217,7 +217,7 @@ Hello World in set:
             Real : x := 2.0;
             Real : y := 2.0;
             Text : s := "of the sum:";
-            print("Result " + s + (x + y)); % Result: "Result of the sum: 4.0"
+            print("Result " + s + (x + y)); # Result: "Result of the sum: 4.0"
         end concat
 
 #### Condition structure
@@ -250,8 +250,8 @@ The only repetition structure is the ```while```:
 
     program inputoutput
         Text : t;
-        input(t); % Get user input
-        print(t); % Print user input
+        input(t); # Get user input
+        print(t); # Print user input
     program inputoutput
 
 ## Team
