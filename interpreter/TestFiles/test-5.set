@@ -1,4 +1,0 @@
-program main
-    Int : v := 2;
-    print(v);
-end main
