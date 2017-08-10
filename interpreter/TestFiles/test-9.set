@@ -1,4 +1,0 @@
-program main
-    Nat : n;
-    Bool : n;
-end main

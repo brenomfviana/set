@@ -1,1 +1,0 @@
-g++ -std=c++11 problem-3.cpp -o p3.exe && ./p3.exe && rm p3.exe
